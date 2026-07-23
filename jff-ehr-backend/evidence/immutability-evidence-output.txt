@@ -1,0 +1,83 @@
+=== JFF EHR immutability evidence run — 2026-07-13 17:15:48Z ===
+seed suffix: 4b17d69e
+
+--- SEED (as owner connection, migrations-only role) ---
+  crew_members       + 5108d008-ab5e-4f89-873a-2b82c0a9f462
+  users              + 0c48105f-3186-4406-89f3-d633ed70d9fc (active, role_permissions=medical)
+  campers            + f9509ff8-eef8-4147-ab22-d80a10a13226
+  camps              + 780cc4f1-fdb0-4713-80e4-568553d64112
+  camp_registrations + da00c962-90db-4805-9e9a-1262226ddd70
+  consent_records    + 71889f7a-893b-4d99-b587-00e7e4b6c1c4  <- the signed clinical record under test
+  audit_logs         + e4732531-86f9-467e-88ee-c7d304e81637  <- the audit entry under test
+
+--- TEST 0: jff_api with NO session identity (RLS fail-closed) ---
+  SELECT of the seeded consent row as anonymous jff_api: 0 row(s) visible (expect 0)
+
+[TEST 0b: anonymous UPDATE]
+  sql:    update consent_records set signed_by = 'Anon Tamper' where consent_id = @id
+  expect: 0 rows affected (row invisible under RLS)
+  result: statement ACCEPTED, 0 row(s) affected  <- no row was visible/permitted under RLS, so nothing changed
+
+--- Simulating authenticated session on jff_api connection ---
+  set_config('app.current_user_id', '0c48105f-3186-4406-89f3-d633ed70d9fc') done
+  SELECT of the seeded consent row now returns: 1 row(s) (expect 1)
+
+[TEST 1: jff_api UPDATE clinical field (signed_by)]
+  sql:    update consent_records set signed_by = 'Tampered Name' where consent_id = @id
+  expect: REJECTED by trigger enforce_clinical_immutability()
+  result: REJECTED by database — SQLSTATE P0001: Only deleted_at/deleted_by may be updated on consent_records; all other columns are immutable.
+
+[TEST 1b: jff_api UPDATE another clinical field (popia_acknowledged)]
+  sql:    update consent_records set popia_acknowledged = false where consent_id = @id
+  expect: REJECTED by trigger enforce_clinical_immutability()
+  result: REJECTED by database — SQLSTATE P0001: Only deleted_at/deleted_by may be updated on consent_records; all other columns are immutable.
+
+[TEST 2: jff_api DELETE clinical record]
+  sql:    delete from consent_records where consent_id = @id
+  expect: 0 rows affected (RLS policy consent_records_delete_none USING (false) hides all rows from DELETE)
+  result: statement ACCEPTED, 0 row(s) affected  <- no row was visible/permitted under RLS, so nothing changed
+
+[TEST 2b: OWNER DELETE clinical record (owner bypasses RLS, trigger still fires)]
+  sql:    delete from consent_records where consent_id = @id
+  expect: REJECTED by trigger enforce_clinical_immutability()
+  result: REJECTED by database — SQLSTATE P0001: Hard delete is not permitted on consent_records; use the soft-delete flag columns.
+
+[TEST 2c: OWNER UPDATE clinical field (owner bypasses RLS, trigger still fires)]
+  sql:    update consent_records set signed_by = 'Owner Tamper' where consent_id = @id
+  expect: REJECTED by trigger enforce_clinical_immutability()
+  result: REJECTED by database — SQLSTATE P0001: Only deleted_at/deleted_by may be updated on consent_records; all other columns are immutable.
+
+[TEST 3: jff_api soft-delete (deleted_at + deleted_by ONLY)]
+  sql:    update consent_records set deleted_at = now(), deleted_by = @crew where consent_id = @id
+  expect: ACCEPTED, 1 row affected — the one permitted mutation
+  result: statement ACCEPTED, 1 row(s) affected
+
+  post-check: deleted_at=2026-07-13 17:15:55.930327+00, deleted_by=5108d008-ab5e-4f89-873a-2b82c0a9f462, signed_by still=Evidence Guardian
+
+[TEST 4: jff_api UPDATE audit_logs]
+  sql:    update audit_logs set action = 'TAMPERED' where audit_id = @id
+  expect: 0 rows affected (RLS policy audit_logs_update_none USING (false))
+  result: statement ACCEPTED, 0 row(s) affected  <- no row was visible/permitted under RLS, so nothing changed
+
+[TEST 4b: jff_api DELETE audit_logs]
+  sql:    delete from audit_logs where audit_id = @id
+  expect: 0 rows affected (RLS policy audit_logs_delete_none USING (false))
+  result: statement ACCEPTED, 0 row(s) affected  <- no row was visible/permitted under RLS, so nothing changed
+
+[TEST 4c: OWNER UPDATE audit_logs (bypasses RLS, trigger still fires)]
+  sql:    update audit_logs set action = 'TAMPERED' where audit_id = @id
+  expect: REJECTED by trigger block_audit_log_mutation()
+  result: REJECTED by database — SQLSTATE P0001: audit_logs is append-only; UPDATE is not permitted.
+
+[TEST 4d: OWNER DELETE audit_logs (bypasses RLS, trigger still fires)]
+  sql:    delete from audit_logs where audit_id = @id
+  expect: REJECTED by trigger block_audit_log_mutation()
+  result: REJECTED by database — SQLSTATE P0001: audit_logs is append-only; DELETE is not permitted.
+
+--- CLEANUP (as owner; requires temporarily disabling the triggers) ---
+  consent_records: trigger disabled -> seed row deleted -> trigger re-enabled
+  audit_logs:      trigger disabled -> seed row deleted -> trigger re-enabled
+  camp_registrations, camps, campers, users, crew_members: seed rows deleted
+  leftover seed rows remaining: 0 (expect 0)
+
+=== run complete ===

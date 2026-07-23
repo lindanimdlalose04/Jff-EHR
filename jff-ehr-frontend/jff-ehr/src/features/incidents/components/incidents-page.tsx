@@ -1,0 +1,238 @@
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus, ShieldCheck, TriangleAlert } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/field";
+import { StatusPill } from "@/components/ui/status-pill";
+import { formatDateTime } from "@/lib/display";
+import { useMe } from "@/features/auth/use-me";
+import { fetchIncidents, reviewIncident, type IncidentRow } from "../api/incidents.api";
+
+/**
+ * Route "/incidents". Filed medication / treatment events. A filed report is
+ * never edited: a medical person adds the investigation and corrective action
+ * plan once, and the DB trigger allows that review exactly one time.
+ */
+export function IncidentsPage() {
+  const me = useMe();
+  const canReview = me.data?.role === "medical";
+  const { data: events, isLoading, isError } = useQuery({
+    queryKey: ["incidents"],
+    queryFn: fetchIncidents,
+  });
+
+  if (isLoading) return <div className="p-6 text-sm text-muted">Loading incidents…</div>;
+  if (isError || !events) {
+    return (
+      <div className="p-6 text-sm text-danger">
+        Couldn&rsquo;t load incidents. Refresh to try again.
+      </div>
+    );
+  }
+
+  const awaiting = events.filter((e) => !e.isReviewed).length;
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <h1 className="text-[17px] font-semibold text-primary">Incidents and near misses</h1>
+        <StatusPill tone="neutral">{events.length}</StatusPill>
+        {awaiting > 0 && <StatusPill tone="warning">{awaiting} awaiting review</StatusPill>}
+        {canReview && (
+          <Link to="/incidents/new" className="ml-auto">
+            <Button variant="primary">
+              <Plus size={15} />
+              Report an event
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {events.length === 0 ? (
+        <div className="rounded-card border border-card bg-surface px-4 py-10 text-center">
+          <TriangleAlert size={22} className="mx-auto text-muted" />
+          <p className="mt-2 text-[13px] font-medium text-primary">No events reported</p>
+          <p className="mt-1 text-[12.5px] text-muted">
+            Medication and treatment events are reported here. Nothing has been filed yet.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {events.map((event) => (
+            <IncidentCard key={event.eventId} event={event} canReview={canReview} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boolean }) {
+  const queryClient = useQueryClient();
+  const [reviewing, setReviewing] = useState(false);
+  const [correctiveAction, setCorrectiveAction] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const review = useMutation({
+    mutationFn: () => reviewIncident(event.eventId, correctiveAction.trim()),
+    onSuccess: () => {
+      setReviewing(false);
+      setCorrectiveAction("");
+      setError(null);
+      void queryClient.invalidateQueries({ queryKey: ["incidents"] });
+    },
+    onError: (e: Error & { response?: { status?: number } }) =>
+      setError(
+        e.response?.status === 403
+          ? "Only the medical team may review events."
+          : e.response?.status === 409
+            ? "This event has already been reviewed; the review cannot be changed."
+            : e.message,
+      ),
+  });
+
+  return (
+    <div className="rounded-card border border-card bg-surface p-4">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-danger-tint text-danger">
+          <TriangleAlert size={15} />
+        </span>
+        {event.camper ? (
+          <Link
+            to={`/campers/${event.camper.camperId}`}
+            className="text-[13.5px] font-medium text-primary hover:underline"
+          >
+            {event.camper.firstName} {event.camper.surname}
+          </Link>
+        ) : (
+          <span className="text-[13.5px] font-medium text-primary">Unknown camper</span>
+        )}
+        {event.camper && (
+          <span className="text-[11px] text-muted">{event.camper.fileNumber}</span>
+        )}
+        {event.isReviewed ? (
+          <StatusPill tone="success">reviewed</StatusPill>
+        ) : (
+          <StatusPill tone="warning">awaiting review</StatusPill>
+        )}
+        <span className="ml-auto text-[11.5px] text-muted">{formatDateTime(event.eventAt)}</span>
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {event.types.map((t) => (
+          <span
+            key={t}
+            className="rounded-full bg-danger-tint px-2 py-0.5 text-[11px] font-medium text-danger"
+          >
+            {t}
+          </span>
+        ))}
+        {event.factors.map((f) => (
+          <span
+            key={f}
+            className="rounded-full bg-neutral-tint px-2 py-0.5 text-[11px] font-medium text-neutral"
+          >
+            {f}
+          </span>
+        ))}
+      </div>
+
+      <p className="mt-2 text-[12.5px] text-secondary">{event.description}</p>
+      <p className="mt-1 text-[11.5px] text-muted">
+        {event.campLabel} · discovered {formatDateTime(event.discoveryAt)}
+      </p>
+
+      <dl className="mt-2 space-y-1 text-[12.5px]">
+        <div>
+          <dt className="inline text-muted">Immediate action: </dt>
+          <dd className="inline text-secondary">{event.immediateAction}</dd>
+        </div>
+        {event.doctorNotified && (
+          <div>
+            <dt className="inline text-muted">Doctor notified: </dt>
+            <dd className="inline text-secondary">{event.doctorNotified}</dd>
+          </div>
+        )}
+        <div>
+          <dt className="inline text-muted">Treatment ordered: </dt>
+          <dd className="inline text-secondary">
+            {event.noTreatmentOrdered ? "None ordered" : (event.treatmentOrdered ?? "Not stated")}
+          </dd>
+        </div>
+      </dl>
+
+      {event.isReviewed && (
+        <div className="mt-2.5 rounded-control border border-accent-border bg-accent-tint/40 px-3 py-2">
+          <p className="text-[11.5px] font-medium uppercase tracking-wide text-accent">
+            Investigation and corrective action
+          </p>
+          <p className="mt-1 text-[12.5px] text-secondary">{event.correctiveAction}</p>
+          <p className="mt-1 text-[11.5px] text-muted">
+            Reviewed by {event.reviewerName ?? "-"}
+            {event.reviewedAt ? ` on ${formatDateTime(event.reviewedAt)}` : ""}
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12px] text-danger">
+          {error}
+        </div>
+      )}
+
+      {reviewing && (
+        <div className="mt-2.5 rounded-control border border-accent-border bg-accent-tint/30 p-3">
+          <label className="mb-1 block text-[12.5px] font-medium text-secondary">
+            Event investigation and corrective action plan
+          </label>
+          <Textarea
+            value={correctiveAction}
+            onChange={(e) => setCorrectiveAction(e.target.value)}
+            placeholder="What was found, and what will change"
+          />
+          <div className="mt-2 flex justify-end gap-2">
+            <Button
+              variant="secondary"
+              className="h-8 px-3"
+              disabled={review.isPending}
+              onClick={() => {
+                setReviewing(false);
+                setError(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="h-8 px-3"
+              disabled={!correctiveAction.trim() || review.isPending}
+              onClick={() => review.mutate()}
+            >
+              {review.isPending ? "Signing off…" : "Sign off review"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[11.5px] text-muted">
+          Reported by {event.reporterName ?? "-"}
+          {event.isReviewed ? "" : " · not yet reviewed"}
+        </p>
+        {canReview && !event.isReviewed && !reviewing && (
+          <Button
+            variant="secondary"
+            className="h-8 px-3"
+            onClick={() => {
+              setReviewing(true);
+              setError(null);
+            }}
+          >
+            <ShieldCheck size={13} /> Add review
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}

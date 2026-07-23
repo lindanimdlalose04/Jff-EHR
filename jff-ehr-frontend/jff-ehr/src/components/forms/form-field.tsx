@@ -1,0 +1,19 @@
+interface FormFieldProps {
+  label: string;
+  htmlFor?: string;
+  error?: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function FormField({ label, htmlFor, error, className, children }: FormFieldProps) {
+  return (
+    <div className={className}>
+      <label htmlFor={htmlFor} className="mb-1.5 block text-xs text-secondary">
+        {label}
+      </label>
+      {children}
+      {error && <p className="mt-1 text-[11.5px] text-danger">{error}</p>}
+    </div>
+  );
+}

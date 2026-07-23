@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --page: 42 40% 96%;           /* #FBF8F1 cream page */
+    --surface: 0 0% 100%;         /* #FFFFFF cards */
+    --field: 45 33% 98%;          /* #FDFCF9 input fill */
+
+    /* Text */
+    --text-primary: 48 6% 16%;    /* #2B2A26 */
+    --text-secondary: 42 6% 40%;  /* #6E6A5F */
+    --text-muted: 45 6% 53%;      /* #8A8578 */
+
+    /* Borders */
+    --border-card: 42 27% 89%;    /* #E7E0D2 */
+    --border-field: 42 23% 80%;   /* #D8D0C0 */
+    --divider: 42 30% 91%;        /* #F0EBE0 */
+    --header-tint: 42 40% 93%;    /* #F6F1E7 table headers */
+
+    /* Accent — teal (clinical) */
+    --accent: 165 76% 25%;        /* #0F6E56 */
+    --accent-tint: 162 47% 92%;   /* #E1F5EE */
+    --accent-border: 158 55% 63%; /* #9FE1CB */
+
+    /* Danger — red (safety, HIV, alerts) */
+    --danger: 0 57% 41%;          /* #A32D2D */
+    --danger-tint: 0 60% 97%;     /* #FDF3F3 */
+    --danger-border: 0 47% 85%;   /* #F0D5D5 */
+
+    /* Warning — amber (pending, due) */
+    --warning: 33 85% 29%;        /* #854F0B */
+    --warning-tint: 40 80% 92%;   /* #FAEEDA */
+
+    /* Admin role — purple */
+    --admin: 251 45% 37%;         /* #3C3489 */
+    --admin-tint: 249 78% 96%;    /* #EEEDFE */
+
+    /* Neutral role — gray (closed/inactive) */
+    --neutral: 60 2% 37%;         /* #5F5E5A */
+    --neutral-tint: 47 20% 92%;   /* #F1EFE8 */
+
+    --radius: 0.5rem;
+  }
+
+  html {
+    background: hsl(var(--page));
+    color: hsl(var(--text-primary));
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    margin: 0;
+  }
+}
