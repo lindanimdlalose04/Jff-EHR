@@ -1,29 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck } from "lucide-react";
-import { apiClient } from "@/api/client";
-import type { CrewMemberDto, UserDto } from "@/api/types";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Info, ShieldCheck } from "lucide-react";
+import type { UserDto } from "@/api/types";
+import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate, initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
+import { fetchAdminUsers, updateUser, type AdminUserRow } from "../api/admin.api";
 
 /**
  * Route "/admin/users", admin-only at BOTH layers: this component refuses to
- * render the page for non-admins (and doesn't fetch), and the API itself
- * returns 403 for GET /users without the admin role — the UI gate is
- * convenience, the API gate is the enforcement.
+ * render for non-admins and does not fetch, and the API returns 403 for
+ * /users without the admin role. The UI gate is convenience, the API gate is
+ * the enforcement.
+ *
+ * Role and active status are editable here (the live RBAC story). An admin
+ * cannot change their own role or deactivate themselves, which prevents
+ * locking the last administrator out.
  */
 export function AdminUsersPage() {
   const me = useMe();
   const isAdmin = me.data?.role === "admin";
 
-  const users = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-users"],
-    queryFn: async () => (await apiClient.get<UserDto[]>("/users")).data,
-    enabled: isAdmin,
-  });
-  const crew = useQuery({
-    queryKey: ["crew-members"],
-    queryFn: async () => (await apiClient.get<CrewMemberDto[]>("/crewmembers")).data,
+    queryFn: fetchAdminUsers,
     enabled: isAdmin,
   });
 
@@ -43,70 +44,130 @@ export function AdminUsersPage() {
     );
   }
 
-  if (users.isLoading || crew.isLoading) {
-    return <div className="p-6 text-sm text-muted">Loading users…</div>;
-  }
-  if (users.isError || !users.data || !crew.data) {
+  if (isLoading) return <div className="p-6 text-sm text-muted">Loading users…</div>;
+  if (isError || !data) {
     return (
-      <div className="p-6 text-sm text-danger">
-        Couldn&rsquo;t load users. Refresh to try again.
-      </div>
+      <div className="p-6 text-sm text-danger">Couldn&rsquo;t load users. Refresh to try again.</div>
     );
   }
-
-  const crewById = new Map(crew.data.map((c) => [c.crewId, c]));
-  const rows = [...users.data].sort((a, b) => a.email.localeCompare(b.email));
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-[17px] font-semibold text-primary">Users</h1>
-        <StatusPill tone="neutral">{rows.length}</StatusPill>
+        <StatusPill tone="neutral">{data.length}</StatusPill>
       </div>
 
       <div className="overflow-hidden rounded-card border border-card bg-surface">
-        <div className="hidden grid-cols-[1.3fr_1.5fr_auto_auto_auto] items-center gap-3 border-b border-divider bg-header-tint px-4 py-2 text-[11.5px] font-medium uppercase tracking-wide text-muted sm:grid">
+        <div className="hidden grid-cols-[1.3fr_1.6fr_auto_auto] items-center gap-3 border-b border-divider bg-header-tint px-4 py-2 text-[11.5px] font-medium uppercase tracking-wide text-muted sm:grid">
           <span>Name</span>
           <span>Email</span>
           <span>Role</span>
-          <span>Status</span>
-          <span className="text-right">Since</span>
+          <span className="text-right">Access</span>
         </div>
-        {rows.map((user) => {
-          const member = crewById.get(user.crewId);
-          const fullName = member ? `${member.name} ${member.surname}` : "Unlinked crew member";
-          return (
-            <div
-              key={user.userId}
-              className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-divider px-4 py-3 last:border-b-0 sm:grid-cols-[1.3fr_1.5fr_auto_auto_auto]"
-            >
-              <span className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-tint text-[11px] font-medium text-accent">
-                  {member ? initialsOf(member.name, member.surname) : "?"}
-                </span>
-                <span>
-                  <span className="block text-[13px] font-medium text-primary">{fullName}</span>
-                  <span className="block text-[11.5px] text-muted sm:hidden">{user.email}</span>
-                </span>
-              </span>
-              <span className="hidden text-[12.5px] text-secondary sm:block">{user.email}</span>
-              <span>
-                <StatusPill tone={user.rolePermissions === "admin" ? "admin" : "success"}>
-                  {user.rolePermissions}
-                </StatusPill>
-              </span>
-              <span className="hidden sm:block">
-                <StatusPill tone={user.isActive ? "success" : "neutral"}>
-                  {user.isActive ? "active" : "inactive"}
-                </StatusPill>
-              </span>
-              <span className="hidden text-right text-[12px] text-muted sm:block">
-                {formatDate(user.createdAt)}
-              </span>
-            </div>
-          );
-        })}
+        {data.map((row) => (
+          <UserRow key={row.user.userId} row={row} currentUserId={me.data?.userId ?? ""} />
+        ))}
       </div>
+
+      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-[12.5px] text-secondary">
+        <Info size={16} className="mt-0.5 shrink-0 text-muted" />
+        <div>
+          <p className="font-medium text-primary">Adding a new staff login</p>
+          <p className="mt-1 text-muted">
+            A login is a Supabase Auth account whose id must match the users row, so creating
+            one needs the Supabase service key and is done server-side, never from the browser.
+            New staff are provisioned by the seed or the Supabase dashboard, then their role and
+            access are managed here. This is the deliberate boundary of the two-backend design.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: string }) {
+  const queryClient = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
+  const { user, crew } = row;
+  const isSelf = user.userId === currentUserId;
+  const fullName = crew ? `${crew.name} ${crew.surname}` : "Unlinked crew member";
+
+  const mutate = useMutation({
+    mutationFn: (patch: Partial<Pick<UserDto, "rolePermissions" | "isActive">>) =>
+      updateUser(user, patch),
+    onSuccess: () => {
+      setError(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error & { response?: { status?: number } }) =>
+      setError(
+        e.response?.status === 400
+          ? "Role must be medical or admin."
+          : e.response?.status === 403
+            ? "Only administrators may manage users."
+            : e.message,
+      ),
+  });
+
+  const otherRole = user.rolePermissions === "admin" ? "medical" : "admin";
+
+  return (
+    <div className="border-b border-divider px-4 py-3 last:border-b-0">
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3 sm:grid-cols-[1.3fr_1.6fr_auto_auto]">
+        <span className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-tint text-[11px] font-medium text-accent">
+            {crew ? initialsOf(crew.name, crew.surname) : "?"}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-[13px] font-medium text-primary">
+              {fullName}
+              {isSelf && <span className="ml-1 text-[11px] text-muted">(you)</span>}
+            </span>
+            <span className="block truncate text-[11.5px] text-muted sm:hidden">{user.email}</span>
+            <span className="block text-[11px] text-muted">since {formatDate(user.createdAt)}</span>
+          </span>
+        </span>
+
+        <span className="hidden truncate text-[12.5px] text-secondary sm:block">{user.email}</span>
+
+        <span className="flex items-center gap-2">
+          <StatusPill tone={user.rolePermissions === "admin" ? "admin" : "success"}>
+            {user.rolePermissions}
+          </StatusPill>
+          {!isSelf && (
+            <Button
+              variant="secondary"
+              className="h-7 px-2 text-[11.5px]"
+              disabled={mutate.isPending}
+              onClick={() => mutate.mutate({ rolePermissions: otherRole })}
+            >
+              Make {otherRole}
+            </Button>
+          )}
+        </span>
+
+        <span className="flex items-center justify-end gap-2">
+          <StatusPill tone={user.isActive ? "success" : "neutral"}>
+            {user.isActive ? "active" : "inactive"}
+          </StatusPill>
+          {!isSelf && (
+            <Button
+              variant="secondary"
+              className="h-7 px-2 text-[11.5px]"
+              disabled={mutate.isPending}
+              onClick={() => mutate.mutate({ isActive: !user.isActive })}
+            >
+              {user.isActive ? "Deactivate" : "Reactivate"}
+            </Button>
+          )}
+        </span>
+      </div>
+      {error && (
+        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-1.5 text-[11.5px] text-danger">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

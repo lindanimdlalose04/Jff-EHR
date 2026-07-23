@@ -54,6 +54,7 @@ public sealed class CrewMedicalCheckinsController(JffEhrDbContext db, ICurrentUs
             CampId = request.CampId,
             Allergies = request.Allergies,
             HasBroviacPort = request.HasBroviacPort,
+            HasBloodCount = request.HasBloodCount,
             Eyesight = request.Eyesight,
             Hearing = request.Hearing,
             MobilityAids = request.MobilityAids,
@@ -91,6 +92,7 @@ public sealed class CrewMedicalCheckinsController(JffEhrDbContext db, ICurrentUs
 
         checkin.Allergies = request.Allergies;
         checkin.HasBroviacPort = request.HasBroviacPort;
+        checkin.HasBloodCount = request.HasBloodCount;
         checkin.Eyesight = request.Eyesight;
         checkin.Hearing = request.Hearing;
         checkin.MobilityAids = request.MobilityAids;
@@ -121,6 +123,7 @@ public sealed class CrewMedicalCheckinsController(JffEhrDbContext db, ICurrentUs
         CampId = c.CampId,
         Allergies = c.Allergies,
         HasBroviacPort = c.HasBroviacPort,
+        HasBloodCount = c.HasBloodCount,
         Eyesight = c.Eyesight,
         Hearing = c.Hearing,
         MobilityAids = c.MobilityAids,

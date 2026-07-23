@@ -9,6 +9,7 @@ import {
   Stethoscope,
   Tent,
   TriangleAlert,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const navItems = [
   { to: "/", label: "Home", icon: House },
   { to: "/camps", label: "Camps", icon: Tent },
   { to: "/campers", label: "Campers", icon: Users },
+  { to: "/crew", label: "Crew", icon: UserCog },
   { to: "/medications", label: "Medications", icon: Pill },
   { to: "/medshack", label: "MedShack", icon: Stethoscope },
   { to: "/incidents", label: "Incidents", icon: TriangleAlert },

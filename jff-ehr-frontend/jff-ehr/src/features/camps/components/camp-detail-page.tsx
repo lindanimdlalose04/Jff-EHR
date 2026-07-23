@@ -174,26 +174,36 @@ function RosterTab({ hub }: { hub: CampHub }) {
 
       <div className="overflow-hidden rounded-card border border-card bg-surface">
         {hub.roster.map(({ registration, camper, pill }) => (
-          <Link
+          <div
             key={registration.registrationId}
-            to={`/campers/${camper.camperId}?tab=history`}
-            className="flex items-center gap-3 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field"
+            className="flex items-center gap-3 border-b border-divider px-4 py-3 last:border-b-0"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-accent-tint text-[12px] font-medium text-accent">
-              {initialsOf(camper.firstName, camper.surname)}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[13.5px] font-medium text-primary">
-                {camper.firstName} {camper.surname}
+            <Link
+              to={`/campers/${camper.camperId}?tab=history`}
+              className="flex min-w-0 flex-1 items-center gap-3 transition hover:opacity-80"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-accent-tint text-[12px] font-medium text-accent">
+                {initialsOf(camper.firstName, camper.surname)}
               </span>
-              <span className="text-[12px] text-muted">
-                {camper.fileNumber}
-                {registration.cabin ? ` · cabin ${registration.cabin}` : ""}
-                {registration.groupName ? ` · ${registration.groupName}` : ""}
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13.5px] font-medium text-primary">
+                  {camper.firstName} {camper.surname}
+                </span>
+                <span className="text-[12px] text-muted">
+                  {camper.fileNumber}
+                  {registration.cabin ? ` · cabin ${registration.cabin}` : ""}
+                  {registration.groupName ? ` · ${registration.groupName}` : ""}
+                </span>
               </span>
-            </span>
-            <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
-          </Link>
+            </Link>
+            {pill === "no consent" ? (
+              <Link to={`/registrations/${registration.registrationId}/consent`}>
+                <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
+              </Link>
+            ) : (
+              <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
+            )}
+          </div>
         ))}
         {hub.roster.length === 0 && (
           <div className="px-4 py-8 text-center text-[13px] text-muted">

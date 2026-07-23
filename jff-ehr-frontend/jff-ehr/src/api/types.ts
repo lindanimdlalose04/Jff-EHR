@@ -229,6 +229,27 @@ export interface CrewMemberDto {
   createdAt: string;
 }
 
+export interface CrewMedicalCheckinDto {
+  checkinId: string;
+  crewId: string;
+  crewName: string | null;
+  campId: string;
+  allergies: string | null;
+  /** Crew-specific: campers do not have this field. */
+  hasBroviacPort: boolean;
+  /** Crew-specific: campers do not have this field. */
+  hasBloodCount: boolean;
+  eyesight: string | null;
+  hearing: string | null;
+  mobilityAids: string | null;
+  currentMedications: string | null;
+  /** The crew indemnity / medical release acknowledgement gate. */
+  medicalReleaseSigned: boolean;
+  checkedInBy: string;
+  checkedInByName: string | null;
+  checkedInAt: string;
+}
+
 export interface ConsentRecordDto {
   consentId: string;
   registrationId: string;

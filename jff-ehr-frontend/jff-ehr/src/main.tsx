@@ -13,11 +13,16 @@ import { CamperFormPage } from "./features/campers/components/camper-form-page";
 import { CamperProfilePage } from "./features/campers/components/camper-profile-page";
 import { PrecampFormPage } from "./features/campers/components/precamp-form-page";
 import { ArrivalCheckPage } from "./features/campers/components/arrival-check-page";
+import { ConsentPage } from "./features/campers/components/consent-page";
 import { CampersListPage } from "./features/campers/components/campers-list-page";
 import { CampDetailPage } from "./features/camps/components/camp-detail-page";
 import { CampFormPage } from "./features/camps/components/camp-form-page";
 import { CampRegisterPage } from "./features/camps/components/camp-register-page";
 import { CampsListPage } from "./features/camps/components/camps-list-page";
+import { CrewListPage } from "./features/crew/components/crew-list-page";
+import { CrewFormPage } from "./features/crew/components/crew-form-page";
+import { CrewDetailPage } from "./features/crew/components/crew-detail-page";
+import { CrewCheckinPage } from "./features/crew/components/crew-checkin-page";
 import { IncidentFormPage } from "./features/incidents/components/incident-form-page";
 import { IncidentsPage } from "./features/incidents/components/incidents-page";
 import { MedicationGridPage } from "./features/medications/components/medication-grid-page";
@@ -51,8 +56,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/campers/new" element={<CamperFormPage />} />
               <Route path="/campers/:camperId" element={<CamperProfilePage />} />
               <Route path="/campers/:camperId/edit" element={<CamperFormPage />} />
+              <Route path="/crew" element={<CrewListPage />} />
+              <Route path="/crew/new" element={<CrewFormPage />} />
+              <Route path="/crew/:crewId" element={<CrewDetailPage />} />
+              <Route path="/crew/:crewId/edit" element={<CrewFormPage />} />
+              <Route path="/crew/:crewId/checkin" element={<CrewCheckinPage />} />
               <Route path="/registrations/:regId/precamp" element={<PrecampFormPage />} />
               <Route path="/registrations/:regId/arrival-check" element={<ArrivalCheckPage />} />
+              <Route path="/registrations/:regId/consent" element={<ConsentPage />} />
               <Route path="/registrations/:regId/medications" element={<MedicationGridPage />} />
               <Route path="/registrations/:regId/prescriptions" element={<PrescriptionsPage />} />
               <Route path="/medications" element={<MedicationRoundsPage />} />

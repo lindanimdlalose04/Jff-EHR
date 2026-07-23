@@ -10,6 +10,7 @@ public sealed class CrewMedicalCheckinDto
     public Guid CampId { get; set; }
     public string? Allergies { get; set; }
     public bool HasBroviacPort { get; set; }
+    public bool HasBloodCount { get; set; }
     public string? Eyesight { get; set; }
     public string? Hearing { get; set; }
     public string? MobilityAids { get; set; }
@@ -30,6 +31,7 @@ public sealed class CreateCrewMedicalCheckinRequest
     public Guid CampId { get; set; }
     public string? Allergies { get; set; }
     public bool HasBroviacPort { get; set; }
+    public bool HasBloodCount { get; set; }
     public string? Eyesight { get; set; }
     public string? Hearing { get; set; }
     public string? MobilityAids { get; set; }
@@ -44,6 +46,7 @@ public sealed class UpdateCrewMedicalCheckinRequest
 {
     public string? Allergies { get; set; }
     public bool HasBroviacPort { get; set; }
+    public bool HasBloodCount { get; set; }
     public string? Eyesight { get; set; }
     public string? Hearing { get; set; }
     public string? MobilityAids { get; set; }

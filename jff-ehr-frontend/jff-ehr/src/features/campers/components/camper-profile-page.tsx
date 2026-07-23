@@ -558,7 +558,8 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
     .map((reg) => {
       const camp = detail.camps.find((c) => c.campId === reg.campId);
       const check = detail.arrivalChecks.find((a) => a.registrationId === reg.registrationId);
-      return { reg, camp, check };
+      const hasConsent = detail.consents.some((c) => c.registrationId === reg.registrationId);
+      return { reg, camp, check, hasConsent };
     })
     .sort((a, b) => (b.camp?.startDate ?? "").localeCompare(a.camp?.startDate ?? ""));
 
@@ -572,7 +573,7 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
 
   return (
     <div className="overflow-hidden rounded-card border border-card bg-surface">
-      {rows.map(({ reg, camp, check }) => {
+      {rows.map(({ reg, camp, check, hasConsent }) => {
         const pill = check
           ? check.status === "signed"
             ? { tone: "success" as const, label: "assessed" }
@@ -619,6 +620,16 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
               className="shrink-0 text-[12px] font-medium text-accent hover:underline"
             >
               Medications
+            </Link>
+            <Link
+              to={`/registrations/${reg.registrationId}/consent`}
+              className={
+                hasConsent
+                  ? "shrink-0 text-[12px] font-medium text-accent hover:underline"
+                  : "shrink-0 text-[12px] font-medium text-danger hover:underline"
+              }
+            >
+              {hasConsent ? "Consent" : "No consent"}
             </Link>
           </div>
         );
