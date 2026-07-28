@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* Surfaces */
-    --page: 42 40% 96%;           /* #FBF8F1 cream page */
+    --page: 122 40% 96%;           /* #FBF8F1 cream page */
     --surface: 0 0% 100%;         /* #FFFFFF cards */
     --field: 45 33% 98%;          /* #FDFCF9 input fill */
 
