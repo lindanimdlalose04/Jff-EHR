@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate, statusLabel, statusTone } from "@/lib/display";
+import { deriveCampState } from "@/lib/camp-state";
 import { useCamps } from "../hooks/use-camps";
 
 /** Route "/camps". Camps list with search; camps are Tier 1, fully maintainable. */
@@ -21,6 +22,7 @@ export function CampsListPage() {
     );
   }
 
+  const now = new Date();
   const needle = search.trim().toLowerCase();
   const visible = camps
     .filter(
@@ -68,16 +70,19 @@ export function CampsListPage() {
             className="grid grid-cols-[1fr_auto] items-center gap-2 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field sm:grid-cols-[1.4fr_1fr_0.8fr_auto_auto]"
           >
             <span className="flex items-center gap-1.5 text-[13.5px] font-medium text-primary">
-              Camp {camp.campNumber} — {camp.venue}
+              Camp {camp.campNumber}: {camp.venue}
               <ChevronRight size={14} className="text-muted" />
             </span>
             <span className="hidden text-[12.5px] text-secondary sm:block">
-              {formatDate(camp.startDate)} – {formatDate(camp.endDate)}
+              {formatDate(camp.startDate)} to {formatDate(camp.endDate)}
             </span>
             <span className="hidden text-[12.5px] text-secondary sm:block">{camp.province}</span>
             <span className="hidden text-[12.5px] text-secondary sm:block">{camp.campType}</span>
             <span className="text-right">
-              <StatusPill tone={statusTone(camp.status)}>{statusLabel(camp.status)}</StatusPill>
+              {(() => {
+                const state = deriveCampState(camp, now);
+                return <StatusPill tone={statusTone(state)}>{statusLabel(state)}</StatusPill>;
+              })()}
             </span>
           </Link>
         ))}

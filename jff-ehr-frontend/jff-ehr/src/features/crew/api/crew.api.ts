@@ -4,6 +4,7 @@ import type {
   CrewMedicalCheckinDto,
   CrewMemberDto,
 } from "@/api/types";
+import { isCampActive } from "@/lib/camp-state";
 
 /**
  * The crew world: parallel to campers, not a reskin. Crew are staff and
@@ -62,7 +63,8 @@ export async function fetchCrewList(): Promise<CrewListContext> {
     get<CrewMemberDto[]>("/crewmembers"),
     get<CampDto[]>("/camps"),
   ]);
-  const activeCamp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const now = new Date();
+  const activeCamp = camps.find((c) => isCampActive(c, now)) ?? null;
 
   const checkins = activeCamp
     ? await get<CrewMedicalCheckinDto[]>("/crewmedicalcheckins", { campId: activeCamp.campId })
@@ -93,7 +95,8 @@ export async function fetchCrewDetail(crewId: string): Promise<CrewDetailContext
     fetchCrewMember(crewId),
     get<CampDto[]>("/camps"),
   ]);
-  const activeCamp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const now = new Date();
+  const activeCamp = camps.find((c) => isCampActive(c, now)) ?? null;
   const checkins = activeCamp
     ? await get<CrewMedicalCheckinDto[]>("/crewmedicalcheckins", {
         campId: activeCamp.campId,

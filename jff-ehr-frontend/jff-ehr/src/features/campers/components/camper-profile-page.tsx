@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { ageYears, formatDate } from "@/lib/display";
+import { deriveCampState } from "@/lib/camp-state";
 import { useCamperDetail } from "../hooks/use-camper-detail";
 import type { CamperDetail } from "../api/camper-detail.api";
 import {
@@ -554,6 +555,7 @@ function MedicalTab({ detail }: { detail: CamperDetail }) {
 }
 
 function CampHistoryTab({ detail }: { detail: CamperDetail }) {
+  const now = new Date();
   const rows = [...detail.registrations]
     .map((reg) => {
       const camp = detail.camps.find((c) => c.campId === reg.campId);
@@ -578,7 +580,7 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
           ? check.status === "signed"
             ? { tone: "success" as const, label: "assessed" }
             : { tone: "warning" as const, label: "draft" }
-          : camp?.status.toLowerCase() === "completed"
+          : camp && deriveCampState(camp, now) === "completed"
             ? { tone: "neutral" as const, label: "completed" }
             : { tone: "warning" as const, label: "not assessed" };
         const checkLabel = check

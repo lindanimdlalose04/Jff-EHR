@@ -7,6 +7,7 @@ import type {
   MedshackTreatmentDto,
   MedshackVisitDto,
 } from "@/api/types";
+import { isCampActive } from "@/lib/camp-state";
 
 /**
  * MedShack visits (Tier 2, append and correct only) and their treatments
@@ -42,7 +43,8 @@ export async function fetchVisitFormContext(): Promise<VisitFormContext> {
     get<CrewMemberDto[]>("/crewmembers"),
   ]);
 
-  const camp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const now = new Date();
+  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
 
   const roster: RosterEntry[] = registrations

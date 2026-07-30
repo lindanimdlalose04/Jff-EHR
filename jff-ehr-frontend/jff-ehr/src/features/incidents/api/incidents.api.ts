@@ -6,6 +6,7 @@ import type {
   MedicationEventDto,
   PrecampMedicalDto,
 } from "@/api/types";
+import { isCampActive } from "@/lib/camp-state";
 
 /**
  * Medication / treatment event / near miss reports.
@@ -54,7 +55,8 @@ export async function fetchIncidentFormContext(): Promise<IncidentFormContext> {
     get<CamperDto[]>("/campers"),
     get<CampDto[]>("/camps"),
   ]);
-  const camp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const now = new Date();
+  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
 
   const campRegs = registrations.filter((r) => r.campId === camp?.campId);

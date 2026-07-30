@@ -8,6 +8,7 @@ import type {
   PrecampMedicalDto,
   PrescriptionDto,
 } from "@/api/types";
+import { isCampActive } from "@/lib/camp-state";
 
 /**
  * Medication grid and rounds.
@@ -168,7 +169,7 @@ export async function fetchRounds(dayOffset: number, now: Date): Promise<RoundsC
     get<PrescriptionDto[]>("/prescriptions"),
   ]);
 
-  const camp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
   const today = toLocalDay(now);
   if (!camp) return { camp: null, day: today, isToday: true, entries: [] };
 

@@ -22,6 +22,7 @@ import {
   statusLabel,
   statusTone,
 } from "@/lib/display";
+import { deriveCampState } from "@/lib/camp-state";
 import { fetchCampHub, pillTone, type CampHub } from "../api/camp-hub.api";
 
 /**
@@ -77,7 +78,10 @@ export function CampDetailPage() {
               <h1 className="text-[17px] font-semibold text-primary">
                 Camp {camp.campNumber}: {camp.venue}
               </h1>
-              <StatusPill tone={statusTone(camp.status)}>{statusLabel(camp.status)}</StatusPill>
+              {(() => {
+                const state = deriveCampState(camp, now);
+                return <StatusPill tone={statusTone(state)}>{statusLabel(state)}</StatusPill>;
+              })()}
             </div>
             <p className="mt-1 text-[12.5px] text-secondary">
               {camp.province} · {formatDate(camp.startDate)} to {formatDate(camp.endDate)} ·{" "}

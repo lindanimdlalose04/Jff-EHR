@@ -15,6 +15,7 @@ import {
   toLocalDay,
   type DoseSlot,
 } from "@/features/medications/api/medications.api";
+import { isCampActive } from "@/lib/camp-state";
 
 /**
  * The home dashboard's data, composed in one call. Every field backs a tile
@@ -62,7 +63,7 @@ export interface Dashboard {
 
 export async function fetchDashboard(now: Date): Promise<Dashboard> {
   const camps = await get<CampDto[]>("/camps");
-  const camp = camps.find((c) => c.status.toLowerCase() === "active") ?? null;
+  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
   if (!camp) {
     return {
       camp: null,
