@@ -7,6 +7,7 @@ import { FormSection } from "@/components/forms/form-section";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
 import { ageYears, formatDate } from "@/lib/display";
 import {
   CONTRIBUTING_FACTORS,
@@ -35,11 +36,12 @@ export function IncidentFormPage() {
   const queryClient = useQueryClient();
   const me = useMe();
   const canFile = me.data?.role === "medical";
+  const { selectedCampId } = useActiveCamp();
   const [start] = useState(nowLocal);
 
   const { data: context, isLoading, isError } = useQuery({
-    queryKey: ["incident-form-context"],
-    queryFn: fetchIncidentFormContext,
+    queryKey: ["incident-form-context", selectedCampId],
+    queryFn: () => fetchIncidentFormContext(selectedCampId),
   });
 
   const [registrationId, setRegistrationId] = useState("");

@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDateTime } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
+import { CampScopePicker } from "@/components/layout/camp-scope-picker";
 import { fetchIncidents, reviewIncident, type IncidentRow } from "../api/incidents.api";
 
 /**
@@ -17,9 +19,10 @@ import { fetchIncidents, reviewIncident, type IncidentRow } from "../api/inciden
 export function IncidentsPage() {
   const me = useMe();
   const canReview = me.data?.role === "medical";
+  const { selectedCampId } = useActiveCamp();
   const { data: events, isLoading, isError } = useQuery({
-    queryKey: ["incidents"],
-    queryFn: fetchIncidents,
+    queryKey: ["incidents", selectedCampId],
+    queryFn: () => fetchIncidents(selectedCampId),
   });
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading incidents…</div>;
@@ -39,8 +42,9 @@ export function IncidentsPage() {
         <h1 className="text-[17px] font-semibold text-primary">Incidents and near misses</h1>
         <StatusPill tone="neutral">{events.length}</StatusPill>
         {awaiting > 0 && <StatusPill tone="warning">{awaiting} awaiting review</StatusPill>}
+        <CampScopePicker className="ml-auto" />
         {canReview && (
-          <Link to="/incidents/new" className="ml-auto">
+          <Link to="/incidents/new">
             <Button variant="primary">
               <Plus size={15} />
               Report an event

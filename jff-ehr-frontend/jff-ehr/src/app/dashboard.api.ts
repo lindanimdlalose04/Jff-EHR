@@ -15,7 +15,6 @@ import {
   toLocalDay,
   type DoseSlot,
 } from "@/features/medications/api/medications.api";
-import { isCampActive } from "@/lib/camp-state";
 
 /**
  * The home dashboard's data, composed in one call. Every field backs a tile
@@ -24,8 +23,9 @@ import { isCampActive } from "@/lib/camp-state";
  * day-one bottleneck, recent MedShack activity, and the active camp anchor.
  *
  * Arrival checks and visits are fetched once (unfiltered) and narrowed to the
- * active camp client-side, rather than once per registration, to keep the
- * landing screen quick.
+ * scoped camp client-side, rather than once per registration, to keep the
+ * landing screen quick. The camp is chosen by the caller (the active-camp
+ * scope) rather than assumed, since several camps can be active at once.
  */
 
 async function get<T>(url: string, params?: Record<string, string>): Promise<T> {
@@ -61,9 +61,11 @@ export interface Dashboard {
   recentVisits: RecentVisit[];
 }
 
-export async function fetchDashboard(now: Date): Promise<Dashboard> {
-  const camps = await get<CampDto[]>("/camps");
-  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
+export async function fetchDashboard(
+  campId: string | null,
+  now: Date,
+): Promise<Dashboard> {
+  const camp = campId ? await get<CampDto>(`/camps/${campId}`) : null;
   if (!camp) {
     return {
       camp: null,

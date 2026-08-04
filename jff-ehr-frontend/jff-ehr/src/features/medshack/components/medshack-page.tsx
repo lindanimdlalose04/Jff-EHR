@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDateTime, initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
+import { CampScopePicker } from "@/components/layout/camp-scope-picker";
 import { appendTreatment, fetchVisits, type VisitRow } from "../api/medshack.api";
 
 /**
@@ -17,9 +19,10 @@ import { appendTreatment, fetchVisits, type VisitRow } from "../api/medshack.api
 export function MedShackPage() {
   const me = useMe();
   const canRecord = me.data?.role === "medical";
+  const { selectedCampId } = useActiveCamp();
   const { data: visits, isLoading, isError } = useQuery({
-    queryKey: ["medshack-visits"],
-    queryFn: fetchVisits,
+    queryKey: ["medshack-visits", selectedCampId],
+    queryFn: () => fetchVisits(selectedCampId),
   });
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading visits…</div>;
@@ -36,8 +39,9 @@ export function MedShackPage() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-[17px] font-semibold text-primary">MedShack</h1>
         <StatusPill tone="neutral">{visits.length} visits</StatusPill>
+        <CampScopePicker className="ml-auto" />
         {canRecord && (
-          <Link to="/medshack/new" className="ml-auto">
+          <Link to="/medshack/new">
             <Button variant="primary">
               <Plus size={15} />
               New visit

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
+import { CampScopePicker } from "@/components/layout/camp-scope-picker";
 import { fetchRounds, recordDose, type DoseSlot, type RoundEntry } from "../api/medications.api";
 
 /**
@@ -19,13 +21,14 @@ export function MedicationRoundsPage() {
   const queryClient = useQueryClient();
   const me = useMe();
   const canRecord = me.data?.role === "medical";
+  const { selectedCampId } = useActiveCamp();
   const [dayOffset, setDayOffset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [now] = useState(() => new Date());
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["medication-rounds", dayOffset],
-    queryFn: () => fetchRounds(dayOffset, now),
+    queryKey: ["medication-rounds", selectedCampId, dayOffset],
+    queryFn: () => fetchRounds(selectedCampId, dayOffset, now),
   });
 
   const record = useMutation({
@@ -71,6 +74,7 @@ export function MedicationRoundsPage() {
         <h1 className="text-[17px] font-semibold text-primary">Medication rounds</h1>
         <StatusPill tone="success">{givenCount} given</StatusPill>
         {missedCount > 0 && <StatusPill tone="warning">{missedCount} missed</StatusPill>}
+        <CampScopePicker className="ml-auto" />
       </div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[12.5px] text-muted">

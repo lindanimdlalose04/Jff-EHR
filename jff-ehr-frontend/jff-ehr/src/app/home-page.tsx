@@ -5,6 +5,8 @@ import { format, parseISO } from "date-fns";
 import { ArrowRight, Check, CircleDashed, Stethoscope, TriangleAlert } from "lucide-react";
 import { formatDate } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
+import { CampScopePicker } from "@/components/layout/camp-scope-picker";
 import { fetchDashboard, type Dashboard, type RoundTileEntry } from "./dashboard.api";
 
 /**
@@ -16,10 +18,11 @@ import { fetchDashboard, type Dashboard, type RoundTileEntry } from "./dashboard
  */
 export function HomePage() {
   const me = useMe();
+  const { selectedCampId } = useActiveCamp();
   const [now] = useState(() => new Date());
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => fetchDashboard(now),
+    queryKey: ["dashboard", selectedCampId],
+    queryFn: () => fetchDashboard(selectedCampId, now),
   });
 
   const firstName = me.data?.name ?? "";
@@ -37,17 +40,22 @@ export function HomePage() {
 
   return (
     <div>
-      <h1 className="text-[18px] font-semibold text-primary">
-        Welcome back{firstName ? `, ${firstName}` : ""}
-      </h1>
-      <p className="mt-0.5 text-[12.5px] text-muted">
-        {camp
-          ? `Camp ${camp.campNumber}, ${camp.venue}` +
-            (data.dayNumber
-              ? ` · day ${data.dayNumber} of ${data.totalDays}`
-              : " · starts soon")
-          : "No camp is currently active."}
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h1 className="text-[18px] font-semibold text-primary">
+            Welcome back{firstName ? `, ${firstName}` : ""}
+          </h1>
+          <p className="mt-0.5 text-[12.5px] text-muted">
+            {camp
+              ? `Camp ${camp.campNumber}, ${camp.venue}` +
+                (data.dayNumber
+                  ? ` · day ${data.dayNumber} of ${data.totalDays}`
+                  : " · starts soon")
+              : "No camp is currently active."}
+          </p>
+        </div>
+        <CampScopePicker className="mt-0.5" />
+      </div>
 
       {!camp ? (
         <div className="mt-5 rounded-card border border-card bg-surface px-4 py-10 text-center text-[13px] text-muted">

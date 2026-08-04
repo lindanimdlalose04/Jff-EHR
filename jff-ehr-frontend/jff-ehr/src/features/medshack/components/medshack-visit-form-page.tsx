@@ -16,6 +16,7 @@ import { FormSection } from "@/components/forms/form-section";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { useMe } from "@/features/auth/use-me";
+import { useActiveCamp } from "@/app/active-camp-context";
 import { ageYears, formatDate } from "@/lib/display";
 import {
   createVisitWithTreatments,
@@ -50,10 +51,11 @@ export function MedShackVisitFormPage() {
   const queryClient = useQueryClient();
   const me = useMe();
   const canRecord = me.data?.role === "medical";
+  const { selectedCampId } = useActiveCamp();
 
   const { data: context, isLoading, isError } = useQuery({
-    queryKey: ["medshack-form-context"],
-    queryFn: fetchVisitFormContext,
+    queryKey: ["medshack-form-context", selectedCampId],
+    queryFn: () => fetchVisitFormContext(selectedCampId),
   });
 
   const [registrationId, setRegistrationId] = useState("");

@@ -7,7 +7,6 @@ import type {
   MedshackTreatmentDto,
   MedshackVisitDto,
 } from "@/api/types";
-import { isCampActive } from "@/lib/camp-state";
 
 /**
  * MedShack visits (Tier 2, append and correct only) and their treatments
@@ -35,7 +34,7 @@ export interface VisitFormContext {
   doctors: CrewMemberDto[];
 }
 
-export async function fetchVisitFormContext(): Promise<VisitFormContext> {
+export async function fetchVisitFormContext(campId: string | null): Promise<VisitFormContext> {
   const [registrations, campers, camps, crew] = await Promise.all([
     get<CampRegistrationDto[]>("/campregistrations"),
     get<CamperDto[]>("/campers"),
@@ -43,8 +42,7 @@ export async function fetchVisitFormContext(): Promise<VisitFormContext> {
     get<CrewMemberDto[]>("/crewmembers"),
   ]);
 
-  const now = new Date();
-  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
+  const camp = campId ? (camps.find((c) => c.campId === campId) ?? null) : null;
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
 
   const roster: RosterEntry[] = registrations
@@ -126,7 +124,13 @@ export interface VisitRow extends MedshackVisitDto {
   treatments: MedshackTreatmentDto[];
 }
 
-export async function fetchVisits(): Promise<VisitRow[]> {
+/**
+ * The visit list, scoped to the chosen active camp. Visits whose registration
+ * belongs to another camp are excluded, so the list matches the camp the rest
+ * of the screen is acting on rather than mixing every camp's visits together.
+ */
+export async function fetchVisits(campId: string | null): Promise<VisitRow[]> {
+  if (!campId) return [];
   const [visits, registrations, campers, camps] = await Promise.all([
     get<MedshackVisitDto[]>("/medshackvisits"),
     get<CampRegistrationDto[]>("/campregistrations"),
@@ -137,8 +141,12 @@ export async function fetchVisits(): Promise<VisitRow[]> {
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
   const campById = new Map(camps.map((c) => [c.campId, c]));
 
+  const scopedVisits = visits.filter(
+    (visit) => regById.get(visit.registrationId)?.campId === campId,
+  );
+
   const rows = await Promise.all(
-    visits.map(async (visit): Promise<VisitRow> => {
+    scopedVisits.map(async (visit): Promise<VisitRow> => {
       const reg = regById.get(visit.registrationId);
       const camp = reg && campById.get(reg.campId);
       return {

@@ -34,3 +34,14 @@ export function deriveCampState(camp: CampLike, now: Date): CampState {
 export function isCampActive(camp: CampLike, now: Date): boolean {
   return deriveCampState(camp, now) === "active";
 }
+
+/**
+ * Every camp active right now, earliest start first. The NPO runs camps in
+ * several provinces at once, so callers must not assume a single active camp:
+ * this returns all of them in a stable order and lets the caller pick a scope.
+ */
+export function getActiveCamps<T extends CampLike>(camps: T[], now: Date): T[] {
+  return camps
+    .filter((camp) => isCampActive(camp, now))
+    .sort((a, b) => a.startDate.localeCompare(b.startDate) || a.endDate.localeCompare(b.endDate));
+}

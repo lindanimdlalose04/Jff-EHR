@@ -8,7 +8,6 @@ import type {
   PrecampMedicalDto,
   PrescriptionDto,
 } from "@/api/types";
-import { isCampActive } from "@/lib/camp-state";
 
 /**
  * Medication grid and rounds.
@@ -156,21 +155,27 @@ export interface RoundsContext {
 }
 
 /**
- * Rounds for the active camp, offset in days from the anchor. The anchor is
+ * Rounds for the scoped camp, offset in days from the anchor. The anchor is
  * today when today falls inside the camp, otherwise the camp's nearest day, so
  * the screen opens on real work rather than an empty list when the demo camp's
- * dates have passed.
+ * dates have passed. The camp is chosen by the caller (the active-camp scope),
+ * not assumed, since several camps can be active at once.
  */
-export async function fetchRounds(dayOffset: number, now: Date): Promise<RoundsContext> {
-  const [camps, registrations, campers, prescriptions] = await Promise.all([
-    get<CampDto[]>("/camps"),
+export async function fetchRounds(
+  campId: string | null,
+  dayOffset: number,
+  now: Date,
+): Promise<RoundsContext> {
+  const today = toLocalDay(now);
+  if (!campId) return { camp: null, day: today, isToday: true, entries: [] };
+
+  const [camp, registrations, campers, prescriptions] = await Promise.all([
+    get<CampDto>(`/camps/${campId}`),
     get<CampRegistrationDto[]>("/campregistrations"),
     get<CamperDto[]>("/campers"),
     get<PrescriptionDto[]>("/prescriptions"),
   ]);
 
-  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
-  const today = toLocalDay(now);
   if (!camp) return { camp: null, day: today, isToday: true, entries: [] };
 
   const anchorDay =

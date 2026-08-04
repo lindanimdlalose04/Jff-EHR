@@ -6,7 +6,6 @@ import type {
   MedicationEventDto,
   PrecampMedicalDto,
 } from "@/api/types";
-import { isCampActive } from "@/lib/camp-state";
 
 /**
  * Medication / treatment event / near miss reports.
@@ -49,14 +48,15 @@ export interface IncidentFormContext {
   roster: IncidentRosterEntry[];
 }
 
-export async function fetchIncidentFormContext(): Promise<IncidentFormContext> {
+export async function fetchIncidentFormContext(
+  campId: string | null,
+): Promise<IncidentFormContext> {
   const [registrations, campers, camps] = await Promise.all([
     get<CampRegistrationDto[]>("/campregistrations"),
     get<CamperDto[]>("/campers"),
     get<CampDto[]>("/camps"),
   ]);
-  const now = new Date();
-  const camp = camps.find((c) => isCampActive(c, now)) ?? null;
+  const camp = campId ? (camps.find((c) => c.campId === campId) ?? null) : null;
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
 
   const campRegs = registrations.filter((r) => r.campId === camp?.campId);
@@ -127,7 +127,13 @@ function parseList(raw: string | null): string[] {
   }
 }
 
-export async function fetchIncidents(): Promise<IncidentRow[]> {
+/**
+ * Filed events, scoped to the chosen active camp. Events whose registration
+ * belongs to another camp are excluded, so the list matches the camp the rest
+ * of the screen is acting on rather than mixing every camp's events together.
+ */
+export async function fetchIncidents(campId: string | null): Promise<IncidentRow[]> {
+  if (!campId) return [];
   const [events, registrations, campers, camps] = await Promise.all([
     get<MedicationEventDto[]>("/medicationevents"),
     get<CampRegistrationDto[]>("/campregistrations"),
@@ -139,6 +145,7 @@ export async function fetchIncidents(): Promise<IncidentRow[]> {
   const campById = new Map(camps.map((c) => [c.campId, c]));
 
   return events
+    .filter((e) => regById.get(e.registrationId)?.campId === campId)
     .map((e) => {
       const reg = regById.get(e.registrationId);
       const camp = reg && campById.get(reg.campId);
