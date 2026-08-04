@@ -6,6 +6,7 @@ import { apiClient } from "@/api/client";
 import type { CamperDto, CampDto, CampRegistrationDto } from "@/api/types";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
+import { SearchSelect } from "@/components/ui/search-select";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { useMe } from "@/features/auth/use-me";
@@ -118,14 +119,18 @@ export function CampRegisterPage() {
         <FormSection icon={<UserPlus size={15} />} title="Registration">
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Camper" htmlFor="camper" className="col-span-2">
-              <Select id="camper" value={camperId} onChange={(e) => setCamperId(e.target.value)}>
-                <option value="">Select a camper</option>
-                {data.available.map((c) => (
-                  <option key={c.camperId} value={c.camperId}>
-                    {c.firstName} {c.surname} ({c.fileNumber})
-                  </option>
-                ))}
-              </Select>
+              <SearchSelect
+                id="camper"
+                value={camperId}
+                onChange={setCamperId}
+                placeholder="Search by name, file number or diagnosis…"
+                emptyText="No camper matches"
+                options={data.available.map((c) => ({
+                  value: c.camperId,
+                  label: `${c.firstName} ${c.surname}`,
+                  hint: `${c.fileNumber}${c.diagnosis ? ` · ${c.diagnosis}` : ""}`,
+                }))}
+              />
             </FormField>
             <FormField label="Cabin" htmlFor="cabin">
               <Input
