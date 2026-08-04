@@ -14,7 +14,8 @@ import {
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { Button } from "@/components/ui/button";
-import { Input, Select, Textarea } from "@/components/ui/field";
+import { Input, Textarea } from "@/components/ui/field";
+import { SearchSelect } from "@/components/ui/search-select";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
 import { ageYears, formatDate } from "@/lib/display";
@@ -171,18 +172,18 @@ export function MedShackVisitFormPage() {
         <FormSection icon={<Stethoscope size={15} />} title="Visit">
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Camper" htmlFor="camper" className="col-span-2">
-              <Select
+              <SearchSelect
                 id="camper"
                 value={registrationId}
-                onChange={(e) => setRegistrationId(e.target.value)}
-              >
-                <option value="">Select a camper</option>
-                {context.roster.map((r) => (
-                  <option key={r.registrationId} value={r.registrationId}>
-                    {r.camper.firstName} {r.camper.surname} ({r.camper.fileNumber})
-                  </option>
-                ))}
-              </Select>
+                onChange={setRegistrationId}
+                placeholder="Search by name, file number or diagnosis…"
+                emptyText="No camper matches"
+                options={context.roster.map((r) => ({
+                  value: r.registrationId,
+                  label: `${r.camper.firstName} ${r.camper.surname}`,
+                  hint: `${r.camper.fileNumber}${r.camper.diagnosis ? ` · ${r.camper.diagnosis}` : ""}`,
+                }))}
+              />
             </FormField>
 
             {selected && (
@@ -388,14 +389,18 @@ export function MedShackVisitFormPage() {
               />
             </FormField>
             <FormField label="Camp doctor countersignature (optional)" htmlFor="doctorId">
-              <Select id="doctorId" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
-                <option value="">No doctor countersignature</option>
-                {context.doctors.map((d) => (
-                  <option key={d.crewId} value={d.crewId}>
-                    {d.name} {d.surname}
-                  </option>
-                ))}
-              </Select>
+              <SearchSelect
+                id="doctorId"
+                value={doctorId}
+                onChange={setDoctorId}
+                placeholder="No doctor countersignature"
+                emptyText="No doctor matches"
+                options={context.doctors.map((d) => ({
+                  value: d.crewId,
+                  label: `${d.name} ${d.surname}`,
+                  hint: "Camp doctor",
+                }))}
+              />
             </FormField>
           </div>
         </FormSection>

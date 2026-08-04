@@ -5,7 +5,8 @@ import { ArrowLeft, ClipboardList, ListChecks, ShieldQuestion, TriangleAlert } f
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { Button } from "@/components/ui/button";
-import { Input, Select, Textarea } from "@/components/ui/field";
+import { Input, Textarea } from "@/components/ui/field";
+import { SearchSelect } from "@/components/ui/search-select";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
 import { ageYears, formatDate } from "@/lib/display";
@@ -131,18 +132,18 @@ export function IncidentFormPage() {
         <FormSection icon={<TriangleAlert size={15} />} title="Camper and timing">
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Camper" htmlFor="camper" className="col-span-2">
-              <Select
+              <SearchSelect
                 id="camper"
                 value={registrationId}
-                onChange={(e) => setRegistrationId(e.target.value)}
-              >
-                <option value="">Select a camper</option>
-                {context.roster.map((r) => (
-                  <option key={r.registrationId} value={r.registrationId}>
-                    {r.camper.firstName} {r.camper.surname} ({r.camper.fileNumber})
-                  </option>
-                ))}
-              </Select>
+                onChange={setRegistrationId}
+                placeholder="Search by name, file number or diagnosis…"
+                emptyText="No camper matches"
+                options={context.roster.map((r) => ({
+                  value: r.registrationId,
+                  label: `${r.camper.firstName} ${r.camper.surname}`,
+                  hint: `${r.camper.fileNumber}${r.diagnosis ? ` · ${r.diagnosis}` : ""}`,
+                }))}
+              />
             </FormField>
 
             {selected && (
