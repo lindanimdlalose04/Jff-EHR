@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, Lock, Pencil, Pill, Plus } from "lucide-react";
+import { Ban, Lock, Pencil, Pill, Plus } from "lucide-react";
 import type { PrescriptionDto } from "@/api/types";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -130,12 +131,14 @@ export function PrescriptionsPage() {
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link
-        to={`/registrations/${regId}/medications`}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Medication grid
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Campers", to: "/campers" },
+          { label: `${camper.firstName} ${camper.surname}`, to: `/campers/${camper.camperId}` },
+          { label: "Medication grid", to: `/registrations/${regId}/medications` },
+          { label: "Prescriptions" },
+        ]}
+      />
 
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>

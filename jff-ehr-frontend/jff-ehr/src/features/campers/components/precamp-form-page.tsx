@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, HeartPulse, NotebookPen, Pill, ShieldQuestion } from "lucide-react";
+import { HeartPulse, NotebookPen, Pill, ShieldQuestion } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -169,12 +170,13 @@ export function PrecampFormPage() {
 
   return (
     <div className="mx-auto max-w-[720px]">
-      <Link
-        to={backTo}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Back to profile
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Campers", to: "/campers" },
+          { label: `${camper.firstName} ${camper.surname}`, to: `/campers/${camper.camperId}` },
+          { label: existing ? "Edit pre-camp medical" : "Pre-camp medical" },
+        ]}
+      />
 
       <h1 className="text-lg font-medium text-primary">
         {existing ? "Edit pre-camp medical" : "Pre-camp medical"}

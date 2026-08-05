@@ -128,12 +128,11 @@ function parseList(raw: string | null): string[] {
 }
 
 /**
- * Filed events, scoped to the chosen active camp. Events whose registration
- * belongs to another camp are excluded, so the list matches the camp the rest
- * of the screen is acting on rather than mixing every camp's events together.
+ * Filed events. A campId scopes them to that camp; null means every camp (the
+ * "All camps" filter), so the screen supports both the day-to-day active-camp
+ * view and looking back across past camps.
  */
 export async function fetchIncidents(campId: string | null): Promise<IncidentRow[]> {
-  if (!campId) return [];
   const [events, registrations, campers, camps] = await Promise.all([
     get<MedicationEventDto[]>("/medicationevents"),
     get<CampRegistrationDto[]>("/campregistrations"),
@@ -145,7 +144,7 @@ export async function fetchIncidents(campId: string | null): Promise<IncidentRow
   const campById = new Map(camps.map((c) => [c.campId, c]));
 
   return events
-    .filter((e) => regById.get(e.registrationId)?.campId === campId)
+    .filter((e) => !campId || regById.get(e.registrationId)?.campId === campId)
     .map((e) => {
       const reg = regById.get(e.registrationId);
       const camp = reg && campById.get(reg.campId);

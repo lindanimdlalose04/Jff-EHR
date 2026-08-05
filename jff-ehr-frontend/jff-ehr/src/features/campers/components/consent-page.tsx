@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, FileCheck, FileText, Plus, ShieldCheck } from "lucide-react";
+import { Ban, FileCheck, FileText, Plus, ShieldCheck } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -93,12 +94,13 @@ export function ConsentPage() {
 
   return (
     <div className="mx-auto max-w-[760px]">
-      <Link
-        to={`/campers/${camper.camperId}?tab=history`}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Back to profile
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Campers", to: "/campers" },
+          { label: `${camper.firstName} ${camper.surname}`, to: `/campers/${camper.camperId}` },
+          { label: "Consent and indemnity" },
+        ]}
+      />
 
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>

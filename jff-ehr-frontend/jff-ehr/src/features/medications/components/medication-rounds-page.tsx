@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
@@ -23,6 +24,7 @@ export function MedicationRoundsPage() {
   const canRecord = me.data?.role === "medical";
   const { selectedCampId } = useActiveCamp();
   const [dayOffset, setDayOffset] = useState(0);
+  const [stateFilter, setStateFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [now] = useState(() => new Date());
 
@@ -61,9 +63,15 @@ export function MedicationRoundsPage() {
   const missedCount = data.entries.filter((e) => e.slot.state === "missed").length;
   const givenCount = data.entries.filter((e) => e.slot.state === "given").length;
 
+  // The status filter narrows the visible rows; the pills above stay day
+  // totals so the summary of the whole round is always in view.
+  const filteredEntries = stateFilter
+    ? data.entries.filter((e) => e.slot.state === stateFilter)
+    : data.entries;
+
   // Group by time slot: that is how the round is actually walked.
   const bySlot = new Map<string, RoundEntry[]>();
-  for (const entry of data.entries) {
+  for (const entry of filteredEntries) {
     if (!bySlot.has(entry.slot.time)) bySlot.set(entry.slot.time, []);
     bySlot.get(entry.slot.time)!.push(entry);
   }
@@ -82,7 +90,18 @@ export function MedicationRoundsPage() {
           {format(new Date(`${data.day}T00:00:00`), "EEEE d MMMM yyyy")}
           {data.isToday ? " (today)" : ""}
         </p>
-        <div className="flex gap-1.5">
+        <div className="flex items-center gap-1.5">
+          <Select
+            aria-label="Filter by dose status"
+            className="h-8 w-auto text-[12.5px]"
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+          >
+            <option value="">All doses</option>
+            <option value="given">Given</option>
+            <option value="missed">Missed</option>
+            <option value="pending">Pending</option>
+          </Select>
           <Button
             variant="secondary"
             className="h-8 px-2"
@@ -108,9 +127,11 @@ export function MedicationRoundsPage() {
         </div>
       )}
 
-      {data.entries.length === 0 ? (
+      {filteredEntries.length === 0 ? (
         <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
-          No doses scheduled on this day.
+          {data.entries.length === 0
+            ? "No doses scheduled on this day."
+            : "No doses match the current filter."}
         </div>
       ) : (
         [...bySlot.entries()].map(([time, entries]) => (
@@ -165,7 +186,14 @@ function RoundRow({
           {camper.firstName} {camper.surname}
         </Link>
         <div className="truncate text-[12px] text-muted">
-          {prescription.medicationName} · {prescription.dose}
+          <Link
+            to={`/registrations/${registration.registrationId}/prescriptions`}
+            className="text-secondary hover:text-primary hover:underline"
+          >
+            {prescription.medicationName}
+          </Link>
+          {" · "}
+          {prescription.dose}
           {prescription.route ? ` · ${prescription.route}` : ""}
           {registration.cabin ? ` · cabin ${registration.cabin}` : ""}
         </div>

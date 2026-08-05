@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, HeartPulse, Pencil, Plus, Tent, TriangleAlert, Trash2 } from "lucide-react";
+import { HeartPulse, Pencil, Plus, Tent, TriangleAlert, Trash2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -56,12 +57,12 @@ export function CamperProfilePage() {
 
   return (
     <div>
-      <Link
-        to="/campers"
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Campers
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Campers", to: "/campers" },
+          { label: `${detail.camper.firstName} ${detail.camper.surname}` },
+        ]}
+      />
 
       <ProfileHeader detail={detail} />
 

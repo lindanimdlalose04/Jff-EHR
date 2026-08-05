@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Tent } from "lucide-react";
+import { Tent } from "lucide-react";
 import { apiClient } from "@/api/client";
 import type { CampDto } from "@/api/types";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -116,12 +117,17 @@ export function CampFormPage() {
 
   return (
     <div className="mx-auto max-w-[640px]">
-      <Link
-        to={backTo}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> {isEdit ? "Back to camp" : "Camps"}
-      </Link>
+      <Breadcrumb
+        items={
+          isEdit
+            ? [
+                { label: "Camps", to: "/camps" },
+                { label: `Camp ${existing.data?.campNumber ?? ""}`, to: `/camps/${campId}` },
+                { label: "Edit" },
+              ]
+            : [{ label: "Camps", to: "/camps" }, { label: "New camp" }]
+        }
+      />
 
       <h1 className="mb-4 text-lg font-medium text-primary">
         {isEdit ? `Edit camp ${existing.data?.campNumber ?? ""}` : "New camp"}

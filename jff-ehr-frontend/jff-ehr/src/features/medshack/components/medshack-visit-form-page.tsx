@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
-  ArrowLeft,
   ClipboardList,
   FilePenLine,
   Plus,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
@@ -143,12 +143,9 @@ export function MedShackVisitFormPage() {
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link
-        to="/medshack"
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> MedShack
-      </Link>
+      <Breadcrumb
+        items={[{ label: "MedShack", to: "/medshack" }, { label: "New visit" }]}
+      />
 
       <h1 className="text-lg font-medium text-primary">MedShack visit</h1>
       <p className="mb-4 mt-0.5 text-[12.5px] text-muted">

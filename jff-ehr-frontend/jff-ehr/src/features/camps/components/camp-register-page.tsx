@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { apiClient } from "@/api/client";
 import type { CamperDto, CampDto, CampRegistrationDto } from "@/api/types";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
@@ -91,17 +92,15 @@ export function CampRegisterPage() {
 
   return (
     <div className="mx-auto max-w-[640px]">
-      <Link
-        to={`/camps/${campId}`}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Back to camp
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Camps", to: "/camps" },
+          { label: `Camp ${data.camp.campNumber}, ${data.camp.venue}`, to: `/camps/${campId}` },
+          { label: "Register a camper" },
+        ]}
+      />
 
       <h1 className="text-lg font-medium text-primary">Register a camper</h1>
-      <p className="mb-4 mt-0.5 text-[12.5px] text-muted">
-        Camp {data.camp.campNumber}, {data.camp.venue}
-      </p>
 
       {error && (
         <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">

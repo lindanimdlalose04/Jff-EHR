@@ -125,12 +125,11 @@ export interface VisitRow extends MedshackVisitDto {
 }
 
 /**
- * The visit list, scoped to the chosen active camp. Visits whose registration
- * belongs to another camp are excluded, so the list matches the camp the rest
- * of the screen is acting on rather than mixing every camp's visits together.
+ * The visit list. A campId scopes it to that camp; null means every camp (the
+ * "All camps" filter), which is how the screen supports both the day-to-day
+ * active-camp view and looking back across past camps.
  */
 export async function fetchVisits(campId: string | null): Promise<VisitRow[]> {
-  if (!campId) return [];
   const [visits, registrations, campers, camps] = await Promise.all([
     get<MedshackVisitDto[]>("/medshackvisits"),
     get<CampRegistrationDto[]>("/campregistrations"),
@@ -141,9 +140,9 @@ export async function fetchVisits(campId: string | null): Promise<VisitRow[]> {
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
   const campById = new Map(camps.map((c) => [c.campId, c]));
 
-  const scopedVisits = visits.filter(
-    (visit) => regById.get(visit.registrationId)?.campId === campId,
-  );
+  const scopedVisits = campId
+    ? visits.filter((visit) => regById.get(visit.registrationId)?.campId === campId)
+    : visits;
 
   const rows = await Promise.all(
     scopedVisits.map(async (visit): Promise<VisitRow> => {

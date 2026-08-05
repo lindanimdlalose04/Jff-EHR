@@ -3,13 +3,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, ShieldCheck, TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/field";
+import { Select, Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
+import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDateTime } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
-import { CampScopePicker } from "@/components/layout/camp-scope-picker";
+import { campFilterLabel } from "@/lib/camp-state";
+import { useCamps } from "@/features/camps/hooks/use-camps";
 import { fetchIncidents, reviewIncident, type IncidentRow } from "../api/incidents.api";
+
+type SortKey = "eventAt" | "discoveryAt";
+
+const SORT_OPTIONS = [
+  { value: "eventAt", label: "Event date" },
+  { value: "discoveryAt", label: "Discovery date" },
+];
 
 /**
  * Route "/incidents". Filed medication / treatment events. A filed report is
@@ -20,9 +29,18 @@ export function IncidentsPage() {
   const me = useMe();
   const canReview = me.data?.role === "medical";
   const { selectedCampId } = useActiveCamp();
+  const camps = useCamps();
+  const [campOverride, setCampOverride] = useState<string | null>(null);
+  const [reviewFilter, setReviewFilter] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("eventAt");
+  const [sortDir, setSortDir] = useState<SortDirection>("desc");
+
+  // Default to the active camp until the user picks; "" means every camp.
+  const campFilter = campOverride === null ? (selectedCampId ?? "") : campOverride;
+
   const { data: events, isLoading, isError } = useQuery({
-    queryKey: ["incidents", selectedCampId],
-    queryFn: () => fetchIncidents(selectedCampId),
+    queryKey: ["incidents", campFilter],
+    queryFn: () => fetchIncidents(campFilter || null),
   });
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading incidents…</div>;
@@ -35,16 +53,29 @@ export function IncidentsPage() {
   }
 
   const awaiting = events.filter((e) => !e.isReviewed).length;
+  const dir = sortDir === "asc" ? 1 : -1;
+  const rows = events
+    .filter(
+      (e) =>
+        !reviewFilter ||
+        (reviewFilter === "reviewed" ? e.isReviewed : !e.isReviewed),
+    )
+    .sort((a, b) =>
+      sortKey === "discoveryAt"
+        ? dir * a.discoveryAt.localeCompare(b.discoveryAt)
+        : dir * a.eventAt.localeCompare(b.eventAt),
+    );
+  const campOptions = [...(camps.data ?? [])].sort((a, b) => b.campNumber - a.campNumber);
+  const now = new Date();
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
         <h1 className="text-[17px] font-semibold text-primary">Incidents and near misses</h1>
-        <StatusPill tone="neutral">{events.length}</StatusPill>
+        <StatusPill tone="neutral">{rows.length}</StatusPill>
         {awaiting > 0 && <StatusPill tone="warning">{awaiting} awaiting review</StatusPill>}
-        <CampScopePicker className="ml-auto" />
         {canReview && (
-          <Link to="/incidents/new">
+          <Link to="/incidents/new" className="ml-auto">
             <Button variant="primary">
               <Plus size={15} />
               Report an event
@@ -53,17 +84,51 @@ export function IncidentsPage() {
         )}
       </div>
 
-      {events.length === 0 ? (
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Select
+          aria-label="Filter by camp"
+          className="h-9 w-auto text-[12.5px]"
+          value={campFilter}
+          onChange={(e) => setCampOverride(e.target.value)}
+        >
+          <option value="">All camps</option>
+          {campOptions.map((c) => (
+            <option key={c.campId} value={c.campId}>
+              {campFilterLabel(c, now)}
+            </option>
+          ))}
+        </Select>
+        <Select
+          aria-label="Filter by review status"
+          className="h-9 w-auto text-[12.5px]"
+          value={reviewFilter}
+          onChange={(e) => setReviewFilter(e.target.value)}
+        >
+          <option value="">All events</option>
+          <option value="awaiting">Awaiting review</option>
+          <option value="reviewed">Reviewed</option>
+        </Select>
+        <SortControl
+          className="ml-auto"
+          options={SORT_OPTIONS}
+          value={sortKey}
+          direction={sortDir}
+          onChange={(v) => setSortKey(v as SortKey)}
+          onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+        />
+      </div>
+
+      {rows.length === 0 ? (
         <div className="rounded-card border border-card bg-surface px-4 py-10 text-center">
           <TriangleAlert size={22} className="mx-auto text-muted" />
-          <p className="mt-2 text-[13px] font-medium text-primary">No events reported</p>
+          <p className="mt-2 text-[13px] font-medium text-primary">No events to show</p>
           <p className="mt-1 text-[12.5px] text-muted">
-            Medication and treatment events are reported here. Nothing has been filed yet.
+            Nothing matches the current filters.
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {events.map((event) => (
+          {rows.map((event) => (
             <IncidentCard key={event.eventId} event={event} canReview={canReview} />
           ))}
         </div>

@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Droplet, HeartPulse, Pencil, ShieldCheck } from "lucide-react";
+import { Droplet, HeartPulse, Pencil, ShieldCheck } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate, formatDateTime, initialsOf } from "@/lib/display";
@@ -31,12 +32,12 @@ export function CrewDetailPage() {
 
   return (
     <div>
-      <Link
-        to="/crew"
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Crew
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Crew", to: "/crew" },
+          { label: `${crew.name} ${crew.surname}` },
+        ]}
+      />
 
       <div className="flex items-start gap-4 rounded-card border border-card bg-surface p-5">
         {crew.photoUrl ? (

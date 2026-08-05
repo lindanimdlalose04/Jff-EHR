@@ -45,3 +45,16 @@ export function getActiveCamps<T extends CampLike>(camps: T[], now: Date): T[] {
     .filter((camp) => isCampActive(camp, now))
     .sort((a, b) => a.startDate.localeCompare(b.startDate) || a.endDate.localeCompare(b.endDate));
 }
+
+interface NamedCamp extends CampLike {
+  campNumber: number;
+  venue: string;
+}
+
+/**
+ * A camp's label for filter dropdowns, tagged with its derived state so a past
+ * or planned camp reads unambiguously when picked from a list of every camp.
+ */
+export function campFilterLabel(camp: NamedCamp, now: Date): string {
+  return `Camp ${camp.campNumber}, ${camp.venue} · ${deriveCampState(camp, now)}`;
+}

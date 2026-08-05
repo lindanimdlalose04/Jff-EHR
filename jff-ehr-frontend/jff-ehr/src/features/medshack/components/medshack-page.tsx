@@ -3,26 +3,46 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/field";
+import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
+import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDateTime, initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
-import { CampScopePicker } from "@/components/layout/camp-scope-picker";
+import { campFilterLabel } from "@/lib/camp-state";
+import { useCamps } from "@/features/camps/hooks/use-camps";
 import { appendTreatment, fetchVisits, type VisitRow } from "../api/medshack.api";
+
+type SortKey = "date" | "camper";
+
+const SORT_OPTIONS = [
+  { value: "date", label: "Visit date" },
+  { value: "camper", label: "Camper name" },
+];
 
 /**
  * Route "/medshack". The visit list. Visits themselves are append and correct
  * only, but treatments are append-only rows, so a further treatment can be
  * added to an existing visit from here without touching the visit record.
+ *
+ * The camp filter defaults to the active camp (the day-to-day view) but can be
+ * switched to any past or planned camp, or to every camp at once.
  */
 export function MedShackPage() {
   const me = useMe();
   const canRecord = me.data?.role === "medical";
   const { selectedCampId } = useActiveCamp();
+  const camps = useCamps();
+  const [campOverride, setCampOverride] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [sortDir, setSortDir] = useState<SortDirection>("desc");
+
+  // Default to the active camp until the user picks; "" means every camp.
+  const campFilter = campOverride === null ? (selectedCampId ?? "") : campOverride;
+
   const { data: visits, isLoading, isError } = useQuery({
-    queryKey: ["medshack-visits", selectedCampId],
-    queryFn: () => fetchVisits(selectedCampId),
+    queryKey: ["medshack-visits", campFilter],
+    queryFn: () => fetchVisits(campFilter || null),
   });
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading visits…</div>;
@@ -34,14 +54,25 @@ export function MedShackPage() {
     );
   }
 
+  const now = new Date();
+  const dir = sortDir === "asc" ? 1 : -1;
+  const rows = [...visits].sort((a, b) => {
+    if (sortKey === "camper") {
+      const an = a.camper ? `${a.camper.surname} ${a.camper.firstName}` : "";
+      const bn = b.camper ? `${b.camper.surname} ${b.camper.firstName}` : "";
+      return dir * (an.localeCompare(bn) || a.visitAt.localeCompare(b.visitAt));
+    }
+    return dir * a.visitAt.localeCompare(b.visitAt);
+  });
+  const campOptions = [...(camps.data ?? [])].sort((a, b) => b.campNumber - a.campNumber);
+
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
         <h1 className="text-[17px] font-semibold text-primary">MedShack</h1>
-        <StatusPill tone="neutral">{visits.length} visits</StatusPill>
-        <CampScopePicker className="ml-auto" />
+        <StatusPill tone="neutral">{rows.length} visits</StatusPill>
         {canRecord && (
-          <Link to="/medshack/new">
+          <Link to="/medshack/new" className="ml-auto">
             <Button variant="primary">
               <Plus size={15} />
               New visit
@@ -50,13 +81,37 @@ export function MedShackPage() {
         )}
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Select
+          aria-label="Filter by camp"
+          className="h-9 w-auto text-[12.5px]"
+          value={campFilter}
+          onChange={(e) => setCampOverride(e.target.value)}
+        >
+          <option value="">All camps</option>
+          {campOptions.map((c) => (
+            <option key={c.campId} value={c.campId}>
+              {campFilterLabel(c, now)}
+            </option>
+          ))}
+        </Select>
+        <SortControl
+          className="ml-auto"
+          options={SORT_OPTIONS}
+          value={sortKey}
+          direction={sortDir}
+          onChange={(v) => setSortKey(v as SortKey)}
+          onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+        />
+      </div>
+
       <div className="space-y-3">
-        {visits.map((visit) => (
+        {rows.map((visit) => (
           <VisitCard key={visit.visitId} visit={visit} canRecord={canRecord} />
         ))}
-        {visits.length === 0 && (
+        {rows.length === 0 && (
           <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
-            No MedShack visits recorded yet.
+            No MedShack visits match the current filter.
           </div>
         )}
       </div>

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ChevronLeft, ChevronRight, Check, Pill, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Pill, TriangleAlert } from "lucide-react";
 import { format } from "date-fns";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useMe } from "@/features/auth/use-me";
 import {
@@ -90,12 +91,13 @@ export function MedicationGridPage() {
 
   return (
     <div>
-      <Link
-        to={`/campers/${camper.camperId}?tab=history`}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Back to profile
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Campers", to: "/campers" },
+          { label: `${camper.firstName} ${camper.surname}`, to: `/campers/${camper.camperId}` },
+          { label: "Medication grid" },
+        ]}
+      />
 
       <div className="rounded-card border border-card bg-surface p-4">
         <h1 className="text-[16px] font-semibold text-primary">

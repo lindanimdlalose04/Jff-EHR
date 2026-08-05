@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Droplet, HeartPulse, Pill, ShieldCheck } from "lucide-react";
+import { Droplet, HeartPulse, Pill, ShieldCheck } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -117,12 +118,13 @@ export function CrewCheckinPage() {
   if (!data.activeCamp) {
     return (
       <div className="mx-auto max-w-[720px]">
-        <Link
-          to={`/crew/${crewId}`}
-          className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-        >
-          <ArrowLeft size={14} /> Back to crew member
-        </Link>
+        <Breadcrumb
+          items={[
+            { label: "Crew", to: "/crew" },
+            { label: `${data.crew.name} ${data.crew.surname}`, to: `/crew/${crewId}` },
+            { label: "Medical check-in" },
+          ]}
+        />
         <div className="rounded-card border border-card bg-surface p-6 text-center text-[13px] text-muted">
           There is no active camp to check this crew member into.
         </div>
@@ -134,12 +136,13 @@ export function CrewCheckinPage() {
 
   return (
     <div className="mx-auto max-w-[720px]">
-      <Link
-        to={`/crew/${crewId}`}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Back to crew member
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Crew", to: "/crew" },
+          { label: `${crew.name} ${crew.surname}`, to: `/crew/${crewId}` },
+          { label: "Medical check-in" },
+        ]}
+      />
 
       <h1 className="text-lg font-medium text-primary">Crew medical check-in</h1>
       <p className="mb-4 mt-0.5 text-[12.5px] text-muted">

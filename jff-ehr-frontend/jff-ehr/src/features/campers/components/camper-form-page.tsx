@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, UserRoundPlus } from "lucide-react";
+import { UserRoundPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "@/api/client";
 import type { CamperDto } from "@/api/types";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -132,12 +133,20 @@ export function CamperFormPage() {
 
   return (
     <div className="mx-auto max-w-[720px]">
-      <Link
-        to={backTo}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> {isEdit ? "Back to profile" : "Campers"}
-      </Link>
+      <Breadcrumb
+        items={
+          isEdit
+            ? [
+                { label: "Campers", to: "/campers" },
+                {
+                  label: `${existing.data?.firstName ?? ""} ${existing.data?.surname ?? ""}`.trim(),
+                  to: `/campers/${camperId}`,
+                },
+                { label: "Edit" },
+              ]
+            : [{ label: "Campers", to: "/campers" }, { label: "New camper" }]
+        }
+      />
 
       <h1 className="mb-4 text-lg font-medium text-primary">
         {isEdit ? `Edit ${existing.data?.firstName} ${existing.data?.surname}` : "New camper"}

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ClipboardList, ListChecks, ShieldQuestion, TriangleAlert } from "lucide-react";
+import { ClipboardList, ListChecks, ShieldQuestion, TriangleAlert } from "lucide-react";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
@@ -102,12 +103,9 @@ export function IncidentFormPage() {
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link
-        to="/incidents"
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Incidents
-      </Link>
+      <Breadcrumb
+        items={[{ label: "Incidents", to: "/incidents" }, { label: "Report an event" }]}
+      />
 
       <h1 className="text-lg font-medium text-primary">
         Medication / treatment event / near miss

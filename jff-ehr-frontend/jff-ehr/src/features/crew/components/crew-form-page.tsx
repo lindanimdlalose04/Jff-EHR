@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, UserRoundCog } from "lucide-react";
+import { UserRoundCog } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
@@ -101,12 +102,20 @@ export function CrewFormPage() {
 
   return (
     <div className="mx-auto max-w-[640px]">
-      <Link
-        to={backTo}
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> {isEdit ? "Back to crew member" : "Crew"}
-      </Link>
+      <Breadcrumb
+        items={
+          isEdit
+            ? [
+                { label: "Crew", to: "/crew" },
+                {
+                  label: `${existing.data?.name ?? ""} ${existing.data?.surname ?? ""}`.trim(),
+                  to: `/crew/${crewId}`,
+                },
+                { label: "Edit" },
+              ]
+            : [{ label: "Crew", to: "/crew" }, { label: "New crew member" }]
+        }
+      />
 
       <h1 className="mb-4 text-lg font-medium text-primary">
         {isEdit ? `Edit ${existing.data?.name} ${existing.data?.surname}` : "New crew member"}

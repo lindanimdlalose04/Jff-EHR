@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -13,6 +12,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
 import {
@@ -64,12 +64,12 @@ export function CampDetailPage() {
 
   return (
     <div>
-      <Link
-        to="/camps"
-        className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-secondary hover:text-primary"
-      >
-        <ArrowLeft size={14} /> Camps
-      </Link>
+      <Breadcrumb
+        items={[
+          { label: "Camps", to: "/camps" },
+          { label: `Camp ${camp.campNumber}, ${camp.venue}` },
+        ]}
+      />
 
       <div className="rounded-card border border-card bg-surface p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -200,13 +200,27 @@ function RosterTab({ hub }: { hub: CampHub }) {
                 </span>
               </span>
             </Link>
-            {pill === "no consent" ? (
-              <Link to={`/registrations/${registration.registrationId}/consent`}>
-                <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
+            <div className="flex shrink-0 items-center gap-3">
+              <Link
+                to={`/registrations/${registration.registrationId}/precamp`}
+                className="hidden text-[11.5px] font-medium text-accent hover:underline sm:inline"
+              >
+                Pre-camp
               </Link>
-            ) : (
-              <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
-            )}
+              <Link
+                to={`/registrations/${registration.registrationId}/arrival-check`}
+                className="hidden text-[11.5px] font-medium text-accent hover:underline sm:inline"
+              >
+                Arrival
+              </Link>
+              {pill === "no consent" ? (
+                <Link to={`/registrations/${registration.registrationId}/consent`}>
+                  <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
+                </Link>
+              ) : (
+                <StatusPill tone={pillTone(pill)}>{pill}</StatusPill>
+              )}
+            </div>
           </div>
         ))}
         {hub.roster.length === 0 && (
