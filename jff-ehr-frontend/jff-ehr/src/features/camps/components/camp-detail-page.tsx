@@ -23,6 +23,7 @@ import {
   statusTone,
 } from "@/lib/display";
 import { deriveCampState } from "@/lib/camp-state";
+import { CampCrewTab } from "@/features/crew/components/camp-crew-tab";
 import { fetchCampHub, pillTone, type CampHub } from "../api/camp-hub.api";
 
 /**
@@ -34,7 +35,7 @@ import { fetchCampHub, pillTone, type CampHub } from "../api/camp-hub.api";
  * a missing consent record shows red ahead of any assessment state.
  */
 
-const TABS = ["Roster", "Medication grid", "MedShack", "Incidents"] as const;
+const TABS = ["Roster", "Crew", "Medication grid", "MedShack", "Incidents"] as const;
 type Tab = (typeof TABS)[number];
 
 export function CampDetailPage() {
@@ -130,6 +131,7 @@ export function CampDetailPage() {
 
       <div className="pt-4">
         {tab === "Roster" && <RosterTab hub={data} />}
+        {tab === "Crew" && <CampCrewTab campId={camp.campId} />}
         {tab === "Medication grid" && (
           <MedicationTab
             hub={data}

@@ -197,6 +197,11 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
             {t}
           </span>
         ))}
+        {event.otherEventType && (
+          <span className="rounded-full bg-danger-tint px-2 py-0.5 text-[11px] font-medium text-danger">
+            Other: {event.otherEventType}
+          </span>
+        )}
         {event.factors.map((f) => (
           <span
             key={f}
@@ -205,6 +210,11 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
             {f}
           </span>
         ))}
+        {event.otherContributingFactor && (
+          <span className="rounded-full bg-neutral-tint px-2 py-0.5 text-[11px] font-medium text-neutral">
+            Other: {event.otherContributingFactor}
+          </span>
+        )}
       </div>
 
       <p className="mt-2 text-[12.5px] text-secondary">{event.description}</p>

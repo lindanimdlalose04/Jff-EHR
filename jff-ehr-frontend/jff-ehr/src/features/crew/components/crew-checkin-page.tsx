@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Droplet, HeartPulse, Pill, ShieldCheck } from "lucide-react";
+import { HeartPulse, NotebookPen, Pill, ShieldCheck } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/field";
+import { Input, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { useMe } from "@/features/auth/use-me";
@@ -28,23 +28,19 @@ import {
 
 interface Draft {
   allergies: string;
-  hasBroviacPort: boolean;
-  hasBloodCount: boolean;
   eyesight: string;
   hearing: string;
-  mobilityAids: string;
   currentMedications: string;
+  comments: string;
   medicalReleaseSigned: boolean;
 }
 
 const empty: Draft = {
   allergies: "",
-  hasBroviacPort: false,
-  hasBloodCount: false,
   eyesight: "",
   hearing: "",
-  mobilityAids: "",
   currentMedications: "",
+  comments: "",
   medicalReleaseSigned: false,
 };
 
@@ -70,12 +66,10 @@ export function CrewCheckinPage() {
     if (!c) return;
     setDraft({
       allergies: c.allergies ?? "",
-      hasBroviacPort: c.hasBroviacPort,
-      hasBloodCount: c.hasBloodCount,
       eyesight: c.eyesight ?? "",
       hearing: c.hearing ?? "",
-      mobilityAids: c.mobilityAids ?? "",
       currentMedications: c.currentMedications ?? "",
+      comments: c.comments ?? "",
       medicalReleaseSigned: c.medicalReleaseSigned,
     });
   }, [data?.checkin]);
@@ -84,12 +78,10 @@ export function CrewCheckinPage() {
     mutationFn: async () => {
       const payload: CheckinPayload = {
         allergies: draft.allergies.trim() || null,
-        hasBroviacPort: draft.hasBroviacPort,
-        hasBloodCount: draft.hasBloodCount,
         eyesight: draft.eyesight.trim() || null,
         hearing: draft.hearing.trim() || null,
-        mobilityAids: draft.mobilityAids.trim() || null,
         currentMedications: draft.currentMedications.trim() || null,
+        comments: draft.comments.trim() || null,
         medicalReleaseSigned: draft.medicalReleaseSigned,
       };
       if (data?.checkin) {
@@ -173,36 +165,18 @@ export function CrewCheckinPage() {
             <FormField label="Hearing" htmlFor="hearing">
               <Input id="hearing" value={draft.hearing} onChange={(e) => set({ hearing: e.target.value })} />
             </FormField>
-            <FormField label="Mobility aids" htmlFor="mobilityAids" className="col-span-2">
-              <Input id="mobilityAids" value={draft.mobilityAids} onChange={(e) => set({ mobilityAids: e.target.value })} />
-            </FormField>
           </div>
         </FormSection>
 
-        <FormSection icon={<Droplet size={15} />} title="Crew-specific" tone="danger">
-          <p className="mb-2 text-[11.5px] text-muted">
-            These two fields are on the crew form and not the camper form.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
-              <input
-                type="checkbox"
-                className="accent-accent"
-                checked={draft.hasBroviacPort}
-                onChange={(e) => set({ hasBroviacPort: e.target.checked })}
-              />
-              Broviac / Port-a-cath
-            </label>
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
-              <input
-                type="checkbox"
-                className="accent-accent"
-                checked={draft.hasBloodCount}
-                onChange={(e) => set({ hasBloodCount: e.target.checked })}
-              />
-              Blood count
-            </label>
-          </div>
+        <FormSection icon={<NotebookPen size={15} />} title="Comments">
+          <FormField label="Anything clinically notable" htmlFor="comments">
+            <Textarea
+              id="comments"
+              value={draft.comments}
+              onChange={(e) => set({ comments: e.target.value })}
+              placeholder="Broviac / port, blood count, mobility, or anything else worth noting"
+            />
+          </FormField>
         </FormSection>
 
         <FormSection icon={<Pill size={15} />} title="Medication">

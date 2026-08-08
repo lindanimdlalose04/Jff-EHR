@@ -193,6 +193,8 @@ export interface MedicationEventDto {
   description: string | null;
   eventTypes: string | null;
   contributingFactors: string | null;
+  otherEventType: string | null;
+  otherContributingFactor: string | null;
   immediateAction: string | null;
   doctorNotified: string | null;
   noTreatmentOrdered: boolean;
@@ -231,23 +233,32 @@ export interface CrewMemberDto {
 
 export interface CrewMedicalCheckinDto {
   checkinId: string;
+  /** The crew member's per-camp registration this check-in hangs off (B3 full mirror). */
+  crewRegistrationId: string;
   crewId: string;
   crewName: string | null;
   campId: string;
   allergies: string | null;
-  /** Crew-specific: campers do not have this field. */
-  hasBroviacPort: boolean;
-  /** Crew-specific: campers do not have this field. */
-  hasBloodCount: boolean;
   eyesight: string | null;
   hearing: string | null;
-  mobilityAids: string | null;
   currentMedications: string | null;
+  /** Free-text notes; replaced the broviac/port, blood-count and mobility fields. */
+  comments: string | null;
   /** The crew indemnity / medical release acknowledgement gate. */
   medicalReleaseSigned: boolean;
   checkedInBy: string;
   checkedInByName: string | null;
   checkedInAt: string;
+}
+
+export interface CrewCampRegistrationDto {
+  crewRegistrationId: string;
+  crewId: string;
+  crewName: string | null;
+  campId: string;
+  role: string | null;
+  status: string;
+  registeredAt: string;
 }
 
 export interface ConsentRecordDto {

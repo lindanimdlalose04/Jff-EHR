@@ -18,6 +18,12 @@ public class MedicationEvent : ISoftDeletableClinicalEntity
     /// <summary>jsonb, stored as raw JSON text at this layer.</summary>
     public string? ContributingFactors { get; set; }
 
+    /// <summary>Free text for the "Other" initial impression, captured only when that box is ticked. The fixed nine in EventTypes are never changed.</summary>
+    public string? OtherEventType { get; set; }
+
+    /// <summary>Free text for the "Other" contributing factor, captured only when that box is ticked. The fixed three in ContributingFactors are never changed.</summary>
+    public string? OtherContributingFactor { get; set; }
+
     public required string ImmediateAction { get; set; }
     public string? DoctorNotified { get; set; }
 

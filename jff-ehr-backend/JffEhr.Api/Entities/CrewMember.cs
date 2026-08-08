@@ -24,7 +24,7 @@ public class CrewMember
 
     public User? User { get; set; }
 
-    public ICollection<CrewMedicalCheckin> MedicalCheckins { get; set; } = new List<CrewMedicalCheckin>();
+    public ICollection<CrewCampRegistration> CampRegistrations { get; set; } = new List<CrewCampRegistration>();
     public ICollection<CrewMedicalCheckin> CheckInsPerformed { get; set; } = new List<CrewMedicalCheckin>();
     public ICollection<PrecampMedical> PrecampMedicalsCaptured { get; set; } = new List<PrecampMedical>();
     public ICollection<ArrivalCheck> ArrivalChecksAssessed { get; set; } = new List<ArrivalCheck>();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserRoundPlus } from "lucide-react";
+import { Upload, UserRoundPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
+import { uploadDocument } from "@/lib/storage-upload";
 import { createCamper, updateCamper, type CamperPayload } from "../api/campers-crud.api";
 
 /**
@@ -58,11 +59,26 @@ export function CamperFormPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CamperFormValues>({
     resolver: zodResolver(camperSchema),
     defaultValues: { sex: "M" },
   });
+  const [uploading, setUploading] = useState(false);
+
+  const uploadPhoto = async (file: File) => {
+    setUploading(true);
+    try {
+      setValue("photoUrl", await uploadDocument("camper-photos", file), {
+        shouldValidate: true,
+      });
+    } catch {
+      // Leave the field untouched; the caregiver can paste a URL instead.
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (existing.data) {
@@ -195,8 +211,25 @@ export function CamperFormPage() {
             <FormField label="Address" htmlFor="address" error={errors.address?.message} className="col-span-2">
               <Textarea id="address" {...register("address")} />
             </FormField>
-            <FormField label="Photo URL" htmlFor="photoUrl" error={errors.photoUrl?.message} className="col-span-2">
-              <Input id="photoUrl" placeholder="https://…" {...register("photoUrl")} />
+            <FormField label="Photo or scanned document (URL or upload)" htmlFor="photoUrl" error={errors.photoUrl?.message} className="col-span-2">
+              <div className="flex gap-2">
+                <Input id="photoUrl" placeholder="https://… or upload" {...register("photoUrl")} />
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary hover:text-primary">
+                  <Upload size={14} />
+                  {uploading ? "Uploading…" : "Upload"}
+                  <input
+                    type="file"
+                    accept="application/pdf,image/*"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadPhoto(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
             </FormField>
           </div>
         </FormSection>

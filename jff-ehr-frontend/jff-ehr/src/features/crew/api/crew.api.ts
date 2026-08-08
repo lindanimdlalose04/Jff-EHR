@@ -1,6 +1,7 @@
 import { apiClient } from "@/api/client";
 import type {
   CampDto,
+  CrewCampRegistrationDto,
   CrewMedicalCheckinDto,
   CrewMemberDto,
 } from "@/api/types";
@@ -84,16 +85,25 @@ export async function fetchCrewList(): Promise<CrewListContext> {
 // Crew detail and check-in
 // ---------------------------------------------------------------------------
 
+/** One camp this crew member is registered to, with the camp joined in. */
+export interface CrewCampEntry {
+  registration: CrewCampRegistrationDto;
+  camp: CampDto | null;
+}
+
 export interface CrewDetailContext {
   crew: CrewMemberDto;
   activeCamp: CampDto | null;
   checkin: CrewMedicalCheckinDto | null;
+  /** Every camp this crew member is registered to (B3), most recent first. */
+  camps: CrewCampEntry[];
 }
 
 export async function fetchCrewDetail(crewId: string): Promise<CrewDetailContext> {
-  const [crew, camps] = await Promise.all([
+  const [crew, camps, registrations] = await Promise.all([
     fetchCrewMember(crewId),
     get<CampDto[]>("/camps"),
+    get<CrewCampRegistrationDto[]>("/crewcampregistrations", { crewId }),
   ]);
   const now = new Date();
   const activeCamp = camps.find((c) => isCampActive(c, now)) ?? null;
@@ -103,17 +113,21 @@ export async function fetchCrewDetail(crewId: string): Promise<CrewDetailContext
         crewId,
       })
     : [];
-  return { crew, activeCamp, checkin: checkins[0] ?? null };
+
+  const campById = new Map(camps.map((c) => [c.campId, c]));
+  const campEntries = registrations
+    .map((r) => ({ registration: r, camp: campById.get(r.campId) ?? null }))
+    .sort((a, b) => (b.camp?.startDate ?? "").localeCompare(a.camp?.startDate ?? ""));
+
+  return { crew, activeCamp, checkin: checkins[0] ?? null, camps: campEntries };
 }
 
 export interface CheckinPayload {
   allergies: string | null;
-  hasBroviacPort: boolean;
-  hasBloodCount: boolean;
   eyesight: string | null;
   hearing: string | null;
-  mobilityAids: string | null;
   currentMedications: string | null;
+  comments: string | null;
   medicalReleaseSigned: boolean;
 }
 
@@ -136,4 +150,77 @@ export async function updateCrewCheckin(
   payload: CheckinPayload,
 ): Promise<void> {
   await apiClient.put(`/crewmedicalcheckins/${checkinId}`, payload);
+}
+
+// ---------------------------------------------------------------------------
+// Crew-to-camp attendance (B3). A crew member is registered per camp, mirroring
+// how a camper registers; attendance is a distinct fact from the medical
+// check-in, so a person can be attending a camp yet "not checked in".
+// ---------------------------------------------------------------------------
+
+export interface CampCrewEntry {
+  registration: CrewCampRegistrationDto;
+  crew: CrewMemberDto | null;
+  checkin: CrewMedicalCheckinDto | null;
+}
+
+/** Crew registered to one camp, joined with each member and their check-in. */
+export async function fetchCampCrew(campId: string): Promise<CampCrewEntry[]> {
+  const [registrations, crew, checkins] = await Promise.all([
+    get<CrewCampRegistrationDto[]>("/crewcampregistrations", { campId }),
+    get<CrewMemberDto[]>("/crewmembers"),
+    get<CrewMedicalCheckinDto[]>("/crewmedicalcheckins", { campId }),
+  ]);
+  const crewById = new Map(crew.map((c) => [c.crewId, c]));
+  const checkinByCrew = new Map(checkins.map((c) => [c.crewId, c]));
+  return registrations
+    .map((r) => ({
+      registration: r,
+      crew: crewById.get(r.crewId) ?? null,
+      checkin: checkinByCrew.get(r.crewId) ?? null,
+    }))
+    .sort((a, b) =>
+      `${a.crew?.surname ?? ""} ${a.crew?.name ?? ""}`.localeCompare(
+        `${b.crew?.surname ?? ""} ${b.crew?.name ?? ""}`,
+      ),
+    );
+}
+
+/** Crew members not yet registered to the given camp (for the add picker). */
+export async function fetchCrewNotInCamp(campId: string): Promise<CrewMemberDto[]> {
+  const [registrations, crew] = await Promise.all([
+    get<CrewCampRegistrationDto[]>("/crewcampregistrations", { campId }),
+    get<CrewMemberDto[]>("/crewmembers"),
+  ]);
+  const taken = new Set(registrations.map((r) => r.crewId));
+  return crew
+    .filter((c) => !taken.has(c.crewId))
+    .sort((a, b) => `${a.surname} ${a.name}`.localeCompare(`${b.surname} ${b.name}`));
+}
+
+export async function addCrewToCamp(
+  crewId: string,
+  campId: string,
+  role: string | null,
+): Promise<CrewCampRegistrationDto> {
+  return (
+    await apiClient.post<CrewCampRegistrationDto>("/crewcampregistrations", {
+      crewId,
+      campId,
+      role,
+      status: "registered",
+    })
+  ).data;
+}
+
+export async function updateCrewRegistration(
+  crewRegistrationId: string,
+  status: string,
+  role: string | null,
+): Promise<void> {
+  await apiClient.put(`/crewcampregistrations/${crewRegistrationId}`, { status, role });
+}
+
+export async function removeCrewFromCamp(crewRegistrationId: string): Promise<void> {
+  await apiClient.delete(`/crewcampregistrations/${crewRegistrationId}`);
 }

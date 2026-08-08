@@ -27,6 +27,7 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
     public DbSet<User> Users => Set<User>();
     public DbSet<Camp> Camps => Set<Camp>();
     public DbSet<CampRegistration> CampRegistrations => Set<CampRegistration>();
+    public DbSet<CrewCampRegistration> CrewCampRegistrations => Set<CrewCampRegistration>();
     public DbSet<ConsentRecord> ConsentRecords => Set<ConsentRecord>();
     public DbSet<CrewMedicalCheckin> CrewMedicalCheckins => Set<CrewMedicalCheckin>();
     public DbSet<PrecampMedical> PrecampMedicals => Set<PrecampMedical>();
@@ -47,6 +48,7 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
         ConfigureUser(modelBuilder);
         ConfigureCamp(modelBuilder);
         ConfigureCampRegistration(modelBuilder);
+        ConfigureCrewCampRegistration(modelBuilder);
         ConfigureConsentRecord(modelBuilder);
         ConfigureCrewMedicalCheckin(modelBuilder);
         ConfigurePrecampMedical(modelBuilder);
@@ -226,11 +228,6 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
                 .WithOne(e => e.Camp)
                 .HasForeignKey(e => e.CampId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany(e => e.CrewMedicalCheckins)
-                .WithOne(e => e.Camp)
-                .HasForeignKey(e => e.CampId)
-                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 
@@ -272,6 +269,39 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
         });
     }
 
+    private static void ConfigureCrewCampRegistration(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CrewCampRegistration>(entity =>
+        {
+            entity.HasKey(e => e.CrewRegistrationId);
+
+            entity.Property(e => e.Role).HasMaxLength(60);
+            entity.Property(e => e.Status).HasMaxLength(20);
+
+            // Mirrors camp_registrations: persistent crew member protected by a
+            // restrict FK, camp episode cascades, one registration per crew member
+            // per camp.
+            entity.HasOne(e => e.CrewMember)
+                .WithMany(e => e.CampRegistrations)
+                .HasForeignKey(e => e.CrewId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Camp)
+                .WithMany()
+                .HasForeignKey(e => e.CampId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.CrewId, e.CampId }).IsUnique();
+
+            // The medical check-in hangs off the registration (full mirror of the
+            // camper clinical chain); removing a registration takes its check-in.
+            entity.HasMany(e => e.MedicalCheckins)
+                .WithOne(e => e.CrewCampRegistration)
+                .HasForeignKey(e => e.CrewRegistrationId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
     private static void ConfigureConsentRecord(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ConsentRecord>(entity =>
@@ -293,11 +323,9 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
         {
             entity.HasKey(e => e.CheckinId);
 
-            entity.HasOne(e => e.CrewMember)
-                .WithMany(e => e.MedicalCheckins)
-                .HasForeignKey(e => e.CrewId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            // CrewCampRegistration -> CrewMedicalCheckin is configured from the
+            // registration side in ConfigureCrewCampRegistration; the crew member
+            // and camp are read through the registration.
             // CheckedInByCrewMember -> CrewMember.CheckInsPerformed is configured
             // from the CrewMember side in ConfigureCrewMember.
         });

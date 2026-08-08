@@ -88,6 +88,10 @@ export interface IncidentPayload {
   eventTypes: string;
   /** JSON array drawn from CONTRIBUTING_FACTORS. */
   contributingFactors: string | null;
+  /** Free text when "Other" impression is ticked; null otherwise. */
+  otherEventType: string | null;
+  /** Free text when "Other" contributing factor is ticked; null otherwise. */
+  otherContributingFactor: string | null;
   immediateAction: string;
   doctorNotified: string | null;
   noTreatmentOrdered: boolean;

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Check, Pill, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, FileDown, Pill, TriangleAlert } from "lucide-react";
 import { format } from "date-fns";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { exportMedicationAdministrationRecord } from "@/lib/mar-pdf";
 import { useMe } from "@/features/auth/use-me";
 import {
   fetchCamperGrid,
@@ -133,6 +134,13 @@ export function MedicationGridPage() {
           Week of {format(weekStart, "d MMMM yyyy")}
         </h2>
         <div className="flex gap-1.5">
+          <Button
+            variant="secondary"
+            className="h-8 px-3"
+            onClick={() => exportMedicationAdministrationRecord(data)}
+          >
+            <FileDown size={13} /> Export PDF
+          </Button>
           <Link to={`/registrations/${regId}/prescriptions`}>
             <Button variant="secondary" className="h-8 px-3">
               <Pill size={13} /> Prescriptions

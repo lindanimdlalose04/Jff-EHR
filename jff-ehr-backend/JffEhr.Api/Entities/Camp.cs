@@ -17,5 +17,4 @@ public class Camp
     public DateTimeOffset CreatedAt { get; set; }
 
     public ICollection<CampRegistration> Registrations { get; set; } = new List<CampRegistration>();
-    public ICollection<CrewMedicalCheckin> CrewMedicalCheckins { get; set; } = new List<CrewMedicalCheckin>();
 }

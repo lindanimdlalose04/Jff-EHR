@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ban, FileCheck, FileText, Plus, ShieldCheck } from "lucide-react";
+import { Ban, FileCheck, FileText, Plus, ShieldCheck, Upload } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
@@ -9,6 +9,7 @@ import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate } from "@/lib/display";
+import { supabase } from "@/lib/supabase";
 import { useMe } from "@/features/auth/use-me";
 import {
   CONSENT_TYPES,
@@ -231,8 +232,31 @@ function ConsentForm({
   const [signedAt, setSignedAt] = useState(today);
   const [documentUrl, setDocumentUrl] = useState("");
   const [popiaAcknowledged, setPopiaAcknowledged] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const valid = consentType && signedBy.trim() && signedAt && popiaAcknowledged;
+
+  // Upload a signed PDF (or scanned image) to Supabase Storage and use its URL,
+  // so a document can come from the computer, not only a pasted link (C2).
+  const uploadDocument = async (file: File) => {
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, "_");
+      const path = `consent/${crypto.randomUUID()}-${safeName}`;
+      const { error: upErr } = await supabase.storage
+        .from("consent-documents")
+        .upload(path, file, { contentType: file.type || "application/pdf", upsert: false });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("consent-documents").getPublicUrl(path);
+      setDocumentUrl(data.publicUrl);
+    } catch (e) {
+      setUploadError(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <FormSection icon={<FileCheck size={15} />} title="Capture consent">
@@ -283,16 +307,47 @@ function ConsentForm({
           />
         </FormField>
         <FormField
-          label="Scanned document URL (optional)"
+          label="Signed document (optional): paste a URL or upload a PDF"
           htmlFor="documentUrl"
           className="col-span-2"
         >
-          <Input
-            id="documentUrl"
-            value={documentUrl}
-            onChange={(e) => setDocumentUrl(e.target.value)}
-            placeholder="https://…"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              id="documentUrl"
+              className="min-w-[200px] flex-1"
+              value={documentUrl}
+              onChange={(e) => setDocumentUrl(e.target.value)}
+              placeholder="https://… or upload a PDF"
+            />
+            <label className="inline-flex h-[38px] cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary transition hover:text-primary">
+              <Upload size={14} />
+              {uploading ? "Uploading…" : "Upload PDF"}
+              <input
+                type="file"
+                accept="application/pdf,image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void uploadDocument(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+          {uploadError && (
+            <p className="mt-1 text-[11.5px] text-danger">{uploadError}</p>
+          )}
+          {documentUrl && !uploadError && (
+            <a
+              href={documentUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-block text-[11.5px] text-accent hover:underline"
+            >
+              View attached document
+            </a>
+          )}
         </FormField>
       </div>
 

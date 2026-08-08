@@ -53,7 +53,11 @@ export function IncidentFormPage() {
   const [discoveryTime, setDiscoveryTime] = useState(start.time);
   const [description, setDescription] = useState("");
   const [types, setTypes] = useState<string[]>([]);
+  const [otherType, setOtherType] = useState(false);
+  const [otherTypeText, setOtherTypeText] = useState("");
   const [factors, setFactors] = useState<string[]>([]);
+  const [otherFactor, setOtherFactor] = useState(false);
+  const [otherFactorText, setOtherFactorText] = useState("");
   const [immediateAction, setImmediateAction] = useState("");
   const [doctorNotified, setDoctorNotified] = useState("");
   const [noTreatmentOrdered, setNoTreatmentOrdered] = useState(false);
@@ -75,6 +79,8 @@ export function IncidentFormPage() {
         contributingFactors: factors.length
           ? JSON.stringify(CONTRIBUTING_FACTORS.filter((f) => factors.includes(f)))
           : null,
+        otherEventType: otherType ? otherTypeText.trim() || null : null,
+        otherContributingFactor: otherFactor ? otherFactorText.trim() || null : null,
         immediateAction: immediateAction.trim(),
         doctorNotified: doctorNotified.trim() || null,
         noTreatmentOrdered,
@@ -98,8 +104,9 @@ export function IncidentFormPage() {
   }
 
   const selected = context.roster.find((r) => r.registrationId === registrationId);
+  const hasImpression = types.length > 0 || (otherType && otherTypeText.trim().length > 0);
   const valid =
-    registrationId && description.trim() && immediateAction.trim() && types.length > 0;
+    registrationId && description.trim() && immediateAction.trim() && hasImpression;
 
   return (
     <div className="mx-auto max-w-[820px]">
@@ -206,9 +213,30 @@ export function IncidentFormPage() {
                 {t}
               </label>
             ))}
+            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+              <input
+                type="checkbox"
+                className="accent-accent"
+                checked={otherType}
+                onChange={(e) => setOtherType(e.target.checked)}
+              />
+              Other
+            </label>
           </div>
-          {types.length === 0 && (
-            <p className="mt-2 text-[11.5px] text-muted">Select at least one.</p>
+          {otherType && (
+            <div className="mt-2">
+              <Input
+                aria-label="Other impression"
+                value={otherTypeText}
+                onChange={(e) => setOtherTypeText(e.target.value)}
+                placeholder="Describe the other impression"
+              />
+            </div>
+          )}
+          {!hasImpression && (
+            <p className="mt-2 text-[11.5px] text-muted">
+              Select at least one, or tick Other and describe it.
+            </p>
           )}
         </FormSection>
 
@@ -229,7 +257,26 @@ export function IncidentFormPage() {
                 {f}
               </label>
             ))}
+            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+              <input
+                type="checkbox"
+                className="accent-accent"
+                checked={otherFactor}
+                onChange={(e) => setOtherFactor(e.target.checked)}
+              />
+              Other
+            </label>
           </div>
+          {otherFactor && (
+            <div className="mt-2">
+              <Input
+                aria-label="Other contributing factor"
+                value={otherFactorText}
+                onChange={(e) => setOtherFactorText(e.target.value)}
+                placeholder="Describe the other contributing factor"
+              />
+            </div>
+          )}
         </FormSection>
 
         <FormSection icon={<ClipboardList size={15} />} title="Description and response">

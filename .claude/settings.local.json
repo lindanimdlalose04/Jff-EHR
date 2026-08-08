@@ -36,7 +36,8 @@
       "Bash(curl -sS -X POST https://vdaywixgkxxmbgyzhjgn.supabase.co/auth/v1/token?grant_type=password -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkYXl3aXhna3h4bWJneXpoamduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNTQyMjksImV4cCI6MjA5ODkzMDIyOX0.RHomh6fujrTs0NrKMblMnw3Xdmuz3vUbWvk6vxtsP9g' -H 'Content-Type: application/json' -d '{\"email\":\"gail.buys@jffdemo.org\",\"password\":\"yDbHsC9u3y6%bpDx\"}' -o 'C:\\\\Users\\\\linda\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-linda-OneDrive-Documents-2026-YEAR-4-Research-Project-671-Artefact-Version-1\\\\ca944dc3-99fb-49e9-818c-c0f8e5aab318\\\\scratchpad\\\\login.json' -w 'HTTP %{http_code}\\\\n')",
       "Bash(npm run *)",
       "Bash(dotnet build *)",
-      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet \"C:\\\\Users\\\\linda\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-linda-OneDrive-Documents-2026-YEAR-4-Research-Project-671-Artefact-Version-1\\\\ca944dc3-99fb-49e9-818c-c0f8e5aab318\\\\scratchpad\\\\api-out\\\\JffEhr.Api.dll\" --urls http://localhost:5271)"
+      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet \"C:\\\\Users\\\\linda\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-linda-OneDrive-Documents-2026-YEAR-4-Research-Project-671-Artefact-Version-1\\\\ca944dc3-99fb-49e9-818c-c0f8e5aab318\\\\scratchpad\\\\api-out\\\\JffEhr.Api.dll\" --urls http://localhost:5271)",
+      "Bash(dotnet ef *)"
     ]
   }
 }

@@ -34,6 +34,7 @@ export function LoginPage() {
     navigate(from, { replace: true });
   };
 
+  
   return (
     <div className="flex min-h-screen items-center justify-center bg-page px-4">
       <div className="w-full max-w-[380px]">

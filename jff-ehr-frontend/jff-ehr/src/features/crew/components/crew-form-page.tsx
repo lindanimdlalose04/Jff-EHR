@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserRoundCog } from "lucide-react";
+import { Upload, UserRoundCog } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
+import { uploadDocument } from "@/lib/storage-upload";
 import { useMe } from "@/features/auth/use-me";
 import { createCrew, fetchCrewMember, updateCrew, type CrewPayload } from "../api/crew.api";
 
@@ -32,6 +33,19 @@ export function CrewFormPage() {
   const me = useMe();
   const canMaintain = me.data?.role === "medical" || me.data?.role === "admin";
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadPhoto = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      set({ photoUrl: await uploadDocument("crew-photos", file) });
+    } catch {
+      setError("Upload failed. Check the storage bucket exists, or paste a URL instead.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const existing = useQuery({
     queryKey: ["crew", crewId],
@@ -156,13 +170,30 @@ export function CrewFormPage() {
                 placeholder="e.g. nurse, doctor, camp admin, volunteer"
               />
             </FormField>
-            <FormField label="Photo URL" htmlFor="photoUrl">
-              <Input
-                id="photoUrl"
-                value={draft.photoUrl}
-                onChange={(e) => set({ photoUrl: e.target.value })}
-                placeholder="https://…"
-              />
+            <FormField label="Photo or scanned document (URL or upload)" htmlFor="photoUrl">
+              <div className="flex gap-2">
+                <Input
+                  id="photoUrl"
+                  value={draft.photoUrl}
+                  onChange={(e) => set({ photoUrl: e.target.value })}
+                  placeholder="https://… or upload"
+                />
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary hover:text-primary">
+                  <Upload size={14} />
+                  {uploading ? "Uploading…" : "Upload"}
+                  <input
+                    type="file"
+                    accept="application/pdf,image/*"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadPhoto(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
             </FormField>
           </div>
         </FormSection>

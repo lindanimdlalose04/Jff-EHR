@@ -11,6 +11,8 @@ public sealed class MedicationEventDto
     public string? Description { get; set; }
     public string? EventTypes { get; set; }
     public string? ContributingFactors { get; set; }
+    public string? OtherEventType { get; set; }
+    public string? OtherContributingFactor { get; set; }
     public string? ImmediateAction { get; set; }
     public string? DoctorNotified { get; set; }
     public bool NoTreatmentOrdered { get; set; }
@@ -44,6 +46,12 @@ public sealed class CreateMedicationEventRequest
     [Required]
     public required string EventTypes { get; set; }
     public string? ContributingFactors { get; set; }
+
+    /// <summary>Free text for the "Other" impression; null unless the Other box was ticked.</summary>
+    public string? OtherEventType { get; set; }
+
+    /// <summary>Free text for the "Other" contributing factor; null unless the Other box was ticked.</summary>
+    public string? OtherContributingFactor { get; set; }
 
     [Required]
     public required string ImmediateAction { get; set; }

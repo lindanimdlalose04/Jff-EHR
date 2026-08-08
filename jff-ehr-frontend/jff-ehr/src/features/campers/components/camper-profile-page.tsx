@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { HeartPulse, Pencil, Plus, Tent, TriangleAlert, Trash2 } from "lucide-react";
+import { FileText, HeartPulse, Pencil, Plus, Tent, TriangleAlert, Trash2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { isPdfUrl } from "@/lib/storage-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -100,12 +101,22 @@ function ProfileHeader({ detail }: { detail: CamperDetail }) {
 
   return (
     <div className="flex items-start gap-4 rounded-card border border-card bg-surface p-5">
-      {camper.photoUrl ? (
+      {camper.photoUrl && !isPdfUrl(camper.photoUrl) ? (
         <img
           src={camper.photoUrl}
           alt={`${camper.firstName} ${camper.surname}`}
           className="h-14 w-14 rounded-[12px] object-cover"
         />
+      ) : camper.photoUrl ? (
+        <a
+          href={camper.photoUrl}
+          target="_blank"
+          rel="noreferrer"
+          title="View scanned document"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-accent"
+        >
+          <FileText size={20} />
+        </a>
       ) : (
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-[17px] font-semibold text-accent">
           {initials}

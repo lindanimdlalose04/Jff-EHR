@@ -3,6 +3,7 @@ using System;
 using JffEhr.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JffEhr.Api.Migrations
 {
     [DbContext(typeof(JffEhrDbContext))]
-    partial class JffEhrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260807082544_CrewCampRegistrations")]
+    partial class CrewCampRegistrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -573,6 +576,10 @@ namespace JffEhr.Api.Migrations
                         .HasColumnType("text")
                         .HasColumnName("allergies");
 
+                    b.Property<Guid>("CampId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("camp_id");
+
                     b.Property<DateTimeOffset>("CheckedInAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("checked_in_at");
@@ -585,9 +592,9 @@ namespace JffEhr.Api.Migrations
                         .HasColumnType("text")
                         .HasColumnName("comments");
 
-                    b.Property<Guid>("CrewRegistrationId")
+                    b.Property<Guid>("CrewId")
                         .HasColumnType("uuid")
-                        .HasColumnName("crew_registration_id");
+                        .HasColumnName("crew_id");
 
                     b.Property<string>("CurrentMedications")
                         .HasColumnType("text")
@@ -608,11 +615,14 @@ namespace JffEhr.Api.Migrations
                     b.HasKey("CheckinId")
                         .HasName("pk_crew_medical_checkins");
 
+                    b.HasIndex("CampId")
+                        .HasDatabaseName("ix_crew_medical_checkins_camp_id");
+
                     b.HasIndex("CheckedInBy")
                         .HasDatabaseName("ix_crew_medical_checkins_checked_in_by");
 
-                    b.HasIndex("CrewRegistrationId")
-                        .HasDatabaseName("ix_crew_medical_checkins_crew_registration_id");
+                    b.HasIndex("CrewId")
+                        .HasDatabaseName("ix_crew_medical_checkins_crew_id");
 
                     b.ToTable("crew_medical_checkins", (string)null);
                 });
@@ -1440,6 +1450,13 @@ namespace JffEhr.Api.Migrations
 
             modelBuilder.Entity("JffEhr.Api.Entities.CrewMedicalCheckin", b =>
                 {
+                    b.HasOne("JffEhr.Api.Entities.Camp", "Camp")
+                        .WithMany("CrewMedicalCheckins")
+                        .HasForeignKey("CampId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_crew_medical_checkins_camps_camp_id");
+
                     b.HasOne("JffEhr.Api.Entities.CrewMember", "CheckedInByCrewMember")
                         .WithMany("CheckInsPerformed")
                         .HasForeignKey("CheckedInBy")
@@ -1447,16 +1464,18 @@ namespace JffEhr.Api.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_crew_medical_checkins_crew_members_checked_in_by");
 
-                    b.HasOne("JffEhr.Api.Entities.CrewCampRegistration", "CrewCampRegistration")
+                    b.HasOne("JffEhr.Api.Entities.CrewMember", "CrewMember")
                         .WithMany("MedicalCheckins")
-                        .HasForeignKey("CrewRegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("CrewId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_crew_medical_checkins_crew_camp_registrations_crew_registra");
+                        .HasConstraintName("fk_crew_medical_checkins_crew_members_crew_id");
+
+                    b.Navigation("Camp");
 
                     b.Navigation("CheckedInByCrewMember");
 
-                    b.Navigation("CrewCampRegistration");
+                    b.Navigation("CrewMember");
                 });
 
             modelBuilder.Entity("JffEhr.Api.Entities.EmergencyContact", b =>
@@ -1673,6 +1692,8 @@ namespace JffEhr.Api.Migrations
 
             modelBuilder.Entity("JffEhr.Api.Entities.Camp", b =>
                 {
+                    b.Navigation("CrewMedicalCheckins");
+
                     b.Navigation("Registrations");
                 });
 
@@ -1700,11 +1721,6 @@ namespace JffEhr.Api.Migrations
                     b.Navigation("Registrations");
                 });
 
-            modelBuilder.Entity("JffEhr.Api.Entities.CrewCampRegistration", b =>
-                {
-                    b.Navigation("MedicalCheckins");
-                });
-
             modelBuilder.Entity("JffEhr.Api.Entities.CrewMember", b =>
                 {
                     b.Navigation("ArrivalChecksAssessed");
@@ -1714,6 +1730,8 @@ namespace JffEhr.Api.Migrations
                     b.Navigation("CampRegistrations");
 
                     b.Navigation("CheckInsPerformed");
+
+                    b.Navigation("MedicalCheckins");
 
                     b.Navigation("MedicationDosesAdministered");
 
