@@ -6,7 +6,7 @@ import { apiClient } from "@/api/client";
 import type { CampDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Input, Select } from "@/components/ui/field";
+import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { useMe } from "@/features/auth/use-me";
@@ -15,8 +15,6 @@ import { useMe } from "@/features/auth/use-me";
  * Routes "/camps/new" and "/camps/:campId/edit". Camps are Tier 1: fully
  * editable administrative data, maintained by medical or admin staff.
  */
-
-const STATUSES = ["planned", "active", "completed", "cancelled"];
 
 interface Draft {
   campNumber: string;
@@ -159,15 +157,6 @@ export function CampFormPage() {
                 />
               </FormField>
             )}
-            <FormField label="Status" htmlFor="status">
-              <Select id="status" value={draft.status} onChange={(e) => set({ status: e.target.value })}>
-                {STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
             <FormField label="Start date" htmlFor="startDate">
               <Input
                 id="startDate"
@@ -207,6 +196,24 @@ export function CampFormPage() {
                 placeholder="e.g. oncology"
               />
             </FormField>
+
+            {isEdit && (
+              <div className="col-span-2 rounded-control border border-card bg-field/40 px-3 py-2.5">
+                <label className="flex items-center gap-2 text-[12.5px] font-medium text-primary">
+                  <input
+                    type="checkbox"
+                    className="accent-danger"
+                    checked={draft.status.toLowerCase() === "cancelled"}
+                    onChange={(e) => set({ status: e.target.checked ? "cancelled" : "planned" })}
+                  />
+                  Cancel this camp
+                </label>
+                <p className="mt-1 text-[11px] text-muted">
+                  Planned, active and completed are worked out from the dates. The only status set
+                  by hand is whether the camp is cancelled.
+                </p>
+              </div>
+            )}
           </div>
         </FormSection>
 
