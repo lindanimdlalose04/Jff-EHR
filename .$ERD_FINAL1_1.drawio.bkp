@@ -1,13 +1,13 @@
-<mxfile host="Electron" modified="2026-08-11T21:08:11.612Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.1 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="1KO1It30UcfbmhTHSfCy" version="24.6.1" type="device">
+<mxfile host="Electron" modified="2026-07-01T12:56:07.045Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.1 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="uQDcIjZSYmta_r6vDyGG" version="24.6.1" type="device">
   <diagram name="JFF EHR ERD" id="WBvbRH5egFpgXNBc8dgy">
-    <mxGraphModel dx="2570" dy="828" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3000" dy="1035" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="3KrlU2yVGq8G0Gz89wXL-293" value="&amp;nbsp;EHR Entity Relationship Diagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#2d2d2d;" parent="1" vertex="1">
+        <mxCell id="3KrlU2yVGq8G0Gz89wXL-293" value="JFF EHR — Entity Relationship Diagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#2d2d2d;" parent="1" vertex="1">
           <mxGeometry x="720" y="20" width="600" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="3KrlU2yVGq8G0Gz89wXL-294" value="Cloud-based EHR ERD" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#666666;fontStyle=2;" parent="1" vertex="1">
+        <mxCell id="3KrlU2yVGq8G0Gz89wXL-294" value="Cloud-based EHR for Just Footprints Foundation — Designed for ITRI 671 research project" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#666666;fontStyle=2;" parent="1" vertex="1">
           <mxGeometry x="720" y="56" width="600" height="20" as="geometry" />
         </mxCell>
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-295" value="CAMPER" style="shape=table;startSize=36;container=1;collapsible=0;childLayout=tableLayout;fontSize=14;fontStyle=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1f3a5f;" parent="1" vertex="1">
@@ -2333,7 +2333,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-815" value="MEDSHACK_VISIT" style="shape=table;startSize=36;container=1;collapsible=0;childLayout=tableLayout;fontSize=14;fontStyle=1;align=center;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#7f3300;" parent="1" vertex="1">
-          <mxGeometry x="1660" y="640" width="360" height="410" as="geometry" />
+          <mxGeometry x="1600" y="640" width="360" height="410" as="geometry" />
         </mxCell>
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-816" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;" parent="3KrlU2yVGq8G0Gz89wXL-815" vertex="1">
           <mxGeometry y="36" width="360" height="22" as="geometry" />
@@ -2642,7 +2642,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-884" value="MEDSHACK_TREATMENT" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fontSize=14;fontStyle=1;align=center;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#7f3300;" parent="1" vertex="1">
-          <mxGeometry x="1690" y="1172" width="360" height="190" as="geometry" />
+          <mxGeometry x="1610" y="1230" width="360" height="190" as="geometry" />
         </mxCell>
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-885" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;" parent="3KrlU2yVGq8G0Gz89wXL-884" vertex="1">
           <mxGeometry y="38" width="360" height="22" as="geometry" />
@@ -3341,7 +3341,10 @@
         <mxCell id="3KrlU2yVGq8G0Gz89wXL-1040" value="&lt;b&gt;USER vs CREW_MEMBER&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#555&quot;&gt;Every USER is a CREW_MEMBER, but most CREW_MEMBERs are not USERs. USER controls system login; CREW_MEMBER tracks anyone working at camp (including volunteers).&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff8c4;strokeColor=#c4b04a;fontSize=12;align=left;verticalAlign=top;spacingTop=4;spacingLeft=6;spacingRight=6;" parent="1" vertex="1">
           <mxGeometry x="2150" y="710" width="280" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="KJD5GCGYBUAfykZVGJ8d-1" value="administers" style="edgeStyle=orthogonalEdgeStyle;fontSize=11;html=1;endArrow=ERmany;startArrow=ERone;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeColor=#4a4a4a;strokeWidth=1.5;elbow=vertical;" parent="1" source="3KrlU2yVGq8G0Gz89wXL-427" target="3KrlU2yVGq8G0Gz89wXL-909" edge="1">
+        <mxCell id="3KrlU2yVGq8G0Gz89wXL-1041" value="&lt;b&gt;Phase 2 candidates&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#555&quot;&gt;VENUE as own entity, PARTNER_ORGANISATION (referring clinics), DOCUMENT_ATTACHMENT (PDF uploads), MEDICATION_CATALOGUE (master drug list). Held for MVP simplicity; revisit after first pilot.&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff8c4;strokeColor=#c4b04a;fontSize=12;align=left;verticalAlign=top;spacingTop=4;spacingLeft=6;spacingRight=6;" parent="1" vertex="1">
+          <mxGeometry x="2150" y="850" width="280" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="KJD5GCGYBUAfykZVGJ8d-1" value="administers" style="edgeStyle=orthogonalEdgeStyle;fontSize=11;html=1;endArrow=ERmany;startArrow=ERone;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeColor=#4a4a4a;strokeWidth=1.5;elbow=vertical;" edge="1" parent="1" source="3KrlU2yVGq8G0Gz89wXL-427" target="3KrlU2yVGq8G0Gz89wXL-909">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="690" y="1250" as="sourcePoint" />
             <mxPoint x="1120" y="1364" as="targetPoint" />
