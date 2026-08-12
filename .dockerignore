@@ -1,0 +1,13 @@
+# Keep the build context small and never copy local build output or secrets.
+**/node_modules
+**/bin
+**/obj
+**/dist
+**/.vite
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.vs
+.idea
+**/*.user

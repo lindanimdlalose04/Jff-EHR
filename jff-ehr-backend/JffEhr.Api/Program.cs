@@ -100,9 +100,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Serve the built React app, which is bundled into wwwroot at container build
+// time. Controller (/api) routes are matched first; any other path falls back to
+// index.html so the SPA's client-side routing works on a hard refresh or deep link.
+// In local development the Vite dev server serves the frontend instead, so wwwroot
+// is empty and this is a no-op.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();

@@ -1,0 +1,33 @@
+# JFF EHR: the app plus a free Cloudflare "quick tunnel" that publishes it on a
+# public HTTPS URL. Values come from a .env file next to this one (see
+# .env.example). Bring it up with:  docker compose up -d --build
+# Then read the public URL from:    docker compose logs cloudflared
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Baked into the front-end bundle at build time (public values).
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    environment:
+      # Runtime configuration for the API. Use the RESTRICTED jff_api database
+      # role here, never the privileged migrations role.
+      ConnectionStrings__JffEhrDb: ${JFF_DB_CONNECTION}
+      Supabase__Url: ${VITE_SUPABASE_URL}
+      Supabase__Audience: authenticated
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    # A quick tunnel: no Cloudflare login, no domain, free. It prints a random
+    # https://<name>.trycloudflare.com URL that stays put while this container
+    # keeps running. Restarting the tunnel changes the URL.
+    command: tunnel --no-autoupdate --url http://app:8080
+    depends_on:
+      - app
+    restart: unless-stopped
