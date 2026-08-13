@@ -68,8 +68,9 @@ await Exec("""
     truncate table
         audit_logs, medication_events, medication_doses, prescriptions,
         medshack_treatments, medshack_visits, precamp_medicals, arrival_checks,
-        consent_records, crew_medical_checkins, camp_registrations,
-        caregivers, emergency_contacts, campers, camps, users, crew_members
+        consent_records, crew_medical_checkins, crew_camp_registrations,
+        camp_registrations, caregivers, emergency_contacts, campers, camps,
+        users, crew_members
     cascade
     """);
 await Exec("delete from auth.users where email = any(@emails)",
@@ -109,11 +110,12 @@ foreach (var s in staff)
         """, ("id", s.UserId), ("email", s.Email));
 
     await Exec("""
-        insert into crew_members (crew_id, name, surname, id_number, role, created_at)
-        values (@crew, @name, @surname, @idnum, @role, now())
+        insert into crew_members (crew_id, name, surname, id_number, role, photo_url, created_at)
+        values (@crew, @name, @surname, @idnum, @role, @photo, now())
         """,
         ("crew", s.CrewId), ("name", s.Name), ("surname", s.Surname),
-        ("idnum", $"DEMO-{s.Name.ToUpperInvariant()}-{s.CrewId.ToString()[..6]}"), ("role", s.Role));
+        ("idnum", $"DEMO-{s.Name.ToUpperInvariant()}-{s.CrewId.ToString()[..6]}"), ("role", s.Role),
+        ("photo", $"https://api.dicebear.com/7.x/avataaars/png?seed={Uri.EscapeDataString(s.Name + s.Surname)}"));
 
     await Exec("""
         insert into users (user_id, crew_id, email, password_hash, role_permissions, is_active, created_at)
@@ -126,14 +128,21 @@ foreach (var s in staff)
 // Camps: one completed, one currently running, one planned.
 // ---------------------------------------------------------------------------
 Console.WriteLine("Creating camps...");
+// Dates are relative to the run date, so one camp is always active "today", its
+// clinical records fall in a sensible recent window, and the demo never goes stale
+// no matter when the seed is run.
+var today = DateTime.Today;
+string D(int offsetDays) => today.AddDays(offsetDays).ToString("yyyy-MM-dd");
+string TS(int offsetDays, string time) => $"{today.AddDays(offsetDays):yyyy-MM-dd} {time}+02";
+
 var campPast = Guid.NewGuid();
 var campActive = Guid.NewGuid();
 var campPlanned = Guid.NewGuid();
 var camps = new (Guid Id, int Number, string Start, string End, string Venue, string Province, string Type, string Status)[]
 {
-    (campPast, 12, "2025-12-05", "2025-12-11", "Camp Kwalata, Dinokeng", "Gauteng", "oncology", "completed"),
-    (campActive, 13, "2026-07-10", "2026-07-16", "Bergkroon, Paarl", "Western Cape", "oncology", "active"),
-    (campPlanned, 14, "2026-12-04", "2026-12-10", "Sondela Nature Reserve, Bela-Bela", "Limpopo", "family", "planned"),
+    (campPast, 12, D(-150), D(-144), "Camp Kwalata, Dinokeng", "Gauteng", "oncology", "completed"),
+    (campActive, 13, D(-2), D(4), "Bergkroon, Paarl", "Western Cape", "oncology", "active"),
+    (campPlanned, 14, D(120), D(126), "Sondela Nature Reserve, Bela-Bela", "Limpopo", "family", "planned"),
 };
 foreach (var c in camps)
 {
@@ -176,12 +185,13 @@ foreach (var k in campers)
 {
     await Exec("""
         insert into campers (camper_id, first_name, surname, dob, sex, language, t_shirt_size,
-                             diagnosis, treating_clinic, file_number, family_group_id, created_at, updated_at)
-        values (@id, @first, @sur, @dob::date, @sex, @lang, @shirt, @diag, @clinic, @file, @fam, now(), now())
+                             diagnosis, treating_clinic, file_number, family_group_id, photo_url, created_at, updated_at)
+        values (@id, @first, @sur, @dob::date, @sex, @lang, @shirt, @diag, @clinic, @file, @fam, @photo, now(), now())
         """,
         ("id", k.Id), ("first", k.First), ("sur", k.Surname), ("dob", k.Dob), ("sex", k.Sex),
         ("lang", k.Language), ("shirt", "S"), ("diag", k.Diagnosis), ("clinic", k.Clinic),
-        ("file", k.FileNo), ("fam", k.FamilyGroup));
+        ("file", k.FileNo), ("fam", k.FamilyGroup),
+        ("photo", $"https://api.dicebear.com/7.x/adventurer/png?seed={k.FileNo}"));
 
     await Exec("""
         insert into caregivers (caregiver_id, camper_id, name, cell_no, relationship, is_primary, created_at)
@@ -220,18 +230,19 @@ async Task Register(Guid campId, Kid k, string status, string registeredAt, stri
 
     await Exec("""
         insert into consent_records (consent_id, registration_id, consent_type, signed_by, witness_name,
-                                     signed_at, signed_location, popia_acknowledged)
-        values (gen_random_uuid(), @reg, 'medical_treatment', @signer, @witness, @at::timestamptz, 'Registration desk', true)
+                                     signed_at, signed_location, popia_acknowledged, document_url)
+        values (gen_random_uuid(), @reg, 'medical_treatment', @signer, @witness, @at::timestamptz, 'Registration desk', true, @doc)
         """,
-        ("reg", regId), ("signer", k.CaregiverName), ("witness", "Lize van Vuuren"), ("at", registeredAt));
+        ("reg", regId), ("signer", k.CaregiverName), ("witness", "Lize van Vuuren"), ("at", registeredAt),
+        ("doc", "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf"));
 }
 
 for (var i = 0; i < 10; i++)
-    await Register(campActive, campers[i], "checked_in", "2026-06-15 09:00+02", i % 2 == 0 ? "Lions" : "Eagles");
+    await Register(campActive, campers[i], "checked_in", TS(-2, "09:00"), i % 2 == 0 ? "Lions" : "Eagles");
 foreach (var i in new[] { 0, 2, 4, 6, 8, 10, 12, 14 })
-    await Register(campPast, campers[i], "attended", "2025-11-10 09:00+02", "Kudu");
+    await Register(campPast, campers[i], "attended", TS(-150, "09:00"), "Kudu");
 for (var i = 10; i < 15; i++)
-    await Register(campPlanned, campers[i], "registered", "2026-07-01 09:00+02", "TBC");
+    await Register(campPlanned, campers[i], "registered", TS(-20, "09:00"), "TBC");
 
 // ---------------------------------------------------------------------------
 // Refinement A split: a pre-camp medical (the caregiver's half) for every
@@ -260,8 +271,8 @@ async Task Precamp(Guid campId, Kid k, Guid capturedBy, string capturedAt)
         ("contact", k.Clinic is null ? null : k.Clinic + " oncology unit"),
         ("vlOver", hiv ? (object)false : null),
         ("vl", hiv ? "Undetectable (<50)" : null),
-        ("vlDate", hiv ? "2026-05-20" : null),
-        ("vlReceived", hiv ? "2026-06-02" : null),
+        ("vlDate", hiv ? D(-80) : null),
+        ("vlReceived", hiv ? D(-68) : null),
         ("findings", k.Diagnosis is null ? null : "Stable on current treatment plan"),
         ("tb", hiv ? "negative" : null),
         ("hepB", hiv ? (object)false : null),
@@ -297,14 +308,14 @@ async Task ArrivalCheck(Guid campId, Kid k, Guid assessedBy, string assessedAt)
 }
 
 for (var i = 0; i < 10; i++)
-    await Precamp(campActive, campers[i], gail.CrewId, "2026-06-20 10:00+02");
+    await Precamp(campActive, campers[i], gail.CrewId, TS(-9, "10:00"));
 foreach (var i in new[] { 0, 2, 4, 6, 8, 10, 12, 14 })
-    await Precamp(campPast, campers[i], gail.CrewId, "2025-11-15 10:00+02");
+    await Precamp(campPast, campers[i], gail.CrewId, TS(-155, "10:00"));
 
 foreach (var i in new[] { 0, 2, 4, 5, 6, 7, 8, 9 })
-    await ArrivalCheck(campActive, campers[i], i % 2 == 0 ? gail.CrewId : mbali.CrewId, "2026-07-10 11:00+02");
+    await ArrivalCheck(campActive, campers[i], i % 2 == 0 ? gail.CrewId : mbali.CrewId, TS(-2, "11:00"));
 foreach (var i in new[] { 0, 4 })
-    await ArrivalCheck(campPast, campers[i], i == 0 ? gail.CrewId : mbali.CrewId, "2025-12-05 10:00+02");
+    await ArrivalCheck(campPast, campers[i], i == 0 ? gail.CrewId : mbali.CrewId, TS(-150, "10:00"));
 
 // ---------------------------------------------------------------------------
 // Prescriptions + doses (active camp).
@@ -327,22 +338,23 @@ foreach (var (kid, med, dose, freq, times) in scripts)
     await Exec("""
         insert into prescriptions (prescription_id, registration_id, medication_name, dose, route, frequency,
                                    scheduled_times, start_date, prescribed_by, created_at)
-        values (@id, @reg, @med, @dose, 'Oral', @freq, @times::jsonb, '2026-07-10'::date, @by, now())
+        values (@id, @reg, @med, @dose, 'Oral', @freq, @times::jsonb, @start::date, @by, now())
         """,
         ("id", scriptId), ("reg", regs[(campForKid, kid.Id)]), ("med", med), ("dose", dose),
-        ("freq", freq), ("times", times), ("by", mbali.CrewId));
+        ("freq", freq), ("times", times), ("start", D(-2)), ("by", mbali.CrewId));
 
     if (campForKid != campActive) continue;
-    // Two administered doses (previous evenings) and one still scheduled today.
-    foreach (var (day, status) in new[] { ("2026-07-12", "given"), ("2026-07-13", "given"), ("2026-07-14", "scheduled") })
+    // Two administered doses (previous evenings) and one still scheduled for today,
+    // so the medication record has given doses and today's round has live work.
+    foreach (var (offset, status) in new[] { (-2, "given"), (-1, "given"), (0, "scheduled") })
     {
         await Exec("""
             insert into medication_doses (dose_id, prescription_id, scheduled_at, administered_at,
                                           administered_by, status, created_at)
             values (gen_random_uuid(), @script, @sched::timestamptz, @given::timestamptz, @by, @status, now())
             """,
-            ("script", scriptId), ("sched", $"{day} 19:00+02"),
-            ("given", status == "given" ? $"{day} 19:05+02" : null),
+            ("script", scriptId), ("sched", TS(offset, "19:00")),
+            ("given", status == "given" ? TS(offset, "19:05") : null),
             ("by", status == "given" ? gail.CrewId : (object?)null), ("status", status));
     }
 }
@@ -379,40 +391,85 @@ async Task Treat(Guid visitId, int seq, string at, string description, string ou
         ("visit", visitId), ("seq", seq), ("at", at), ("desc", description), ("outcome", outcome), ("by", gail.CrewId));
 }
 
-var v1 = await Visit(campers[4], "2026-07-12 15:20+02", "Fell during soccer, graze on left knee",
+var v1 = await Visit(campers[4], TS(-2, "15:20"), "Fell during soccer, graze on left knee",
     36.8m, 88, "110/70", 99, "Superficial graze, no other injury",
     "3 cm superficial abrasion, left knee. Prosthesis undamaged.",
     "Wound cleaned and dressed. Observed 20 min.", "Keep dressing dry; return tomorrow for check.", null);
-await Treat(v1, 1, "2026-07-12 15:25+02", "Wound irrigated with saline, chlorhexidine applied", "Clean wound bed");
-await Treat(v1, 2, "2026-07-12 15:35+02", "Non-adherent dressing applied", "Settled, returned to activities");
+await Treat(v1, 1, TS(-2, "15:25"), "Wound irrigated with saline, chlorhexidine applied", "Clean wound bed");
+await Treat(v1, 2, TS(-2, "15:35"), "Non-adherent dressing applied", "Settled, returned to activities");
 
-var v2 = await Visit(campers[6], "2026-07-13 18:40+02", "Headache and fatigue after hike",
+var v2 = await Visit(campers[6], TS(-1, "18:40"), "Headache and fatigue after hike",
     37.9m, 96, "105/68", 98, "Mild pyrexia, tired, no photophobia or neck stiffness",
     "Likely heat exhaustion / exertion. No red flags.",
     "Oral fluids given, rested in MedShack 1 hour.", "Encourage fluids; lighter programme tomorrow.", mbali.CrewId);
-await Treat(v2, 1, "2026-07-13 18:50+02", "Paracetamol 500 mg PO administered", "Reviewed after 1 h, much improved");
+await Treat(v2, 1, TS(-1, "18:50"), "Paracetamol 500 mg PO administered", "Reviewed after 1 h, much improved");
 
-var v3 = await Visit(campers[8], "2026-07-13 07:30+02", "Nausea after morning medication",
+var v3 = await Visit(campers[8], TS(0, "07:30"), "Nausea after morning medication",
     36.6m, 84, "100/65", 99, "Nauseous, no vomiting, abdomen soft",
     "Medication-related nausea, resolving", "Observed through breakfast; tolerated dry toast.",
     "Give morning dose with food going forward.", null);
-await Treat(v3, 1, "2026-07-13 07:45+02", "Ondansetron 2 mg PO administered per standing order", "Nausea settled within 30 min");
+await Treat(v3, 1, TS(0, "07:45"), "Ondansetron 2 mg PO administered per standing order", "Nausea settled within 30 min");
 
 // ---------------------------------------------------------------------------
 // Crew medical check-ins for the active camp.
 // ---------------------------------------------------------------------------
-Console.WriteLine("Creating crew medical check-ins...");
+// Crew-per-camp registrations (B3): crew attend specific camps, mirroring campers.
+Console.WriteLine("Creating crew camp registrations and medical check-ins...");
+var crewRegs = new Dictionary<(Guid Camp, Guid Crew), Guid>();
+async Task RegisterCrew(Guid campId, Staff s, string status, string at)
+{
+    var regId = Guid.NewGuid();
+    crewRegs[(campId, s.CrewId)] = regId;
+    await Exec("""
+        insert into crew_camp_registrations (crew_registration_id, crew_id, camp_id, role, status, registered_at)
+        values (@id, @crew, @camp, @role, @status, @at::timestamptz)
+        """,
+        ("id", regId), ("crew", s.CrewId), ("camp", campId), ("role", s.Role),
+        ("status", status), ("at", at));
+}
+
+// All four staff attend the active camp; Gail and Mbali also attended the past one
+// (so the crew "Camps attended" history has content).
+foreach (var s in staff)
+    await RegisterCrew(campActive, s, "attended", TS(-2, "08:00"));
+await RegisterCrew(campPast, gail, "attended", TS(-150, "08:00"));
+await RegisterCrew(campPast, mbali, "attended", TS(-150, "08:00"));
+
+// Check in three of the four for the active camp. Riana stays registered but not
+// checked in, to show the attending-versus-checked-in distinction. The check-in
+// hangs off the crew member's registration (the full mirror).
 foreach (var s in new[] { gail, mbali, lize })
 {
     await Exec("""
-        insert into crew_medical_checkins (checkin_id, crew_id, camp_id, allergies, has_broviac_port,
+        insert into crew_medical_checkins (checkin_id, crew_registration_id, allergies, comments,
             medical_release_signed, checked_in_by, checked_in_at)
-        values (gen_random_uuid(), @crew, @camp, @allergies, false, true, @by, '2026-07-10 08:00+02'::timestamptz)
+        values (gen_random_uuid(), @reg, @allergies, @comments, true, @by, @at::timestamptz)
         """,
-        ("crew", s.CrewId), ("camp", campActive),
-        ("allergies", s.Name == "Mbali" ? "Bee stings (carries adrenaline pen)" : null),
-        ("by", gail.CrewId));
+        ("reg", crewRegs[(campActive, s.CrewId)]),
+        ("allergies", s.Name == "Mbali" ? "Bee stings" : null),
+        ("comments", s.Name == "Mbali" ? "Carries an adrenaline auto-injector." : null),
+        ("by", gail.CrewId), ("at", TS(-2, "08:00")));
 }
+
+// A filed incident that exercises the new "Other" impression and factor (B1),
+// alongside a fixed impression from the paper form's taxonomy.
+Console.WriteLine("Creating a medication event (incident)...");
+await Exec("""
+    insert into medication_events (event_id, registration_id, event_at, discovery_at, description,
+        event_types, contributing_factors, other_event_type, other_contributing_factor,
+        immediate_action, no_treatment_ordered, reporter_id, created_at)
+    values (gen_random_uuid(), @reg, @at::timestamptz, @disc::timestamptz, @desc,
+        @types::jsonb, @factors::jsonb, @other, @otherFactor, @action, false, @by, now())
+    """,
+    ("reg", regs[(campActive, campers[0].Id)]),
+    ("at", TS(-1, "20:10")), ("disc", TS(-1, "20:25")),
+    ("desc", "Evening dose given about an hour later than scheduled after a power outage delayed the round."),
+    ("types", """["Wrong time"]"""),
+    ("factors", """["Distractions"]"""),
+    ("other", "Power outage during the evening round"),
+    ("otherFactor", "Backup generator failed to start"),
+    ("action", "Dose given once power returned; camper monitored, no adverse effect. Camp doctor informed."),
+    ("by", gail.CrewId));
 
 await tx.CommitAsync();
 Console.WriteLine("\nSeed committed.\n");
