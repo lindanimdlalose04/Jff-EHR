@@ -6,6 +6,7 @@ import { queryClient } from "./api/query-client";
 import { AppLayout } from "./app/app-layout";
 import { HomePage } from "./app/home-page";
 import { AdminUsersPage } from "./features/admin/components/admin-users-page";
+import { RegistrationIntakePage } from "./features/admin/components/registration-intake-page";
 import { AuthProvider } from "./features/auth/auth-context";
 import { LoginPage } from "./features/auth/login-page";
 import { ProtectedRoute } from "./features/auth/protected-route";
@@ -72,6 +73,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/incidents" element={<IncidentsPage />} />
               <Route path="/incidents/new" element={<IncidentFormPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/intake" element={<RegistrationIntakePage />} />
             </Route>
           </Routes>
         </BrowserRouter>

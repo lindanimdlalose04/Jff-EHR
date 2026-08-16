@@ -61,9 +61,13 @@ properties, verified against the entities, not the paper-form wording.
 | 9 | Language spoken | Short answer | No | Language |
 
 T-shirt size note: give fixed options rather than free text, so ordering by size is
-possible and the guessing the administrator complained about is removed. Suggested option
-set (confirm with the client): age 5 to 6, age 7 to 8, age 9 to 10, age 11 to 12, age 13
-to 14, small adult, medium adult, large adult.
+possible and the guessing the administrator complained about is removed. The stored
+`Camper.TShirtSize` column holds at most 8 characters, so the option VALUES must be
+compact codes (the Google Form can show a longer label but the value it records, and
+therefore the CSV cell, must fit 8 characters). Suggested set (confirm with the client):
+5-6, 7-8, 9-10, 11-12, 13-14, S, M, L, XL. If the client insists on words like "medium
+adult", the `campers.t_shirt_size` column has to be widened first, which is a separate
+migration on an existing table and is out of this feature's scope.
 
 Age is not collected. It is derived from `Dob` in the EHR (form 01 rule: derive, do not
 store).

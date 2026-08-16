@@ -10,6 +10,7 @@ import {
   Tent,
   TriangleAlert,
   UserCog,
+  UserPlus,
   Users,
   X,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const navItems = [
   { to: "/medications", label: "Medications", icon: Pill },
   { to: "/medshack", label: "MedShack", icon: Stethoscope },
   { to: "/incidents", label: "Incidents", icon: TriangleAlert },
+  { to: "/admin/intake", label: "Intake", icon: UserPlus, adminOnly: true },
   { to: "/admin/users", label: "Admin", icon: ShieldCheck, adminOnly: true },
 ];
 

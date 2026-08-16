@@ -1,0 +1,4 @@
+Timestamp,Child's first name,Surname,Date of birth,Sex,Race,T-shirt size,Home address,Cell number,Language spoken,Parent / primary caregiver name and surname,Caregiver cell number,Caregiver work number,Emergency contact name,Emergency contact cell number,Emergency contact work number,Relationship to child (e.g. Aunt)
+2026/08/15 9:14:02 AM,Thabo,Sample,2016-04-12,Male,,9-10,"14 Test Street, Sampletown, 4001",0710000001,isiZulu,Nomsa Sample,0710000002,0310000003,Grace Example,0710000004,,Aunt
+2026/08/15 9:20:41 AM,Lerato,Placeholder,2014-11-03,Female,,11-12,"7 Demo Road, Exampleville",0720000001,Sesotho,Sipho Placeholder,0720000002,,Peter Demo,0720000004,0320000005,Uncle
+2026/08/15 9:31:10 AM,Amara,Testchild,birth cert to follow,Female,,S,"22 Placeholder Ave, Testburg",0730000001,English,Fatima Testchild,0730000002,,Yusuf Sample,0730000004,,Father

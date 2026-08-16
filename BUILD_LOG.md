@@ -252,13 +252,30 @@ data-entry load; it relocated it.
 
 ### Status
 
-- Form spec written (`spec/forms/08_public_registration_intake.md`).
-- CSV import feature: not yet built. Backend is an admin-gated endpoint that
-  parses the Google Form CSV export and creates draft records; frontend is an
-  upload control plus a review-and-confirm queue in the admin area. Two schema
-  constraints to handle: `Camper.FileNumber` is required but is a Part 2 value
-  not collected here (import assigns a placeholder, surfaced for correction), and
-  `Caregiver.Relationship` is required but not asked for the primary caregiver
-  (import defaults it to "Parent / caregiver"). Duplicate detection is on first
-  name, surname and date of birth, so a returning child is not captured twice.
-  This log will be updated as the feature is built and verified.
+- Form spec written (`spec/forms/08_public_registration_intake.md`), with a
+  sample CSV to test the import (`spec/forms/sample_public_intake.csv`).
+- CSV import feature: BUILT, both tiers compile clean. Not yet applied to the
+  live database and not yet runtime-verified (both gated on the migration below).
+  - Backend: `pending_registrations` staging table (entity, DbContext config,
+    migration `20260816062226_PendingRegistrations` with admin-only RLS), a
+    dependency-free `CsvReader`, and an admin-gated `RegistrationIntakeController`
+    with import, list-pending, confirm (promote to camper plus primary caregiver
+    plus emergency contact) and discard.
+  - Frontend: `/admin/intake` page (admin-gated) with CSV upload, a review queue
+    of editable draft rows, duplicate and bad-date flags, and confirm or discard.
+    New nav item "Intake" (admin only).
+  - Design choices realised: a staging table (not a draft flag on `campers`), so
+    unconfirmed data never touches the clinical tables. `Camper.FileNumber` is
+    required but a Part 2 value not collected here, so confirm assigns a unique
+    placeholder `INTAKE-xxxxxxxx` (surfaced for correction) unless the admin
+    supplies a real one. `Caregiver.Relationship` defaults to "Parent / caregiver".
+    T-shirt options are compact codes because `campers.t_shirt_size` holds 8 chars.
+    Duplicate detection is on first name, surname and date of birth; a flagged row
+    needs an explicit override to confirm, so a returning child is not re-created.
+- Next step, to be run by the maintainer against the live database (the
+  privileged migrations role, as with every prior migration):
+  `dotnet dotnet-ef database update --project JffEhr.Api/JffEhr.Api.csproj`
+  from `jff-ehr-backend`, with the migrations connection configured. After that,
+  runtime verification: sign in as an admin, import the sample CSV, confirm one
+  row, check the camper appears, and confirm the duplicate and bad-date rows
+  behave. This log will be updated once verified.

@@ -38,6 +38,7 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
     public DbSet<MedshackTreatment> MedshackTreatments => Set<MedshackTreatment>();
     public DbSet<MedicationEvent> MedicationEvents => Set<MedicationEvent>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<PendingRegistration> PendingRegistrations => Set<PendingRegistration>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +60,35 @@ public class JffEhrDbContext(DbContextOptions<JffEhrDbContext> options) : DbCont
         ConfigureMedshackTreatment(modelBuilder);
         ConfigureMedicationEvent(modelBuilder);
         ConfigureAuditLog(modelBuilder);
+        ConfigurePendingRegistration(modelBuilder);
+    }
+
+    private static void ConfigurePendingRegistration(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PendingRegistration>(entity =>
+        {
+            entity.HasKey(e => e.PendingRegistrationId);
+            entity.HasIndex(e => e.ImportBatchId);
+            entity.HasIndex(e => e.Status);
+
+            entity.Property(e => e.FirstName).HasMaxLength(80);
+            entity.Property(e => e.Surname).HasMaxLength(80);
+            entity.Property(e => e.Sex).HasMaxLength(8);
+            entity.Property(e => e.Race).HasMaxLength(30);
+            entity.Property(e => e.CellNumber).HasMaxLength(20);
+            entity.Property(e => e.Language).HasMaxLength(40);
+            entity.Property(e => e.TShirtSize).HasMaxLength(20);
+            entity.Property(e => e.CaregiverName).HasMaxLength(160);
+            entity.Property(e => e.CaregiverCellNo).HasMaxLength(20);
+            entity.Property(e => e.CaregiverWorkNo).HasMaxLength(20);
+            entity.Property(e => e.EmergencyName).HasMaxLength(160);
+            entity.Property(e => e.EmergencyCellNo).HasMaxLength(20);
+            entity.Property(e => e.EmergencyWorkNo).HasMaxLength(20);
+            entity.Property(e => e.EmergencyRelationship).HasMaxLength(40);
+            entity.Property(e => e.RawDob).HasMaxLength(40);
+            entity.Property(e => e.ImportNote).HasMaxLength(200);
+            entity.Property(e => e.Status).HasMaxLength(20);
+        });
     }
 
     private static void ConfigureCamper(ModelBuilder modelBuilder)

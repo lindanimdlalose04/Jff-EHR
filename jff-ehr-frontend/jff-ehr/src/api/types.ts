@@ -272,3 +272,64 @@ export interface ConsentRecordDto {
   documentUrl: string | null;
   popiaAcknowledged: boolean;
 }
+
+/** A staged, not-yet-confirmed registration from the public intake CSV import. */
+export interface PendingRegistrationDto {
+  pendingRegistrationId: string;
+  importBatchId: string;
+  sourceRow: number;
+  firstName: string;
+  surname: string;
+  dob: string | null;
+  sex: string | null;
+  race: string | null;
+  address: string | null;
+  cellNumber: string | null;
+  language: string | null;
+  tShirtSize: string | null;
+  caregiverName: string | null;
+  caregiverCellNo: string | null;
+  caregiverWorkNo: string | null;
+  emergencyName: string | null;
+  emergencyCellNo: string | null;
+  emergencyWorkNo: string | null;
+  emergencyRelationship: string | null;
+  rawDob: string | null;
+  importNote: string | null;
+  status: string;
+  possibleDuplicate: boolean;
+  duplicateOfCamperId: string | null;
+  promotedCamperId: string | null;
+  importedAt: string;
+}
+
+export interface ImportResultDto {
+  importBatchId: string;
+  rowsImported: number;
+  possibleDuplicates: number;
+  rowsWithNotes: number;
+  pending: PendingRegistrationDto[];
+}
+
+/** The administrator's confirmed values promoted into a real camper. */
+export interface ConfirmRegistrationRequest {
+  firstName: string;
+  surname: string;
+  dob: string;
+  sex: string;
+  race: string | null;
+  address: string | null;
+  cellNumber: string | null;
+  language: string | null;
+  tShirtSize: string | null;
+  fileNumber: string | null;
+  caregiverName: string;
+  caregiverCellNo: string;
+  caregiverWorkNo: string | null;
+  caregiverRelationship: string;
+  emergencyName: string;
+  emergencyCellNo: string;
+  emergencyWorkNo: string | null;
+  emergencyRelationship: string;
+  confirmDespiteDuplicate: boolean;
+}
