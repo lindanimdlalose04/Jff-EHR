@@ -205,3 +205,60 @@ as real when navigated. Passwords are random per run and printed at the end.
 
 The four accounts are two medical (Gail Buys, Mbali Buthelezi) and two admin
 (Lize van Vuuren, Riana Scheepers).
+
+## Operations-side intake (admin registration import)
+
+This section records work opened by the operations-side evaluation of mid August
+2026. The artefact was walked through with the administrator (Lize van Vuuren),
+alongside the domain expert (Sr Gail Buys). It was the first time an
+operations / admin stakeholder, rather than a clinical one, evaluated the
+system. Full narrative is in Chapter 4 thread C.
+
+### The finding
+
+As an EHR the system was received well ("almost perfect" for the clinical
+workflow). The gap was on the operations side, and it traces to how the artefact
+was informed: all prior feedback came from clinical staff, so the artefact
+optimised the clinical workflow and under-served the operational workflow that
+feeds it. The concrete bottleneck: no clinical record can begin until a child's
+record exists in the system, and that capture is manual, one child at a time,
+from paper forms that arrive late (often the morning of camp), for roughly fifty
+new children per camp, done by one administrator. The system did not reduce that
+data-entry load; it relocated it.
+
+### The decision
+
+- **Intake for this artefact is a Google Form plus an admin-only CSV import**, not
+  a native intake portal. The form carries only form 01 Part 1 (identity,
+  contact, logistics). Responses export to CSV and import into the EHR as draft
+  camper, primary-caregiver and emergency-contact records for the administrator
+  to review and confirm. Field-level authority and the CSV column order are in
+  `spec/forms/08_public_registration_intake.md`.
+- **A native in-app intake portal was considered and deliberately not adopted.**
+  The longer-term direction is a separate open-source EHR effort (OpenMRS or a
+  comparable stack, carrying this artefact's workflow and style forward), which
+  places deeper operational integration beyond this artefact's boundary. This is
+  a scope decision, not a capability limit.
+- **The form is split by sensitivity, not convenience.** Part 2 medical data
+  (diagnosis, viral load, TB and hepatitis history, medication) is paediatric HIV
+  data and stays out of the public form on POPIA grounds; it remains captured
+  inside the EHR by clinical staff. Part 3 indemnity and its signature stay on
+  paper, scanned and uploaded as a PDF against the camper through the existing
+  consent capture feature, because government-served and rural families cannot
+  reliably sign electronically. The public form collects no signature.
+- **No new role.** The import lives under the existing `admin` login. Both admin
+  users (Lize and Riana) hold it and both get the feature. The two-role model
+  (`medical`, `admin`) is unchanged.
+
+### Status
+
+- Form spec written (`spec/forms/08_public_registration_intake.md`).
+- CSV import feature: not yet built. Backend is an admin-gated endpoint that
+  parses the Google Form CSV export and creates draft records; frontend is an
+  upload control plus a review-and-confirm queue in the admin area. Two schema
+  constraints to handle: `Camper.FileNumber` is required but is a Part 2 value
+  not collected here (import assigns a placeholder, surfaced for correction), and
+  `Caregiver.Relationship` is required but not asked for the primary caregiver
+  (import defaults it to "Parent / caregiver"). Duplicate detection is on first
+  name, surname and date of birth, so a returning child is not captured twice.
+  This log will be updated as the feature is built and verified.
