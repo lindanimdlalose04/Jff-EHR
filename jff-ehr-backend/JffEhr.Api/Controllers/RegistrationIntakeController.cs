@@ -68,6 +68,16 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
             return BadRequest("The file has no data rows.");
         }
 
+        // Cap the batch so a very large or malformed file cannot exhaust memory or
+        // flood the shared database from a single request. This is well above a
+        // realistic camp intake.
+        const int maxDataRows = 5000;
+        if (rows.Count - 1 > maxDataRows)
+        {
+            return BadRequest(
+                $"That file has {rows.Count - 1} rows. Import at most {maxDataRows} at a time.");
+        }
+
         // Detect and drop a leading Timestamp column if present.
         var header = rows[0];
         var offset = header.Length > 0 && header[0].Trim().Equals("Timestamp", StringComparison.OrdinalIgnoreCase)
@@ -79,9 +89,14 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
             .Select(c => new { c.CamperId, c.FirstName, c.Surname, c.Dob })
             .ToListAsync();
 
+        var userId = currentUser.UserId;
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         var batchId = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
-        var userId = currentUser.UserId ?? Guid.Empty;
         var staged = new List<PendingRegistration>();
 
         for (var r = 1; r < rows.Count; r++)
@@ -121,7 +136,7 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
                 EmergencyWorkNo = NullIfBlank(Cell(EmergencyWorkNo), 20),
                 EmergencyRelationship = NullIfBlank(Cell(EmergencyRelationship), 40),
                 Status = "pending",
-                ImportedBy = userId,
+                ImportedBy = userId.Value,
                 ImportedAt = now,
             };
 
@@ -184,7 +199,14 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
     [HttpPost("{id:guid}/confirm")]
     public async Task<ActionResult<CamperDto>> Confirm(Guid id, ConfirmRegistrationRequest request)
     {
-        var pending = await db.PendingRegistrations.FindAsync(id);
+        // Lock the staging row for the duration of the transaction so two admins
+        // reviewing the same draft at once cannot both promote it into two campers.
+        // A second confirm blocks here, then sees status != 'pending' and is rejected.
+        await using var tx = await db.Database.BeginTransactionAsync();
+
+        var pending = await db.PendingRegistrations
+            .FromSql($"SELECT * FROM pending_registrations WHERE pending_registration_id = {id} FOR UPDATE")
+            .FirstOrDefaultAsync();
         if (pending is null) { return NotFound(); }
         if (pending.Status != "pending")
         {
@@ -259,9 +281,11 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
         try
         {
             await db.SaveChangesAsync();
+            await tx.CommitAsync();
         }
         catch (DbUpdateException ex) when (ex.IsUniqueViolation())
         {
+            // Transaction disposes without commit, so the staging row stays 'pending'.
             return Conflict("A camper with this file number already exists.");
         }
 

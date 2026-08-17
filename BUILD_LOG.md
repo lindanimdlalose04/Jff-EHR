@@ -254,8 +254,8 @@ data-entry load; it relocated it.
 
 - Form spec written (`spec/forms/08_public_registration_intake.md`), with a
   sample CSV to test the import (`spec/forms/sample_public_intake.csv`).
-- CSV import feature: BUILT, both tiers compile clean. Not yet applied to the
-  live database and not yet runtime-verified (both gated on the migration below).
+- CSV import feature: BUILT and both tiers compile clean. Migration APPLIED to
+  the live database on 2026-08-16 and verified (see "Verification" below).
   - Backend: `pending_registrations` staging table (entity, DbContext config,
     migration `20260816062226_PendingRegistrations` with admin-only RLS), a
     dependency-free `CsvReader`, and an admin-gated `RegistrationIntakeController`
@@ -272,10 +272,59 @@ data-entry load; it relocated it.
     T-shirt options are compact codes because `campers.t_shirt_size` holds 8 chars.
     Duplicate detection is on first name, surname and date of birth; a flagged row
     needs an explicit override to confirm, so a returning child is not re-created.
-- Next step, to be run by the maintainer against the live database (the
-  privileged migrations role, as with every prior migration):
-  `dotnet dotnet-ef database update --project JffEhr.Api/JffEhr.Api.csproj`
-  from `jff-ehr-backend`, with the migrations connection configured. After that,
-  runtime verification: sign in as an admin, import the sample CSV, confirm one
-  row, check the camper appears, and confirm the duplicate and bad-date rows
-  behave. This log will be updated once verified.
+### Verification (2026-08-16)
+
+The migration was applied through the privileged migrations role (`postgres`),
+the same path every prior migration used, with `dotnet dotnet-ef database update`
+and the `JffEhrDbMigrations` connection. Only this one migration was pending; it
+is additive (a new table plus its policies and grants) and its Down drops only
+that table, so no existing data was touched. Verified:
+
+- Schema landed: `pending_registrations` exists with row level security enabled,
+  28 columns, two indexes, the grant to `jff_api`, and the four admin-only
+  policies with the expected `app_user_role() = 'admin'` clauses.
+- RLS behaves, tested by connecting AS the real `jff_api` role inside a rolled-back
+  transaction (no data persisted): with an admin identity set, INSERT, SELECT and
+  UPDATE on the staging table all succeed; with a medical identity set, SELECT
+  returns zero rows and INSERT is denied (Postgres 42501). This is the intended
+  admin-only staging behaviour.
+- The API boots clean against the migrated database, and the three intake
+  endpoints are registered and auth-gated (401 unauthenticated, while a bogus
+  route gives 404, so the gate is real).
+
+Not yet done: the authenticated UI click-through (admin login, upload the sample
+CSV, confirm a row, see the camper appear). It needs an admin password, which is
+not held here, and it would create a real camper in the live evaluation database.
+Recommended to run it against a local or throwaway database, or accept that the
+promote step reduces to the same `jff_api` insert into `campers` that the existing
+camper-create screen already performs and that RLS already permits for admins.
+
+### Security and correctness review (2026-08-16)
+
+A review pass over the new feature, with fixes applied and re-verified:
+
+- **Unbounded import (fixed).** The import now caps a batch at 5000 data rows, so
+  a very large or malformed file cannot exhaust memory or flood the shared
+  database from one request.
+- **Concurrent double-promote (fixed).** Two administrators confirming the same
+  draft at once could each create a camper. Confirm now locks the staging row
+  with `SELECT ... FOR UPDATE` inside a transaction; the second confirm blocks,
+  then sees the row is no longer pending and is rejected. Verified against the
+  live database as the `jff_api` role in a rolled-back transaction.
+- **Byte order mark (fixed).** A surviving UTF-8 BOM on the export would have
+  shifted every column by one silently. The CSV reader now strips a leading BOM.
+  Verified: a BOM-prefixed sample parses to the correct 17 columns with the
+  header intact and a comma-bearing address kept as one cell.
+- **Missing identity (fixed).** Import now returns 401 if the request has no
+  resolved user id, rather than stamping an empty importer.
+- **Reviewed, no change needed.** SQL is parameterised throughout (EF Core;
+  the confirm lock uses an interpolated `FromSql`, which parameterises); output
+  is rendered by React, which escapes it; the endpoints are admin-gated at the
+  API and again by row level security. There is no cookie auth, so CSRF does not
+  apply.
+- **Latent, noted for future work.** CSV formula injection is not exploitable
+  today because no screen exports camper data to CSV or Excel (the only export
+  is the medication-record PDF). If such an export is added, cells beginning with
+  `= + - @` must be prefixed with an apostrophe. Duplicate detection loads the
+  campers table into memory per import, which is fine at camp scale but worth
+  revisiting if the roster grows large.

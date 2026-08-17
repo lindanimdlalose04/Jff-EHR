@@ -1,0 +1,238 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="1. Architecture" id="arch">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a_med" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="80" y="40" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="a_adm" value="Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="200" y="40" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="spa" value="React SPA (browser)&lt;br&gt;Vite, TanStack Query, forms" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="60" y="210" width="230" height="70" as="geometry"/></mxCell>
+        <mxCell id="api" value=".NET API&lt;br&gt;ASP.NET Core, EF Core&lt;br&gt;role policies: medical / admin" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="60" y="400" width="230" height="80" as="geometry"/></mxCell>
+        <mxCell id="storage" value="Supabase Storage&lt;br&gt;photos, consent PDFs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="460" y="150" width="200" height="56" as="geometry"/></mxCell>
+        <mxCell id="auth" value="Supabase Auth&lt;br&gt;issues JWT (JWKS)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="460" y="290" width="200" height="56" as="geometry"/></mxCell>
+        <mxCell id="pg" value="PostgreSQL (Supabase)&lt;br&gt;&lt;br&gt;row-level security (per role)&lt;br&gt;clinical immutability triggers&lt;br&gt;audit log" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="460" y="400" width="390" height="100" as="geometry"/></mxCell>
+        <mxCell id="note1" value="Schema changes run through a separate privileged migrations role." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="460" y="510" width="390" height="20" as="geometry"/></mxCell>
+        <mxCell id="e1" value="use" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a_med" target="spa"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="use" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a_adm" target="spa"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="sign in / JWT" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="spa" target="auth"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="upload / fetch files" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="spa" target="storage"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="REST + Bearer JWT" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="spa" target="api"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="validate JWT (JWKS)" style="endArrow=classic;html=1;dashed=1;strokeColor=#000000;fontColor=#000000;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" edge="1" parent="1" source="api" target="auth"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="SQL as jff_api role" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="api" target="pg"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="2. Use cases" id="usecases">
+    <mxGraphModel dx="900" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="960" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bnd" value="JFF EHR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;align=center;fontStyle=1;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="340" y="40" width="280" height="900" as="geometry"/></mxCell>
+        <mxCell id="uc1" value="Maintain campers" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="80" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc2" value="Register camper to camp" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="150" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc3" value="Capture pre-camp medical" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="220" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc4" value="Perform arrival check" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="290" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc5" value="Capture consent" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="360" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc6" value="Administer medication" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="430" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc7" value="Record MedShack visit" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="500" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc8" value="Report incident" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="570" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc9" value="Maintain camps" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="640" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc10" value="Maintain crew" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="710" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc11" value="Import registrations" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="780" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uc12" value="Manage users" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="390" y="850" width="180" height="44" as="geometry"/></mxCell>
+        <mxCell id="uac_med" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="130" y="380" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="uac_adm" value="Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="790" y="560" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="uac_par" value="Parent / social worker" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="70" y="800" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="uc_ext" value="Submit Part 1 form (Google Form)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="150" y="790" width="170" height="50" as="geometry"/></mxCell>
+        <mxCell id="am1" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am2" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am3" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am4" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am5" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am6" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am7" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am8" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am9" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="am10" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_med" target="uc10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="aa1" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_adm" target="uc1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="aa9" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_adm" target="uc9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="aa11" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_adm" target="uc11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="aa12" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_adm" target="uc12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="apar" style="endArrow=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="uac_par" target="uc_ext"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="adep" value="&lt;&lt;depends on&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="uc_ext" target="uc11"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="3. Maintain campers" id="p_campers">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical / admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="1. Maintain campers&lt;br&gt;&lt;br&gt;Camper form (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="140" width="220" height="100" as="geometry"/></mxCell>
+        <mxCell id="d1" value="D1  campers&lt;br&gt;PostgreSQL - Tier 1 (full CRUD)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="60" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="d2" value="D2  caregivers&lt;br&gt;PostgreSQL - Tier 1" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="170" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="d3" value="D3  emergency_contacts&lt;br&gt;PostgreSQL - Tier 1" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="280" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="SELECT / INSERT / UPDATE / DELETE" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" value="INSERT / UPDATE / DELETE" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f3" value="INSERT / UPDATE / DELETE" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="4. Register camper to camp" id="p_register">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical / admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="2. Register camper to camp&lt;br&gt;&lt;br&gt;Registration (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="140" width="220" height="100" as="geometry"/></mxCell>
+        <mxCell id="d1" value="D1  campers&lt;br&gt;(read here)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="60" width="270" height="50" as="geometry"/></mxCell>
+        <mxCell id="d4" value="D4  camps&lt;br&gt;(read here)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="160" width="270" height="50" as="geometry"/></mxCell>
+        <mxCell id="d5" value="D5  camp_registrations&lt;br&gt;PostgreSQL - the hinge record" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="270" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="SELECT existing campers" style="endArrow=classic;html=1;dashed=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" value="SELECT active camps" style="endArrow=classic;html=1;dashed=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f3" value="INSERT registration" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d5"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="5. Capture assessment" id="p_assess">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="3. Capture assessment&lt;br&gt;pre-camp medical + arrival check&lt;br&gt;&lt;br&gt;Assessment forms (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="140" width="230" height="100" as="geometry"/></mxCell>
+        <mxCell id="d6" value="D6  precamp_medicals&lt;br&gt;PostgreSQL - Tier 2 (append)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="80" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="d7" value="D7  arrival_checks&lt;br&gt;PostgreSQL - Tier 2 (append)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="250" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="nt" value="On SIGN the record is locked: a trigger blocks any UPDATE / DELETE of a signed record." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="530" y="150" width="270" height="40" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="INSERT draft / UPDATE while draft" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" value="INSERT draft / UPDATE while draft" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d7"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="6. Administer medication" id="p_meds">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="4. Administer medication&lt;br&gt;prescribe, then sign off each dose&lt;br&gt;&lt;br&gt;Medication grid (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="140" width="230" height="100" as="geometry"/></mxCell>
+        <mxCell id="d8" value="D8  prescriptions&lt;br&gt;PostgreSQL - locks after first dose" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="90" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="d9" value="D9  medication_doses&lt;br&gt;PostgreSQL - Tier 2 (append)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="250" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="SELECT / INSERT prescription" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" value="INSERT dose / UPDATE status = given" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d9"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="7. Record MedShack visit" id="p_medshack">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="5. Record MedShack visit&lt;br&gt;vitals, findings, repeating treatments&lt;br&gt;&lt;br&gt;MedShack form (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="140" width="230" height="100" as="geometry"/></mxCell>
+        <mxCell id="d10" value="D10  medshack_visits&lt;br&gt;PostgreSQL - Tier 2 (append)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="90" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="d11" value="D11  medshack_treatments&lt;br&gt;PostgreSQL - many per visit" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="250" width="270" height="54" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="INSERT visit" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" value="INSERT one row per treatment" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d11"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="8. Report incident" id="p_incident">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="460" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="130" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="6. Report incident&lt;br&gt;near-miss / medication event&lt;br&gt;&lt;br&gt;Incident form (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="120" width="230" height="100" as="geometry"/></mxCell>
+        <mxCell id="d12" value="D12  medication_events&lt;br&gt;PostgreSQL - Tier 2 (append + review)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="530" y="140" width="280" height="54" as="geometry"/></mxCell>
+        <mxCell id="nt" value="Reviewed once, then immutable: the safety record cannot be rewritten." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="530" y="210" width="280" height="40" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="INSERT event / UPDATE once (review)" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d12"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="9. Import registrations" id="p_intake">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ext" value="Parent form&lt;br&gt;CSV export" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="40" y="70" width="110" height="50" as="geometry"/></mxCell>
+        <mxCell id="ac" value="Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="60" y="260" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="7. Import registrations&lt;br&gt;import CSV to drafts, review,&lt;br&gt;confirm each into a real camper&lt;br&gt;&lt;br&gt;Intake screen (React) + .NET API (admin only)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="200" y="150" width="240" height="120" as="geometry"/></mxCell>
+        <mxCell id="d13" value="D13  pending_registrations&lt;br&gt;PostgreSQL - admin-only RLS (staging)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="580" y="60" width="290" height="54" as="geometry"/></mxCell>
+        <mxCell id="d1" value="D1  campers (Tier 1)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="580" y="200" width="290" height="44" as="geometry"/></mxCell>
+        <mxCell id="d2" value="D2  caregivers (Tier 1)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="580" y="270" width="290" height="44" as="geometry"/></mxCell>
+        <mxCell id="d3" value="D3  emergency_contacts (Tier 1)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="580" y="340" width="290" height="44" as="geometry"/></mxCell>
+        <mxCell id="nt" value="Medical (Part 2) data and the signature never enter this path." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="580" y="420" width="290" height="30" as="geometry"/></mxCell>
+        <mxCell id="e_up" value="upload CSV" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ext" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_rev" value="review / confirm" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f13" value="INSERT drafts / SELECT for dedup" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc1" value="on CONFIRM: INSERT" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc2" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc3" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="10. Maintain camps" id="p_maintcamps">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="420" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical / admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="120" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="8. Maintain camps&lt;br&gt;&lt;br&gt;Camp form (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="110" width="220" height="100" as="geometry"/></mxCell>
+        <mxCell id="d4" value="D4  camps&lt;br&gt;PostgreSQL - Tier 1 (create / edit)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="110" width="290" height="54" as="geometry"/></mxCell>
+        <mxCell id="nt" value="Status is a cancel toggle (active state is derived from dates). A camp that has registrations cannot be deleted." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="520" y="185" width="300" height="50" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="SELECT / INSERT / UPDATE  (DELETE if unused)" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="11. Maintain crew" id="p_maintcrew">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="440" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ac" value="Medical / admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="40" y="140" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="pr" value="9. Maintain crew&lt;br&gt;&lt;br&gt;Crew form (React) + .NET API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;arcSize=8;" vertex="1" parent="1"><mxGeometry x="160" y="130" width="220" height="100" as="geometry"/></mxCell>
+        <mxCell id="d14" value="D14  crew_members&lt;br&gt;PostgreSQL - Tier 1 (full CRUD)" style="shape=partialRectangle;html=1;whiteSpace=wrap;top=1;bottom=1;left=0;right=0;fillColor=#ffffff;strokeColor=#000000;align=left;spacingLeft=8;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="520" y="120" width="290" height="54" as="geometry"/></mxCell>
+        <mxCell id="nt" value="Crew mirror campers: each volunteer is a persistent person, registered per camp (crew_camp_registrations) and given a check-in (crew_medical_checkins) by separate processes." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="520" y="195" width="310" height="70" as="geometry"/></mxCell>
+        <mxCell id="eu" value="uses" style="endArrow=open;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="ac" target="pr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f1" value="SELECT / INSERT / UPDATE / DELETE" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="pr" target="d14"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="12. Google Form intake" id="p_gform">
+    <mxGraphModel dx="900" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="780" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="g1" value="Google Forms  (external)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="150" y="20" width="340" height="250" as="geometry"/></mxCell>
+        <mxCell id="g2" value="JFF EHR  (admin only)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="150" y="290" width="600" height="470" as="geometry"/></mxCell>
+        <mxCell id="s1" value="Parent / social worker fills the Google Form (Part 1 only)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="50" width="260" height="50" as="geometry"/></mxCell>
+        <mxCell id="s2" value="Responses collect in a Google Sheet" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="130" width="260" height="44" as="geometry"/></mxCell>
+        <mxCell id="s3" value="Administrator exports the responses as a CSV file" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="204" width="260" height="44" as="geometry"/></mxCell>
+        <mxCell id="s4" value="Administrator uploads the CSV on the intake screen" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="320" width="260" height="50" as="geometry"/></mxCell>
+        <mxCell id="s5" value="System creates draft rows in pending_registrations (staging) and flags likely duplicates" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="400" width="260" height="60" as="geometry"/></mxCell>
+        <mxCell id="s6" value="Administrator reviews each draft" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="490" width="260" height="44" as="geometry"/></mxCell>
+        <mxCell id="dec" value="Confirm draft?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="240" y="560" width="160" height="80" as="geometry"/></mxCell>
+        <mxCell id="s7a" value="Create camper + primary caregiver + emergency contact" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="500" y="570" width="230" height="60" as="geometry"/></mxCell>
+        <mxCell id="s7b" value="Discard draft (marked discarded)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="190" y="680" width="260" height="44" as="geometry"/></mxCell>
+        <mxCell id="ntg" value="Medical (Part 2) and the signed indemnity are never collected on this form." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontColor=#000000;" vertex="1" parent="1"><mxGeometry x="500" y="650" width="230" height="50" as="geometry"/></mxCell>
+        <mxCell id="fa" style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1" source="s1" target="s2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fb" style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1" source="s2" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fc" value="enters the EHR" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;" edge="1" parent="1" source="s3" target="s4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fd" style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1" source="s4" target="s5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe" style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1" source="s5" target="s6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ff" style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1" source="s6" target="dec"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fyes" value="confirm" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dec" target="s7a"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fno" value="discard" style="endArrow=classic;html=1;strokeColor=#000000;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dec" target="s7b"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

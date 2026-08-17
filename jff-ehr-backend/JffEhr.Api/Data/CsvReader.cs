@@ -19,6 +19,14 @@ public static class CsvReader
             return rows;
         }
 
+        // Strip a leading UTF-8 byte order mark (U+FEFF). StreamReader usually
+        // removes it, but if one survives it would corrupt the first header cell
+        // and silently shift every imported column by one, so guard here too.
+        if (text[0] == 0xFEFF)
+        {
+            text = text[1..];
+        }
+
         // Normalise line endings so a lone CR or CRLF are treated the same.
         text = text.Replace("\r\n", "\n").Replace('\r', '\n');
 
