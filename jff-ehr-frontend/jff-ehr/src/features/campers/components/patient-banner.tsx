@@ -17,7 +17,7 @@ export function PatientBanner({ patient }: { patient: PatientBannerData }) {
     <div className="flex items-stretch overflow-hidden rounded-card border border-card bg-surface">
       <div className="w-[5px] bg-accent" aria-hidden />
       <div className="flex flex-1 items-center gap-3.5 px-[18px] py-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-accent-tint text-sm font-medium text-accent">
+        <div className="flex h-11 w-11 items-center justify-center rounded-none bg-accent-tint text-sm font-medium text-accent">
           {patient.initials}
         </div>
         <div className="flex-1">

@@ -217,7 +217,7 @@ function RecentMedShackTile({ data }: { data: Dashboard }) {
         <ul className="divide-y divide-divider">
           {data.recentVisits.map((visit) => (
             <li key={visit.visitId} className="flex items-center gap-2.5 py-2">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-danger-tint text-danger">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-none bg-danger-tint text-danger">
                 <Stethoscope size={13} />
               </span>
               <span className="min-w-0 flex-1">

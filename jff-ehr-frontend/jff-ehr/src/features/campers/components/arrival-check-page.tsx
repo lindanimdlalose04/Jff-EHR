@@ -253,11 +253,11 @@ export function ArrivalCheckPage() {
           </p>
         </div>
         {signed ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-tint px-2.5 py-1 text-[11.5px] font-medium text-accent">
+          <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2.5 py-1 text-[11.5px] font-semibold text-success-text">
             <Lock size={12} /> signed
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-full bg-warning-tint px-2.5 py-1 text-[11.5px] font-medium text-warning">
+          <span className="inline-flex items-center gap-1 border border-warning bg-warning-tint px-2.5 py-1 text-[11.5px] font-semibold text-warning-text">
             <Pencil size={12} /> draft, editable
           </span>
         )}

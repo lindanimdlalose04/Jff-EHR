@@ -37,7 +37,9 @@
       "Bash(npm run *)",
       "Bash(dotnet build *)",
       "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet \"C:\\\\Users\\\\linda\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-linda-OneDrive-Documents-2026-YEAR-4-Research-Project-671-Artefact-Version-1\\\\ca944dc3-99fb-49e9-818c-c0f8e5aab318\\\\scratchpad\\\\api-out\\\\JffEhr.Api.dll\" --urls http://localhost:5271)",
-      "Bash(dotnet ef *)"
+      "Bash(dotnet ef *)",
+      "Read(//c/HONS/Databases/Panda Pocket/**)",
+      "Bash(winget install *)"
     ]
   }
 }

@@ -38,9 +38,9 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-page px-4">
       <div className="w-full max-w-[380px]">
-        <div className="rounded-card border border-card bg-surface p-7 shadow-sm">
+        <div className="rounded-card border border-card bg-surface p-7">
           <div className="mb-6 flex flex-col items-center text-center">
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-[12px] bg-accent text-white">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-none bg-accent text-white">
               <HeartPulse size={22} />
             </div>
             <h1 className="text-[17px] font-semibold text-primary">JFF EHR</h1>

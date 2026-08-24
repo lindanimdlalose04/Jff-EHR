@@ -151,7 +151,7 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
   return (
     <div className="rounded-card border border-card bg-surface p-4">
       <div className="flex flex-wrap items-center gap-2.5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-danger-tint text-danger">
+        <span className="flex h-8 w-8 items-center justify-center rounded-none bg-danger-tint text-danger">
           <Stethoscope size={15} />
         </span>
         {visit.camper ? (

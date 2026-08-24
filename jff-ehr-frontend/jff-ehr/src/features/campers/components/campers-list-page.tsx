@@ -147,7 +147,7 @@ export function CampersListPage() {
               to={`/campers/${camper.camperId}`}
               className="flex items-center gap-3 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-accent-tint text-[12px] font-medium text-accent">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[12px] font-medium text-accent">
                 {initialsOf(camper.firstName, camper.surname)}
               </span>
               <span className="min-w-0 flex-1">

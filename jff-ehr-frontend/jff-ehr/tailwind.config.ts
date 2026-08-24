@@ -19,15 +19,29 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           tint: "hsl(var(--accent-tint))",
           border: "hsl(var(--accent-border))",
+          strong: "hsl(var(--accent-strong))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          tint: "hsl(var(--success-tint))",
+          text: "hsl(var(--success-text))",
         },
         danger: {
           DEFAULT: "hsl(var(--danger))",
           tint: "hsl(var(--danger-tint))",
           border: "hsl(var(--danger-border))",
+          text: "hsl(var(--danger-text))",
         },
         warning: {
           DEFAULT: "hsl(var(--warning))",
           tint: "hsl(var(--warning-tint))",
+          text: "hsl(var(--warning-text))",
+        },
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          grid: "hsl(var(--chart-grid))",
         },
         admin: {
           DEFAULT: "hsl(var(--admin))",
@@ -39,7 +53,8 @@ export default {
         },
       },
       borderRadius: {
-        card: "12px",
+        // Clinical Blue is square. See spec/design/design-system.md.
+        card: "0px",
         control: "var(--radius)",
       },
     },

@@ -116,7 +116,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
     <div className="border-b border-divider px-4 py-3 last:border-b-0">
       <div className="grid grid-cols-[1fr_auto] items-center gap-3 sm:grid-cols-[1.3fr_1.6fr_auto_auto]">
         <span className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-tint text-[11px] font-medium text-accent">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent">
             {crew ? initialsOf(crew.name, crew.surname) : "?"}
           </span>
           <span className="min-w-0">

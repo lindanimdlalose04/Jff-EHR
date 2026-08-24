@@ -132,7 +132,7 @@ export function SearchSelect({
       {open && (
         <ul
           role="listbox"
-          className="absolute z-20 mt-1 max-h-[280px] w-full overflow-y-auto rounded-control border border-card bg-surface py-1 shadow-lg"
+          className="absolute z-20 mt-1 max-h-[280px] w-full overflow-y-auto rounded-control border border-card bg-surface py-1"
         >
           {matches.length === 0 ? (
             <li className="px-3 py-2 text-[12.5px] text-muted">{emptyText}</li>

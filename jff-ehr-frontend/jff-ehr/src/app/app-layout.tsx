@@ -1,19 +1,5 @@
 import { useState } from "react";
-import {
-  HeartPulse,
-  House,
-  LogOut,
-  Menu,
-  Pill,
-  ShieldCheck,
-  Stethoscope,
-  Tent,
-  TriangleAlert,
-  UserCog,
-  UserPlus,
-  Users,
-  X,
-} from "lucide-react";
+import { HeartPulse, LogOut, Menu, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { ActiveCampProvider } from "@/app/active-camp-context";
 import { AppHeader } from "@/components/layout/app-header";
@@ -23,41 +9,68 @@ import { useAuth } from "@/features/auth/auth-context";
 import { useMe } from "@/features/auth/use-me";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { to: "/", label: "Home", icon: House },
-  { to: "/camps", label: "Camps", icon: Tent },
-  { to: "/campers", label: "Campers", icon: Users },
-  { to: "/crew", label: "Crew", icon: UserCog },
-  { to: "/medications", label: "Medications", icon: Pill },
-  { to: "/medshack", label: "MedShack", icon: Stethoscope },
-  { to: "/incidents", label: "Incidents", icon: TriangleAlert },
-  { to: "/admin/intake", label: "Intake", icon: UserPlus, adminOnly: true },
-  { to: "/admin/users", label: "Admin", icon: ShieldCheck, adminOnly: true },
+/**
+ * Text navigation, grouped by what the section is for. Deliberately no icons:
+ * an icon per item is decoration here, not meaning. See
+ * spec/design/design-system.md, rule 3.
+ */
+const navGroups = [
+  {
+    heading: "Records",
+    items: [
+      { to: "/", label: "Home" },
+      { to: "/camps", label: "Camps" },
+      { to: "/campers", label: "Campers" },
+      { to: "/crew", label: "Crew" },
+    ],
+  },
+  {
+    heading: "Clinical",
+    items: [
+      { to: "/medications", label: "Medications" },
+      { to: "/medshack", label: "MedShack" },
+      { to: "/incidents", label: "Incidents" },
+    ],
+  },
+  {
+    heading: "Administration",
+    adminOnly: true,
+    items: [
+      { to: "/admin/intake", label: "Registration intake" },
+      { to: "/admin/users", label: "Users" },
+    ],
+  },
 ];
 
 function SidebarNav({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
   return (
-    <nav className="space-y-0.5">
-      {navItems
-        .filter((item) => !item.adminOnly || isAdmin)
-        .map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === "/"}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-2.5 rounded-control px-3 py-2 text-[13px] font-medium transition",
-                isActive
-                  ? "bg-accent-tint text-accent"
-                  : "text-secondary hover:bg-field hover:text-primary",
-              )
-            }
-          >
-            <Icon size={16} />
-            {label}
-          </NavLink>
+    <nav>
+      {navGroups
+        .filter((group) => !group.adminOnly || isAdmin)
+        .map((group) => (
+          <div key={group.heading}>
+            <p className="px-3 pb-1 pt-3 text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">
+              {group.heading}
+            </p>
+            {group.items.map(({ to, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === "/"}
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  cn(
+                    "block border-l-[3px] px-3 py-2 text-[13px] transition",
+                    isActive
+                      ? "border-accent bg-surface font-bold text-accent-strong"
+                      : "border-transparent font-medium text-secondary hover:bg-page hover:text-primary",
+                  )
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
         ))}
     </nav>
   );
@@ -100,7 +113,7 @@ export function AppLayout() {
         />
 
         <div className="flex">
-          <aside className="sticky top-0 hidden h-[calc(100vh-61px)] w-[210px] shrink-0 overflow-y-auto border-r border-card bg-surface p-3 min-[900px]:block">
+          <aside className="sticky top-0 hidden h-[calc(100vh-61px)] w-[210px] shrink-0 overflow-y-auto border-r border-card bg-page px-0 py-1 min-[900px]:block">
             <SidebarNav isAdmin={isAdmin} />
           </aside>
 
@@ -111,8 +124,8 @@ export function AppLayout() {
                 onClick={() => setMobileNavOpen(false)}
                 aria-hidden
               />
-              <div className="absolute left-0 top-0 h-full w-[240px] border-r border-card bg-surface p-3 shadow-lg">
-                <div className="mb-2 flex items-center justify-between px-1">
+              <div className="absolute left-0 top-0 h-full w-[240px] border-r border-card bg-page px-0 py-1">
+                <div className="mb-1 flex items-center justify-between px-3 pt-2">
                   <span className="text-[13px] font-semibold text-primary">Menu</span>
                   <button
                     type="button"

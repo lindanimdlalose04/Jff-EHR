@@ -116,7 +116,7 @@ export function CampCrewTab({ campId }: { campId: string }) {
               key={entry.registration.crewRegistrationId}
               className="flex flex-wrap items-center gap-3 border-b border-divider px-4 py-3 last:border-b-0"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-tint text-[11px] font-medium text-accent">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent">
                 {entry.crew ? initialsOf(entry.crew.name, entry.crew.surname) : "?"}
               </span>
               <Link

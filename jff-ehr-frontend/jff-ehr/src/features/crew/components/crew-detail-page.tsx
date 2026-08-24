@@ -47,7 +47,7 @@ export function CrewDetailPage() {
           <img
             src={crew.photoUrl}
             alt={`${crew.name} ${crew.surname}`}
-            className="h-14 w-14 rounded-[12px] object-cover"
+            className="h-14 w-14 rounded-none object-cover"
           />
         ) : crew.photoUrl ? (
           <a
@@ -55,12 +55,12 @@ export function CrewDetailPage() {
             target="_blank"
             rel="noreferrer"
             title="View scanned document"
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-accent"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-accent"
           >
             <FileText size={20} />
           </a>
         ) : (
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-[17px] font-semibold text-accent">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[17px] font-semibold text-accent">
             {initialsOf(crew.name, crew.surname)}
           </span>
         )}

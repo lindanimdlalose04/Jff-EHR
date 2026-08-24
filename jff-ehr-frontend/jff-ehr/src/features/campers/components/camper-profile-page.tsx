@@ -105,7 +105,7 @@ function ProfileHeader({ detail }: { detail: CamperDetail }) {
         <img
           src={camper.photoUrl}
           alt={`${camper.firstName} ${camper.surname}`}
-          className="h-14 w-14 rounded-[12px] object-cover"
+          className="h-14 w-14 rounded-none object-cover"
         />
       ) : camper.photoUrl ? (
         <a
@@ -113,12 +113,12 @@ function ProfileHeader({ detail }: { detail: CamperDetail }) {
           target="_blank"
           rel="noreferrer"
           title="View scanned document"
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-accent"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-accent"
         >
           <FileText size={20} />
         </a>
       ) : (
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-accent-tint text-[17px] font-semibold text-accent">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[17px] font-semibold text-accent">
           {initials}
         </span>
       )}
@@ -609,7 +609,7 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
               to={camp ? `/camps/${camp.campId}` : "#"}
               className="flex min-w-0 flex-1 items-center gap-3 transition hover:opacity-80"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-[9px] bg-accent-tint text-accent">
+              <span className="flex h-9 w-9 items-center justify-center rounded-none bg-accent-tint text-accent">
                 <Tent size={16} />
               </span>
               <span className="min-w-0 flex-1">

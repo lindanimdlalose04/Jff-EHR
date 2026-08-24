@@ -137,7 +137,7 @@ export function ConsentPage() {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-[8px] bg-accent-tint text-accent">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-none bg-accent-tint text-accent">
                     <FileCheck size={14} />
                   </span>
                   <span className="text-[13.5px] font-medium text-primary">

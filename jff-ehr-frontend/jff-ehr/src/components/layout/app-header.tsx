@@ -15,7 +15,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   return (
     <header className="flex items-center gap-3 border-b border-card bg-surface px-[18px] py-3.5">
-      <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-accent text-white">
+      <div className="flex h-8 w-8 items-center justify-center rounded-none bg-accent text-white">
         {icon}
       </div>
       <div className="flex-1">

@@ -174,7 +174,7 @@ function RoundRow({
     <div className="flex items-center gap-3 border-b border-divider px-4 py-2.5 last:border-b-0">
       <Link
         to={`/campers/${camper.camperId}`}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-tint text-[11px] font-medium text-accent"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent"
       >
         {initialsOf(camper.firstName, camper.surname)}
       </Link>
