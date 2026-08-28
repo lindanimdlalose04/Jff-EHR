@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FileText, HeartPulse, Pencil, Plus, Tent, TriangleAlert, Trash2 } from "lucide-react";
+import { FileText, HeartPulse, Pencil, Plus, Tent, Trash2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { isPdfUrl } from "@/lib/storage-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
-import { ageYears, formatDate } from "@/lib/display";
+import { RecordBanner, TabStrip, SectionHead, FieldGrid, Field } from "@/components/ui/record-chrome";
+import { camperBannerFlags } from "../lib/banner";
+import { ageYears, formatDate, formatSex } from "@/lib/display";
 import { deriveCampState } from "@/lib/camp-state";
 import { useCamperDetail } from "../hooks/use-camper-detail";
 import type { CamperDetail } from "../api/camper-detail.api";
@@ -65,23 +67,9 @@ export function CamperProfilePage() {
         ]}
       />
 
-      <ProfileHeader detail={detail} />
-
-      <div className="mt-4 flex gap-1 border-b border-card">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={
-              tab === t
-                ? "border-b-2 border-accent px-3 py-2 text-[13px] font-medium text-accent"
-                : "border-b-2 border-transparent px-3 py-2 text-[13px] font-medium text-secondary hover:text-primary"
-            }
-          >
-            {t}
-          </button>
-        ))}
+      <div className="border border-card bg-surface">
+        <ProfileHeader detail={detail} />
+        <TabStrip tabs={TABS} active={tab} onChange={setTab} />
       </div>
 
       <div className="pt-4">
@@ -95,96 +83,82 @@ export function CamperProfilePage() {
 }
 
 function ProfileHeader({ detail }: { detail: CamperDetail }) {
-  const { camper, siblings, consents } = detail;
+  const { camper, siblings } = detail;
   const initials = `${camper.firstName[0] ?? ""}${camper.surname[0] ?? ""}`.toUpperCase();
-  const hasConsent = consents.length > 0;
+  const flags = camperBannerFlags(detail);
+
+  const media =
+    camper.photoUrl && !isPdfUrl(camper.photoUrl) ? (
+      <img
+        src={camper.photoUrl}
+        alt={`${camper.firstName} ${camper.surname}`}
+        className="h-12 w-12 shrink-0 object-cover"
+      />
+    ) : camper.photoUrl ? (
+      <a
+        href={camper.photoUrl}
+        target="_blank"
+        rel="noreferrer"
+        title="View scanned document"
+        className="flex h-12 w-12 shrink-0 items-center justify-center border border-card bg-accent-tint text-accent"
+      >
+        <FileText size={18} />
+      </a>
+    ) : (
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center border border-card bg-accent-tint text-md font-bold text-accent">
+        {initials}
+      </span>
+    );
 
   return (
-    <div className="flex items-start gap-4 rounded-card border border-card bg-surface p-5">
-      {camper.photoUrl && !isPdfUrl(camper.photoUrl) ? (
-        <img
-          src={camper.photoUrl}
-          alt={`${camper.firstName} ${camper.surname}`}
-          className="h-14 w-14 rounded-none object-cover"
-        />
-      ) : camper.photoUrl ? (
-        <a
-          href={camper.photoUrl}
-          target="_blank"
-          rel="noreferrer"
-          title="View scanned document"
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-accent"
-        >
-          <FileText size={20} />
-        </a>
-      ) : (
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[17px] font-semibold text-accent">
-          {initials}
-        </span>
-      )}
-
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-[17px] font-semibold text-primary">
-            {camper.firstName} {camper.surname}
-          </h1>
-          <StatusPill tone="neutral">{camper.fileNumber}</StatusPill>
-        </div>
-        <p className="mt-0.5 text-[12.5px] text-secondary">
-          {camper.diagnosis ?? "No diagnosis on file"} · {ageYears(camper.dob)} years
+    <RecordBanner
+      title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+      media={media}
+      flags={flags}
+      meta={
+        <>
+          <span className="mono">{camper.fileNumber}</span> &middot; {formatSex(camper.sex)} &middot; DOB{" "}
+          <span className="mono">{camper.dob}</span> ({ageYears(camper.dob)}y) &middot;{" "}
+          {camper.diagnosis ?? "no diagnosis on file"}
           {siblings.map((s) => (
             <span key={s.camperId}>
               {" · "}
-              <Link to={`/campers/${s.camperId}`} className="text-accent hover:underline">
-                linked to {s.fileNumber} (sibling)
+              <Link to={`/campers/${s.camperId}`} className="text-accent underline">
+                sibling {s.fileNumber}
               </Link>
             </span>
           ))}
-        </p>
-      </div>
-
-      {hasConsent ? (
-        <StatusPill tone="neutral">consent on file</StatusPill>
-      ) : (
-        <span className="inline-flex items-center gap-1 rounded-full bg-danger-tint px-2.5 py-1 text-[11.5px] font-medium text-danger">
-          <TriangleAlert size={12} /> consent missing
-        </span>
-      )}
-    </div>
-  );
-}
-
-function FieldRow({ label, value }: { label: string; value: string | null | undefined }) {
-  return (
-    <div className="flex justify-between gap-3 border-b border-divider py-2 text-[12.5px] last:border-b-0">
-      <dt className="text-muted">{label}</dt>
-      <dd className="text-right text-primary">{value || "-"}</dd>
-    </div>
+        </>
+      }
+    />
   );
 }
 
 function PersonalTab({ detail }: { detail: CamperDetail }) {
   const { camper } = detail;
   return (
-    <div className="rounded-card border border-card bg-surface p-5">
-      <div className="mb-3 flex items-center justify-between">
-        <p className="text-[12px] text-muted">Personal information, from registration form</p>
+    <div className="border border-card bg-surface">
+      <SectionHead title="Demographics" hint="From the registration form" />
+      <FieldGrid>
+        <Field label="Surname" value={camper.surname} />
+        <Field label="First name" value={camper.firstName} />
+        <Field label="Date of birth" value={formatDate(camper.dob)} mono />
+        <Field label="Sex" value={formatSex(camper.sex)} />
+        <Field label="Race" value={camper.race} />
+        <Field label="Language" value={camper.language} />
+        <Field label="T-shirt size" value={camper.tShirtSize} />
+        <Field label="Cell number" value={camper.cellNumber} mono />
+        <Field label="File number" value={camper.fileNumber} mono />
+        <Field label="Treating clinic" value={camper.treatingClinic} />
+        <Field label="Address" value={camper.address} full />
+      </FieldGrid>
+      <div className="flex justify-end border-t border-card bg-page px-4 py-2.5">
         <Link to={`/campers/${camper.camperId}/edit`}>
           <Button variant="secondary" className="h-8 px-3">
-            <Pencil size={13} /> Edit
+            <Pencil size={13} /> Edit personal details
           </Button>
         </Link>
       </div>
-      <dl>
-        <FieldRow label="Date of birth" value={formatDate(camper.dob)} />
-        <FieldRow label="Sex" value={camper.sex === "M" ? "Male" : "Female"} />
-        <FieldRow label="Race" value={camper.race} />
-        <FieldRow label="Language" value={camper.language} />
-        <FieldRow label="T-shirt size" value={camper.tShirtSize} />
-        <FieldRow label="Address" value={camper.address} />
-        <FieldRow label="Cell number" value={camper.cellNumber} />
-        <FieldRow label="Treating clinic" value={camper.treatingClinic} />
-      </dl>
     </div>
   );
 }
@@ -510,7 +484,7 @@ function MedicalTab({ detail }: { detail: CamperDetail }) {
 
   if (!latest) {
     return (
-      <div className="rounded-card border border-card bg-surface p-6 text-center text-[13px] text-muted">
+      <div className="border border-card bg-surface p-6 text-center text-base text-muted">
         <p>
           No pre-camp medical information on file yet. It is captured from the
           caregiver&rsquo;s registration pack before each camp.
@@ -525,20 +499,21 @@ function MedicalTab({ detail }: { detail: CamperDetail }) {
   const meds = latest.medicationList ? (JSON.parse(latest.medicationList) as string[]) : [];
 
   return (
-    <div className="rounded-card border border-card bg-surface p-5">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <p className="text-[12px] text-muted">
-          From the caregiver&rsquo;s pre-camp medical form
-          {camp ? `, ${camp.venue} (Camp ${camp.campNumber})` : ""}. Captured by{" "}
-          {latest.capturedByName ?? "-"} on {formatDate(latest.capturedAt)}.
-        </p>
-        {maintainButton}
-      </div>
-      <dl>
-        <FieldRow label="Diagnosis (this cycle)" value={latest.diagnosis} />
-        <FieldRow label="Treating clinic / contact" value={latest.treatingContact} />
-        <FieldRow label="Hospital file number" value={latest.hospitalFileNumber} />
-        <FieldRow
+    <div className="border border-card bg-surface">
+      <SectionHead
+        title="Pre-camp medical"
+        hint={
+          <>
+            {camp ? `${camp.venue}, camp ${camp.campNumber} · ` : ""}
+            captured by {latest.capturedByName ?? "-"} on {formatDate(latest.capturedAt)}
+          </>
+        }
+      />
+      <FieldGrid>
+        <Field label="Diagnosis" value={latest.diagnosis} />
+        <Field label="Hospital file no." value={latest.hospitalFileNumber} mono />
+        <Field label="Treating contact" value={latest.treatingContact} full />
+        <Field
           label="Viral load"
           value={
             latest.viralLoad
@@ -546,22 +521,23 @@ function MedicalTab({ detail }: { detail: CamperDetail }) {
               : null
           }
         />
-        <FieldRow label="TB status" value={latest.tbStatus} />
-        <FieldRow
+        <Field label="TB status" value={latest.tbStatus} />
+        <Field
           label="Hepatitis B"
           value={latest.hepatitisB == null ? null : latest.hepatitisB ? "Yes" : "No"}
         />
-        <FieldRow
+        <Field
           label="Adherence barriers"
           value={latest.adherenceBarriers ? (latest.adherenceBarriersDetail ?? "Yes") : "None reported"}
         />
-        <FieldRow label="Current medication" value={meds.length ? meds.join(", ") : null} />
-        <FieldRow label="Dietary requirements" value={latest.dietaryRequirements} />
-        <FieldRow label="Religion" value={latest.religion} />
-        <FieldRow label="Disclosures" value={latest.additionalInfo} />
-        <FieldRow label="Behavioural / psychosocial history" value={latest.camperHistoryNotes} />
-        <FieldRow label="Clinical findings" value={latest.clinicalFindings} />
-      </dl>
+        <Field label="Dietary requirements" value={latest.dietaryRequirements} />
+        <Field label="Religion" value={latest.religion} />
+        <Field label="Current medication" value={meds.length ? meds.join(", ") : null} full />
+        <Field label="Clinical findings" value={latest.clinicalFindings} full />
+        <Field label="Disclosures" value={latest.additionalInfo} full />
+        <Field label="Behavioural history" value={latest.camperHistoryNotes} full />
+      </FieldGrid>
+      <div className="flex justify-end border-t border-card bg-page px-4 py-2.5">{maintainButton}</div>
     </div>
   );
 }

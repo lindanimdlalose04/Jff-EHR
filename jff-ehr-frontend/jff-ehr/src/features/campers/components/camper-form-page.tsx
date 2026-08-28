@@ -1,3 +1,4 @@
+import { normaliseSex } from "@/lib/display";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -87,7 +88,7 @@ export function CamperFormPage() {
         firstName: c.firstName,
         surname: c.surname,
         dob: c.dob,
-        sex: c.sex === "F" ? "F" : "M",
+        sex: normaliseSex(c.sex) ?? "M",
         race: c.race ?? "",
         tShirtSize: c.tShirtSize ?? "",
         address: c.address ?? "",

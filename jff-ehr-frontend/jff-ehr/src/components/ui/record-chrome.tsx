@@ -1,0 +1,154 @@
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+/**
+ * The shared record parts from spec/design/design-system.md, section 5:
+ * the pinned banner, the tab strip, and the label-and-value grid.
+ *
+ * These exist so a screen composes known parts instead of inventing new ones.
+ * That is what stops the interface drifting back into a different card for
+ * every situation. Square, ruled, no shadows.
+ */
+
+/** A status flag shown in a banner. Always carries a word, never colour alone. */
+export interface BannerFlag {
+  label: string;
+  tone: "success" | "warning" | "danger" | "neutral";
+}
+
+const flagTone: Record<BannerFlag["tone"], string> = {
+  success: "border-success bg-success-tint text-success-text",
+  warning: "border-warning bg-warning-tint text-warning-text",
+  danger: "border-danger bg-danger-tint text-danger-text",
+  neutral: "border-field-border bg-neutral-tint text-neutral",
+};
+
+/**
+ * Pinned identity strip. The hospital convention: who this record is about,
+ * their identifiers, and anything dangerous, all visible without scrolling.
+ * `title` is rendered as given, so campers pass "SURNAME, First".
+ */
+export function RecordBanner({
+  title,
+  meta,
+  flags = [],
+  media,
+}: {
+  title: string;
+  meta: ReactNode;
+  flags?: BannerFlag[];
+  media?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-4 border-b border-card bg-page px-4 py-3">
+      <div className="flex min-w-0 items-start gap-3">
+        {media}
+        <div className="min-w-0">
+          <h1 className="text-lg font-bold text-primary">{title}</h1>
+          <p className="mt-0.5 text-sm text-secondary">{meta}</p>
+        </div>
+      </div>
+      {flags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {flags.map((f) => (
+            <span
+              key={f.label}
+              className={cn(
+                "border px-2 py-[3px] text-xs font-bold uppercase",
+                flagTone[f.tone],
+              )}
+            >
+              {f.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Solid accent tab strip over a record. The active tab inverts to the surface. */
+export function TabStrip<T extends string>({
+  tabs,
+  active,
+  onChange,
+}: {
+  tabs: readonly T[];
+  active: T;
+  onChange: (tab: T) => void;
+}) {
+  return (
+    <div role="tablist" className="flex flex-wrap bg-accent">
+      {tabs.map((t) => (
+        <button
+          key={t}
+          type="button"
+          role="tab"
+          aria-selected={t === active}
+          onClick={() => onChange(t)}
+          className={cn(
+            "border-r border-accent-strong px-3.5 py-2 text-base font-semibold transition",
+            t === active
+              ? "bg-surface text-primary"
+              : "text-white/85 hover:bg-accent-strong hover:text-white",
+          )}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Uppercase section rule above a block of fields or a table. */
+export function SectionHead({ title, hint }: { title: string; hint?: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-card px-4 pb-1.5 pt-3">
+      <h2 className="text-xs font-bold uppercase tracking-[0.07em] text-accent">{title}</h2>
+      {hint && <span className="text-sm text-muted">{hint}</span>}
+    </div>
+  );
+}
+
+/**
+ * Two label-and-value pairs per row on wide screens, one on narrow. Labels sit
+ * in a fixed column so values line up down the page, which is what makes a
+ * record scannable rather than readable.
+ */
+export function FieldGrid({ children }: { children: ReactNode }) {
+  return <dl className="grid grid-cols-1 sm:grid-cols-[150px_1fr] lg:grid-cols-[150px_1fr_150px_1fr]">{children}</dl>;
+}
+
+export function Field({
+  label,
+  value,
+  mono = false,
+  full = false,
+}: {
+  label: string;
+  value: ReactNode;
+  mono?: boolean;
+  full?: boolean;
+}) {
+  return (
+    <>
+      <dt
+        className={cn(
+          "border-b border-divider px-4 py-2 text-sm font-semibold text-secondary",
+          full && "lg:col-start-1",
+        )}
+      >
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          "border-b border-divider px-3 py-2 text-base text-primary",
+          mono && "mono",
+          full && "lg:col-span-3",
+        )}
+      >
+        {value || <span className="text-muted">Not recorded</span>}
+      </dd>
+    </>
+  );
+}

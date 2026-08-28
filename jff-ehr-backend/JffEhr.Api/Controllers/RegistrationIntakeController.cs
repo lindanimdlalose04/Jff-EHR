@@ -237,7 +237,7 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
             FirstName = request.FirstName,
             Surname = request.Surname,
             Dob = request.Dob,
-            Sex = request.Sex,
+            Sex = NormaliseSex(request.Sex),
             Race = request.Race,
             Address = request.Address,
             CellNumber = request.CellNumber,
@@ -311,6 +311,20 @@ public sealed class RegistrationIntakeController(JffEhrDbContext db, ICurrentUse
         await db.SaveChangesAsync();
         return NoContent();
     }
+
+    /// <summary>
+    /// The campers.sex column is canonically "M" or "F", matching the seeder and
+    /// the camper form's enum. The public intake form collects the words "Male"
+    /// and "Female", so confirmation must fold them down. Storing the long form
+    /// put two conventions in one column, which made the camper edit form load
+    /// "Female" as "M" and silently flip a child's sex on the next save.
+    /// </summary>
+    private static string NormaliseSex(string sex) => sex.Trim().ToLowerInvariant() switch
+    {
+        "m" or "male" => "M",
+        "f" or "female" => "F",
+        _ => sex.Trim(),
+    };
 
     private static bool TryParseDob(string text, out DateOnly dob)
     {

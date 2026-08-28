@@ -13,7 +13,5 @@ export {
 // Camper feature: the patient banner primitive. The assessment vertical was
 // replaced by the Refinement A split (pre-camp medical + arrival check); its
 // screens live in features/ and are routed directly, not exported here.
-export {
-  PatientBanner,
-  type PatientBannerData,
-} from "./features/campers/components/patient-banner";
+export { RecordBanner, TabStrip, SectionHead, FieldGrid, Field } from "./components/ui/record-chrome";
+export type { BannerFlag } from "./components/ui/record-chrome";

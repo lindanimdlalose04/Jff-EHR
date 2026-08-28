@@ -18,7 +18,7 @@ import { Input, Textarea } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
-import { ageYears, formatDate } from "@/lib/display";
+import { ageYears, formatDate, formatSex } from "@/lib/display";
 import {
   createVisitWithTreatments,
   fetchVisitFormContext,
@@ -185,7 +185,7 @@ export function MedShackVisitFormPage() {
 
             {selected && (
               <div className="col-span-2 rounded-control bg-header-tint px-3 py-2 text-[12px] text-secondary">
-                {selected.camper.sex === "M" ? "Male" : "Female"} ·{" "}
+                {formatSex(selected.camper.sex)} ·{" "}
                 {ageYears(selected.camper.dob)} years · born{" "}
                 {formatDate(selected.camper.dob)}
                 {selected.groupName ? ` · group ${selected.groupName}` : ""}

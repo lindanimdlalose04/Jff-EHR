@@ -1,35 +1,43 @@
-import { ageYears } from "@/lib/display";
+import type { BannerFlag } from "@/components/ui/record-chrome";
 import type { CamperDetail } from "../api/camper-detail.api";
-import type { PatientBannerData } from "../components/patient-banner";
 
 /**
- * Camper + latest clinical records -> PatientBanner shape. After the
- * Refinement A split: HIV status comes from the newest pre-camp medical (the
- * caregiver's declared VL / TB block), allergies from the newest arrival check
- * (the nurse's day-one confirmation).
+ * Camper record -> the flags shown in the pinned banner.
+ *
+ * The banner exists for one reason: anything that could hurt the child should
+ * be visible without scrolling and without opening a tab. So it carries the
+ * allergy (taken from the nurse's day-one arrival check, which is the
+ * confirmed source rather than the caregiver's pre-camp declaration) and the
+ * consent state, because no child may take part without a signed indemnity.
+ *
+ * Deliberately NOT shown: HIV status. The earlier version inferred it from
+ * "has a viral load or TB value on file", which is not the same thing as a
+ * positive diagnosis, so the flag could be wrong. It is also the most
+ * sensitive fact in the record, and a banner is the one part of the screen a
+ * bystander at a camp table can read. The diagnosis stays in the meta line and
+ * the detail stays behind the medical tab.
  */
-export function toBanner(detail: CamperDetail): PatientBannerData {
-  const { camper, siblings, precampMedicals, arrivalChecks } = detail;
-  const latestPrecamp = [...precampMedicals].sort((a, b) =>
-    b.capturedAt.localeCompare(a.capturedAt),
-  )[0];
+export function camperBannerFlags(detail: CamperDetail): BannerFlag[] {
+  const { consents, arrivalChecks } = detail;
+  const flags: BannerFlag[] = [];
+
   const latestCheck = [...arrivalChecks].sort((a, b) =>
     b.assessedAt.localeCompare(a.assessedAt),
   )[0];
-  return {
-    initials: `${camper.firstName[0] ?? ""}${camper.surname[0] ?? ""}`.toUpperCase(),
-    fullName: `${camper.firstName} ${camper.surname}`,
-    ageYears: ageYears(camper.dob),
-    sex: camper.sex === "M" ? "Male" : "Female",
-    regNumber: camper.fileNumber,
-    familyGroupLabel: siblings.length
-      ? `${camper.surname} (${siblings.length + 1} siblings)`
-      : undefined,
-    diagnosis: camper.diagnosis ?? "No diagnosis on file",
-    allergies:
-      latestCheck?.hasAllergies && latestCheck.allergiesDetail
-        ? latestCheck.allergiesDetail.split(",").map((s) => s.trim())
-        : undefined,
-    hivPositive: Boolean(latestPrecamp?.viralLoad ?? latestPrecamp?.tbStatus),
-  };
+
+  if (latestCheck?.hasAllergies) {
+    const detailText = latestCheck.allergiesDetail?.trim();
+    flags.push({
+      label: detailText ? `Allergy: ${detailText}` : "Allergies on file",
+      tone: "danger",
+    });
+  }
+
+  flags.push(
+    consents.length > 0
+      ? { label: "Consent signed", tone: "success" }
+      : { label: "Consent missing", tone: "danger" },
+  );
+
+  return flags;
 }
