@@ -20,7 +20,7 @@ export function CampScopePicker({ className = "" }: { className?: string }) {
   if (activeCamps.length === 1) {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 text-[12.5px] font-medium text-secondary ${className}`}
+        className={`inline-flex items-center gap-1.5 text-sm font-medium text-secondary ${className}`}
       >
         <Tent size={13} className="text-muted" />
         {label(activeCamps[0])}
@@ -33,7 +33,7 @@ export function CampScopePicker({ className = "" }: { className?: string }) {
       <Tent size={13} className="text-muted" />
       <span className="sr-only">Active camp</span>
       <Select
-        className="h-8 w-auto text-[12.5px]"
+        className="h-8 w-auto text-sm"
         value={selectedCampId ?? ""}
         onChange={(e) => setSelectedCampId(e.target.value)}
       >

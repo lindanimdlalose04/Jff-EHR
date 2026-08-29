@@ -69,7 +69,7 @@ export function MedShackPage() {
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">MedShack</h1>
+        <h1 className="text-lg font-semibold text-primary">MedShack</h1>
         <StatusPill tone="neutral">{rows.length} visits</StatusPill>
         {canRecord && (
           <Link to="/medshack/new" className="ml-auto">
@@ -84,7 +84,7 @@ export function MedShackPage() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Select
           aria-label="Filter by camp"
-          className="h-9 w-auto text-[12.5px]"
+          className="h-9 w-auto text-sm"
           value={campFilter}
           onChange={(e) => setCampOverride(e.target.value)}
         >
@@ -110,7 +110,7 @@ export function MedShackPage() {
           <VisitCard key={visit.visitId} visit={visit} canRecord={canRecord} />
         ))}
         {rows.length === 0 && (
-          <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
+          <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
             No MedShack visits match the current filter.
           </div>
         )}
@@ -157,28 +157,28 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
         {visit.camper ? (
           <Link
             to={`/campers/${visit.camper.camperId}`}
-            className="text-[13.5px] font-medium text-primary hover:underline"
+            className="text-base font-medium text-primary hover:underline"
           >
             {visit.camper.firstName} {visit.camper.surname}
           </Link>
         ) : (
-          <span className="text-[13.5px] font-medium text-primary">Unknown camper</span>
+          <span className="text-base font-medium text-primary">Unknown camper</span>
         )}
         {visit.camper && (
-          <span className="text-[11px] text-muted">
+          <span className="text-xs text-muted">
             {initialsOf(visit.camper.firstName, visit.camper.surname)} · {visit.camper.fileNumber}
           </span>
         )}
-        <span className="ml-auto text-[11.5px] text-muted">{formatDateTime(visit.visitAt)}</span>
+        <span className="ml-auto text-xs text-muted">{formatDateTime(visit.visitAt)}</span>
       </div>
 
-      <p className="mt-2 text-[13px] font-medium text-primary">{visit.reason}</p>
-      <p className="mt-0.5 text-[11.5px] text-muted">
+      <p className="mt-2 text-base font-medium text-primary">{visit.reason}</p>
+      <p className="mt-0.5 text-xs text-muted">
         {visit.campLabel}
         {visit.accompaniedBy ? ` · accompanied by ${visit.accompaniedBy}` : ""}
       </p>
 
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-secondary">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-secondary">
         {visit.temperature != null && <span>{visit.temperature}°C</span>}
         {visit.pulse != null && <span>Pulse {visit.pulse}</span>}
         {visit.bloodPressure && <span>BP {visit.bloodPressure}</span>}
@@ -186,12 +186,12 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
       </div>
 
       {visit.signsSymptoms && (
-        <p className="mt-1.5 text-[12.5px] text-secondary">{visit.signsSymptoms}</p>
+        <p className="mt-1.5 text-sm text-secondary">{visit.signsSymptoms}</p>
       )}
-      {visit.findings && <p className="mt-1 text-[12.5px] text-secondary">{visit.findings}</p>}
+      {visit.findings && <p className="mt-1 text-sm text-secondary">{visit.findings}</p>}
 
       {visit.treatments.length > 0 && (
-        <ul className="mt-2 space-y-0.5 border-l-2 border-accent-border pl-3 text-[12.5px] text-secondary">
+        <ul className="mt-2 space-y-0.5 border-l-2 border-accent-border pl-3 text-sm text-secondary">
           {visit.treatments.map((t) => (
             <li key={t.treatmentId}>
               {t.sequenceNo}. {t.treatmentDescription}
@@ -205,20 +205,20 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
       )}
 
       {visit.adviceGiven && (
-        <p className="mt-2 text-[12.5px] text-secondary">
+        <p className="mt-2 text-sm text-secondary">
           <span className="text-muted">Advice: </span>
           {visit.adviceGiven}
         </p>
       )}
       {visit.nursingReport && (
-        <p className="mt-1 text-[12.5px] text-secondary">
+        <p className="mt-1 text-sm text-secondary">
           <span className="text-muted">Report: </span>
           {visit.nursingReport}
         </p>
       )}
 
       {error && (
-        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12px] text-danger">
+        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -262,7 +262,7 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
       )}
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[11.5px] text-muted">
+        <p className="text-xs text-muted">
           Nurse: {visit.nurseName ?? "-"}
           {visit.doctorName ? ` · Doctor: ${visit.doctorName}` : ""}
         </p>

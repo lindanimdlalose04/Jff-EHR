@@ -215,7 +215,7 @@ export function CamperFormPage() {
             <FormField label="Photo or scanned document (URL or upload)" htmlFor="photoUrl" error={errors.photoUrl?.message} className="col-span-2">
               <div className="flex gap-2">
                 <Input id="photoUrl" placeholder="https://… or upload" {...register("photoUrl")} />
-                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary hover:text-primary">
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-sm font-medium text-secondary hover:text-primary">
                   <Upload size={14} />
                   {uploading ? "Uploading…" : "Upload"}
                   <input
@@ -250,7 +250,7 @@ export function CamperFormPage() {
         </FormSection>
 
         {serverError && (
-          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
             {serverError}
           </div>
         )}

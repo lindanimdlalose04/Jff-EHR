@@ -181,7 +181,7 @@ export function PrecampFormPage() {
       <h1 className="text-lg font-medium text-primary">
         {existing ? "Edit pre-camp medical" : "Pre-camp medical"}
       </h1>
-      <p className="mb-4 mt-0.5 text-[12.5px] text-muted">
+      <p className="mb-4 mt-0.5 text-sm text-muted">
         {camper.firstName} {camper.surname} ({camper.fileNumber}) · from the caregiver&rsquo;s
         registration pack, strictly confidential
       </p>
@@ -258,7 +258,7 @@ export function PrecampFormPage() {
               </Select>
             </FormField>
             <div className="col-span-2">
-              <label className="flex items-center gap-2 text-[12.5px] text-primary">
+              <label className="flex items-center gap-2 text-sm text-primary">
                 <input type="checkbox" className="accent-accent" {...register("tbOisHistory")} />
                 History of TB or opportunistic infections
               </label>
@@ -282,7 +282,7 @@ export function PrecampFormPage() {
               </FormField>
             ))}
             <div className="col-span-2">
-              <label className="flex items-center gap-2 text-[12.5px] text-primary">
+              <label className="flex items-center gap-2 text-sm text-primary">
                 <input type="checkbox" className="accent-accent" {...register("adherenceBarriers")} />
                 Adherence barriers
               </label>
@@ -333,7 +333,7 @@ export function PrecampFormPage() {
         </FormSection>
 
         {serverError && (
-          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
             {serverError}
           </div>
         )}

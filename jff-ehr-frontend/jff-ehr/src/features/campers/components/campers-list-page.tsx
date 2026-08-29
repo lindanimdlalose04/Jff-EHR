@@ -96,7 +96,7 @@ export function CampersListPage() {
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">Campers</h1>
+        <h1 className="text-lg font-semibold text-primary">Campers</h1>
         <StatusPill tone="neutral">{visible.length}</StatusPill>
         <Link to="/campers/new" className="ml-auto">
           <Button variant="primary" className="h-9 px-3">
@@ -117,7 +117,7 @@ export function CampersListPage() {
         </div>
         <Select
           aria-label="Filter by camp"
-          className="h-9 w-auto text-[12.5px]"
+          className="h-9 w-auto text-sm"
           value={campFilter}
           onChange={(e) => setCampFilter(e.target.value)}
         >
@@ -147,15 +147,15 @@ export function CampersListPage() {
               to={`/campers/${camper.camperId}`}
               className="flex items-center gap-3 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[12px] font-medium text-accent">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-accent-tint text-sm font-medium text-accent">
                 {initialsOf(camper.firstName, camper.surname)}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5 text-[13.5px] font-medium text-primary">
+                <span className="flex items-center gap-1.5 text-base font-medium text-primary">
                   {camper.firstName} {camper.surname}
                   <ChevronRight size={14} className="shrink-0 text-muted" />
                 </span>
-                <span className="mt-0.5 block truncate text-[12px] text-muted">
+                <span className="mt-0.5 block truncate text-sm text-muted">
                   {camper.fileNumber}
                   {camper.diagnosis ? ` · ${camper.diagnosis}` : " · No diagnosis on file"}
                 </span>
@@ -169,7 +169,7 @@ export function CampersListPage() {
           );
         })}
         {visible.length === 0 && (
-          <div className="px-4 py-6 text-center text-[13px] text-muted">
+          <div className="px-4 py-6 text-center text-base text-muted">
             No campers match the current filters.
           </div>
         )}

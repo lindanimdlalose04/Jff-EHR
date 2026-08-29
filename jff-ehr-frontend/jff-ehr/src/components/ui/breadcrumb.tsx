@@ -20,7 +20,7 @@ export function Breadcrumb({ items, className }: { items: Crumb[]; className?: s
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn("mb-3 flex flex-wrap items-center gap-1 text-[12.5px]", className)}
+      className={cn("mb-3 flex flex-wrap items-center gap-1 text-sm", className)}
     >
       {items.map((item, i) => {
         const last = i === items.length - 1;

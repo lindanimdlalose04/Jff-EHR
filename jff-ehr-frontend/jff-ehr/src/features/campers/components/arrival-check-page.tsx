@@ -247,24 +247,24 @@ export function ArrivalCheckPage() {
           <h1 className="text-lg font-medium text-primary">
             Arrival check and medication check-in
           </h1>
-          <p className="mt-0.5 text-[12.5px] text-muted">
+          <p className="mt-0.5 text-sm text-muted">
             {camper.firstName} {camper.surname} ({camper.fileNumber})
             {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""} · nurse-signed on day one
           </p>
         </div>
         {signed ? (
-          <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2.5 py-1 text-[11.5px] font-semibold text-success-text">
+          <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2.5 py-1 text-xs font-semibold text-success-text">
             <Lock size={12} /> signed
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 border border-warning bg-warning-tint px-2.5 py-1 text-[11.5px] font-semibold text-warning-text">
+          <span className="inline-flex items-center gap-1 border border-warning bg-warning-tint px-2.5 py-1 text-xs font-semibold text-warning-text">
             <Pencil size={12} /> draft, editable
           </span>
         )}
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {serverError}
         </div>
       )}
@@ -297,20 +297,20 @@ function ReadOnlyOverlapFields({ dietary, religion }: { dietary: string | null; 
   return (
     <div className="grid grid-cols-2 gap-3 rounded-control bg-header-tint px-3 py-2.5">
       <div>
-        <div className="text-[11.5px] font-medium uppercase tracking-wide text-muted">
+        <div className="text-xs font-medium uppercase tracking-wide text-muted">
           Special dietary requirements
         </div>
-        <div className="mt-0.5 text-[12.5px] text-secondary">
+        <div className="mt-0.5 text-sm text-secondary">
           {dietary ?? "Not captured on pre-camp medical"}
         </div>
       </div>
       <div>
-        <div className="text-[11.5px] font-medium uppercase tracking-wide text-muted">Religion</div>
-        <div className="mt-0.5 text-[12.5px] text-secondary">
+        <div className="text-xs font-medium uppercase tracking-wide text-muted">Religion</div>
+        <div className="mt-0.5 text-sm text-secondary">
           {religion ?? "Not captured on pre-camp medical"}
         </div>
       </div>
-      <p className="col-span-2 text-[11px] text-muted">
+      <p className="col-span-2 text-xs text-muted">
         Read-only, owned by the pre-camp medical record.
       </p>
     </div>
@@ -332,7 +332,7 @@ function CheckboxWithDetail({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-2 text-[12.5px] text-primary">
+      <label className="flex items-center gap-2 text-sm text-primary">
         <input type="checkbox" className="accent-accent" {...checked} />
         {label}
       </label>
@@ -385,7 +385,7 @@ function CheckForm({
       <FormSection icon={<ClipboardPlus size={15} />} title="Assessment">
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2">
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+            <label className="flex items-center gap-2 text-sm text-primary">
               <input type="checkbox" className="accent-accent" {...register("hasAllergies")} />
               Allergies
             </label>
@@ -414,7 +414,7 @@ function CheckForm({
       </FormSection>
 
       <FormSection icon={<Accessibility size={15} />} title="Assistance with daily living">
-        <label className="flex items-center gap-2 text-[12.5px] text-primary">
+        <label className="flex items-center gap-2 text-sm text-primary">
           <input type="checkbox" className="accent-accent" {...register("adlEnabled")} />
           Needs assistance with daily living
         </label>
@@ -464,12 +464,12 @@ function CheckForm({
 
       <FormSection icon={<Pill size={15} />} title="Medication">
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex items-center gap-2 text-[12.5px] text-primary">
+          <label className="flex items-center gap-2 text-sm text-primary">
             <input type="checkbox" className="accent-accent" {...register("hasMedication")} />
             Medication
           </label>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+            <label className="flex items-center gap-2 text-sm text-primary">
               <input type="checkbox" className="accent-accent" {...register("medicationHandedIn")} />
               Medication handed in
             </label>
@@ -502,7 +502,7 @@ function CheckForm({
       </FormSection>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-[340px] text-[11.5px] text-muted">
+        <p className="max-w-[340px] text-xs text-muted">
           Signing locks this record. Later corrections show as amendments, never silent edits.
         </p>
         <div className="flex gap-2.5">
@@ -526,7 +526,7 @@ function CheckForm({
 
 function SignedRow({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="flex justify-between gap-3 border-b border-divider py-2 text-[12.5px] last:border-b-0">
+    <div className="flex justify-between gap-3 border-b border-divider py-2 text-sm last:border-b-0">
       <dt className="text-muted">{label}</dt>
       <dd className="text-right text-primary">{value || "-"}</dd>
     </div>
@@ -603,7 +603,7 @@ function SignedView({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="inline-flex items-center gap-1.5 text-[12.5px] text-secondary">
+        <p className="inline-flex items-center gap-1.5 text-sm text-secondary">
           <Lock size={13} className="text-accent" />
           Signed by {check.signedByName ?? "-"}
           {check.signedAt ? ` on ${formatDateTime(check.signedAt)}` : ""}. This record is locked.
@@ -613,7 +613,7 @@ function SignedView({
           {amending ? "Amending…" : "Amend"}
         </Button>
       </div>
-      <p className="mt-1.5 text-right text-[11px] text-muted">
+      <p className="mt-1.5 text-right text-xs text-muted">
         Amending retires this signed record as a visible amendment and opens a new
         prefilled draft. Nothing is overwritten.
       </p>

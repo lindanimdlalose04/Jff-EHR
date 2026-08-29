@@ -19,11 +19,11 @@ export function AppHeader({
         {icon}
       </div>
       <div className="flex-1">
-        <div className="text-[15px] font-medium text-primary">{title}</div>
+        <div className="text-md font-medium text-primary">{title}</div>
         {subtitle && <div className="text-xs text-muted">{subtitle}</div>}
       </div>
       {actions}
-      <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-accent-tint text-xs font-medium text-accent">
+      <div className="flex h-[34px] w-[34px] items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
         {userInitials}
       </div>
     </header>

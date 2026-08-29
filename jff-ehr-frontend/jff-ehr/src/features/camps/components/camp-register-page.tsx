@@ -103,7 +103,7 @@ export function CampRegisterPage() {
       <h1 className="text-lg font-medium text-primary">Register a camper</h1>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -157,7 +157,7 @@ export function CampRegisterPage() {
             </FormField>
           </div>
           {data.available.length === 0 && (
-            <p className="mt-2 text-[12px] text-muted">
+            <p className="mt-2 text-sm text-muted">
               Every camper on file is already registered to this camp.{" "}
               <Link to="/campers/new" className="text-accent hover:underline">
                 Create a new camper
@@ -180,7 +180,7 @@ export function CampRegisterPage() {
           </Button>
         </div>
         {!canMaintain && (
-          <p className="mt-2 text-right text-[11.5px] text-muted">
+          <p className="mt-2 text-right text-xs text-muted">
             Registrations are maintained by medical or admin staff.
           </p>
         )}

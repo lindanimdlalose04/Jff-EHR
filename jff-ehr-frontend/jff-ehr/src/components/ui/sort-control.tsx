@@ -37,11 +37,11 @@ export function SortControl({
   return (
     <div className={cn("inline-flex items-center gap-1.5", className)}>
       <ArrowDownUp size={14} className="text-muted" />
-      <span className="text-[12px] text-muted">Sort</span>
+      <span className="text-sm text-muted">Sort</span>
       <Select
         id={id}
         aria-label="Sort by"
-        className="h-8 w-auto text-[12.5px]"
+        className="h-8 w-auto text-sm"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

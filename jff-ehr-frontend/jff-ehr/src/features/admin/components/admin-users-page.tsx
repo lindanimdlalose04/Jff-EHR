@@ -33,11 +33,11 @@ export function AdminUsersPage() {
   if (!isAdmin) {
     return (
       <div className="rounded-card border border-card bg-surface px-6 py-12 text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-admin-tint text-admin">
+        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-none bg-admin-tint text-admin">
           <ShieldCheck size={20} />
         </span>
-        <h1 className="mt-3 text-[14px] font-medium text-primary">Admin access required</h1>
-        <p className="mx-auto mt-1 max-w-[380px] text-[12.5px] text-muted">
+        <h1 className="mt-3 text-base font-medium text-primary">Admin access required</h1>
+        <p className="mx-auto mt-1 max-w-[380px] text-sm text-muted">
           Your account has the medical role. User management is limited to administrators.
         </p>
       </div>
@@ -54,12 +54,12 @@ export function AdminUsersPage() {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">Users</h1>
+        <h1 className="text-lg font-semibold text-primary">Users</h1>
         <StatusPill tone="neutral">{data.length}</StatusPill>
       </div>
 
       <div className="overflow-hidden rounded-card border border-card bg-surface">
-        <div className="hidden grid-cols-[1.3fr_1.6fr_auto_auto] items-center gap-3 border-b border-divider bg-header-tint px-4 py-2 text-[11.5px] font-medium uppercase tracking-wide text-muted sm:grid">
+        <div className="hidden grid-cols-[1.3fr_1.6fr_auto_auto] items-center gap-3 border-b border-divider bg-header-tint px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted sm:grid">
           <span>Name</span>
           <span>Email</span>
           <span>Role</span>
@@ -70,7 +70,7 @@ export function AdminUsersPage() {
         ))}
       </div>
 
-      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-[12.5px] text-secondary">
+      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-sm text-secondary">
         <Info size={16} className="mt-0.5 shrink-0 text-muted" />
         <div>
           <p className="font-medium text-primary">Adding a new staff login</p>
@@ -116,20 +116,20 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
     <div className="border-b border-divider px-4 py-3 last:border-b-0">
       <div className="grid grid-cols-[1fr_auto] items-center gap-3 sm:grid-cols-[1.3fr_1.6fr_auto_auto]">
         <span className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
             {crew ? initialsOf(crew.name, crew.surname) : "?"}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-[13px] font-medium text-primary">
+            <span className="block truncate text-base font-medium text-primary">
               {fullName}
-              {isSelf && <span className="ml-1 text-[11px] text-muted">(you)</span>}
+              {isSelf && <span className="ml-1 text-xs text-muted">(you)</span>}
             </span>
-            <span className="block truncate text-[11.5px] text-muted sm:hidden">{user.email}</span>
-            <span className="block text-[11px] text-muted">since {formatDate(user.createdAt)}</span>
+            <span className="block truncate text-xs text-muted sm:hidden">{user.email}</span>
+            <span className="block text-xs text-muted">since {formatDate(user.createdAt)}</span>
           </span>
         </span>
 
-        <span className="hidden truncate text-[12.5px] text-secondary sm:block">{user.email}</span>
+        <span className="hidden truncate text-sm text-secondary sm:block">{user.email}</span>
 
         <span className="flex items-center gap-2">
           <StatusPill tone={user.rolePermissions === "admin" ? "admin" : "success"}>
@@ -138,7 +138,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
           {!isSelf && (
             <Button
               variant="secondary"
-              className="h-7 px-2 text-[11.5px]"
+              className="h-7 px-2 text-xs"
               disabled={mutate.isPending}
               onClick={() => mutate.mutate({ rolePermissions: otherRole })}
             >
@@ -154,7 +154,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
           {!isSelf && (
             <Button
               variant="secondary"
-              className="h-7 px-2 text-[11.5px]"
+              className="h-7 px-2 text-xs"
               disabled={mutate.isPending}
               onClick={() => mutate.mutate({ isActive: !user.isActive })}
             >
@@ -164,7 +164,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
         </span>
       </div>
       {error && (
-        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-1.5 text-[11.5px] text-danger">
+        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-1.5 text-xs text-danger">
           {error}
         </div>
       )}

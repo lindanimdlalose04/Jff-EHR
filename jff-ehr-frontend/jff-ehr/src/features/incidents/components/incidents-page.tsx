@@ -71,7 +71,7 @@ export function IncidentsPage() {
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">Incidents and near misses</h1>
+        <h1 className="text-lg font-semibold text-primary">Incidents and near misses</h1>
         <StatusPill tone="neutral">{rows.length}</StatusPill>
         {awaiting > 0 && <StatusPill tone="warning">{awaiting} awaiting review</StatusPill>}
         {canReview && (
@@ -87,7 +87,7 @@ export function IncidentsPage() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Select
           aria-label="Filter by camp"
-          className="h-9 w-auto text-[12.5px]"
+          className="h-9 w-auto text-sm"
           value={campFilter}
           onChange={(e) => setCampOverride(e.target.value)}
         >
@@ -100,7 +100,7 @@ export function IncidentsPage() {
         </Select>
         <Select
           aria-label="Filter by review status"
-          className="h-9 w-auto text-[12.5px]"
+          className="h-9 w-auto text-sm"
           value={reviewFilter}
           onChange={(e) => setReviewFilter(e.target.value)}
         >
@@ -121,8 +121,8 @@ export function IncidentsPage() {
       {rows.length === 0 ? (
         <div className="rounded-card border border-card bg-surface px-4 py-10 text-center">
           <TriangleAlert size={22} className="mx-auto text-muted" />
-          <p className="mt-2 text-[13px] font-medium text-primary">No events to show</p>
-          <p className="mt-1 text-[12.5px] text-muted">
+          <p className="mt-2 text-base font-medium text-primary">No events to show</p>
+          <p className="mt-1 text-sm text-muted">
             Nothing matches the current filters.
           </p>
         </div>
@@ -170,59 +170,59 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
         {event.camper ? (
           <Link
             to={`/campers/${event.camper.camperId}`}
-            className="text-[13.5px] font-medium text-primary hover:underline"
+            className="text-base font-medium text-primary hover:underline"
           >
             {event.camper.firstName} {event.camper.surname}
           </Link>
         ) : (
-          <span className="text-[13.5px] font-medium text-primary">Unknown camper</span>
+          <span className="text-base font-medium text-primary">Unknown camper</span>
         )}
         {event.camper && (
-          <span className="text-[11px] text-muted">{event.camper.fileNumber}</span>
+          <span className="text-xs text-muted">{event.camper.fileNumber}</span>
         )}
         {event.isReviewed ? (
           <StatusPill tone="success">reviewed</StatusPill>
         ) : (
           <StatusPill tone="warning">awaiting review</StatusPill>
         )}
-        <span className="ml-auto text-[11.5px] text-muted">{formatDateTime(event.eventAt)}</span>
+        <span className="ml-auto text-xs text-muted">{formatDateTime(event.eventAt)}</span>
       </div>
 
       <div className="mt-2 flex flex-wrap gap-1.5">
         {event.types.map((t) => (
           <span
             key={t}
-            className="rounded-full bg-danger-tint px-2 py-0.5 text-[11px] font-medium text-danger"
+            className="rounded-none bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger"
           >
             {t}
           </span>
         ))}
         {event.otherEventType && (
-          <span className="rounded-full bg-danger-tint px-2 py-0.5 text-[11px] font-medium text-danger">
+          <span className="rounded-none bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger">
             Other: {event.otherEventType}
           </span>
         )}
         {event.factors.map((f) => (
           <span
             key={f}
-            className="rounded-full bg-neutral-tint px-2 py-0.5 text-[11px] font-medium text-neutral"
+            className="rounded-none bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral"
           >
             {f}
           </span>
         ))}
         {event.otherContributingFactor && (
-          <span className="rounded-full bg-neutral-tint px-2 py-0.5 text-[11px] font-medium text-neutral">
+          <span className="rounded-none bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral">
             Other: {event.otherContributingFactor}
           </span>
         )}
       </div>
 
-      <p className="mt-2 text-[12.5px] text-secondary">{event.description}</p>
-      <p className="mt-1 text-[11.5px] text-muted">
+      <p className="mt-2 text-sm text-secondary">{event.description}</p>
+      <p className="mt-1 text-xs text-muted">
         {event.campLabel} · discovered {formatDateTime(event.discoveryAt)}
       </p>
 
-      <dl className="mt-2 space-y-1 text-[12.5px]">
+      <dl className="mt-2 space-y-1 text-sm">
         <div>
           <dt className="inline text-muted">Immediate action: </dt>
           <dd className="inline text-secondary">{event.immediateAction}</dd>
@@ -243,11 +243,11 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
 
       {event.isReviewed && (
         <div className="mt-2.5 rounded-control border border-accent-border bg-accent-tint/40 px-3 py-2">
-          <p className="text-[11.5px] font-medium uppercase tracking-wide text-accent">
+          <p className="text-xs font-medium uppercase tracking-wide text-accent">
             Investigation and corrective action
           </p>
-          <p className="mt-1 text-[12.5px] text-secondary">{event.correctiveAction}</p>
-          <p className="mt-1 text-[11.5px] text-muted">
+          <p className="mt-1 text-sm text-secondary">{event.correctiveAction}</p>
+          <p className="mt-1 text-xs text-muted">
             Reviewed by {event.reviewerName ?? "-"}
             {event.reviewedAt ? ` on ${formatDateTime(event.reviewedAt)}` : ""}
           </p>
@@ -255,14 +255,14 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
       )}
 
       {error && (
-        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12px] text-danger">
+        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
 
       {reviewing && (
         <div className="mt-2.5 rounded-control border border-accent-border bg-accent-tint/30 p-3">
-          <label className="mb-1 block text-[12.5px] font-medium text-secondary">
+          <label className="mb-1 block text-sm font-medium text-secondary">
             Event investigation and corrective action plan
           </label>
           <Textarea
@@ -295,7 +295,7 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
       )}
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[11.5px] text-muted">
+        <p className="text-xs text-muted">
           Reported by {event.reporterName ?? "-"}
           {event.isReviewed ? "" : " · not yet reviewed"}
         </p>

@@ -148,13 +148,13 @@ export function MedShackVisitFormPage() {
       />
 
       <h1 className="text-lg font-medium text-primary">MedShack visit</h1>
-      <p className="mb-4 mt-0.5 text-[12.5px] text-muted">
+      <p className="mb-4 mt-0.5 text-sm text-muted">
         {ORGANISATION}
         {context.camp ? ` · Camp ${context.camp.campNumber}, ${context.camp.venue}` : ""}
       </p>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -184,7 +184,7 @@ export function MedShackVisitFormPage() {
             </FormField>
 
             {selected && (
-              <div className="col-span-2 rounded-control bg-header-tint px-3 py-2 text-[12px] text-secondary">
+              <div className="col-span-2 rounded-control bg-header-tint px-3 py-2 text-sm text-secondary">
                 {formatSex(selected.camper.sex)} ·{" "}
                 {ageYears(selected.camper.dob)} years · born{" "}
                 {formatDate(selected.camper.dob)}
@@ -297,16 +297,16 @@ export function MedShackVisitFormPage() {
 
         <FormSection icon={<Syringe size={15} />} title="Treatment given">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-[12.5px]">
+            <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-header-tint">
-                  <th className="w-[92px] border-b border-divider px-2 py-1.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-muted">
+                  <th className="w-[92px] border-b border-divider px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                     Time
                   </th>
-                  <th className="border-b border-divider px-2 py-1.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-muted">
+                  <th className="border-b border-divider px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                     Treatment
                   </th>
-                  <th className="border-b border-divider px-2 py-1.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-muted">
+                  <th className="border-b border-divider px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                     Outcome
                   </th>
                   <th className="w-[42px] border-b border-divider" />
@@ -356,7 +356,7 @@ export function MedShackVisitFormPage() {
             </table>
           </div>
           <div className="mt-2.5 flex items-center justify-between">
-            <p className="text-[11px] text-muted">
+            <p className="text-xs text-muted">
               Each row is saved as its own treatment record, numbered in this order.
             </p>
             <Button type="button" variant="secondary" className="h-8 px-3" onClick={addRow}>
@@ -403,7 +403,7 @@ export function MedShackVisitFormPage() {
         </FormSection>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[11.5px] text-muted">
+          <p className="text-xs text-muted">
             Signed as {me.data ? `${me.data.name} ${me.data.surname}` : "the camp nurse"}. A saved
             visit cannot be edited, only corrected by a further record.
           </p>
@@ -417,7 +417,7 @@ export function MedShackVisitFormPage() {
           </div>
         </div>
         {!canRecord && (
-          <p className="mt-2 text-right text-[11.5px] text-muted">
+          <p className="mt-2 text-right text-xs text-muted">
             Recording visits is limited to the medical team.
           </p>
         )}

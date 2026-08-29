@@ -100,13 +100,13 @@ export function CampCrewTab({ campId }: { campId: string }) {
       )}
 
       {error && (
-        <div className="mb-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
 
       {crew.data.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
+        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
           No crew registered to this camp yet.
         </div>
       ) : (
@@ -116,16 +116,16 @@ export function CampCrewTab({ campId }: { campId: string }) {
               key={entry.registration.crewRegistrationId}
               className="flex flex-wrap items-center gap-3 border-b border-divider px-4 py-3 last:border-b-0"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
                 {entry.crew ? initialsOf(entry.crew.name, entry.crew.surname) : "?"}
               </span>
               <Link
                 to={`/crew/${entry.registration.crewId}`}
-                className="text-[13px] font-medium text-primary hover:underline"
+                className="text-base font-medium text-primary hover:underline"
               >
                 {entry.crew ? `${entry.crew.name} ${entry.crew.surname}` : "Unknown crew member"}
               </Link>
-              <span className="text-[11.5px] text-muted">
+              <span className="text-xs text-muted">
                 {entry.registration.role ?? entry.crew?.role ?? ""}
               </span>
               {entry.checkin ? (
@@ -137,7 +137,7 @@ export function CampCrewTab({ campId }: { campId: string }) {
                 {canMaintain ? (
                   <Select
                     aria-label="Attendance status"
-                    className="h-8 w-auto text-[12px] capitalize"
+                    className="h-8 w-auto text-sm capitalize"
                     value={entry.registration.status}
                     onChange={(e) =>
                       setStatus.mutate({

@@ -106,7 +106,7 @@ export function ConsentPage() {
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
           <h1 className="text-lg font-medium text-primary">Consent and indemnity</h1>
-          <p className="mt-0.5 text-[12.5px] text-muted">
+          <p className="mt-0.5 text-sm text-muted">
             {camper.firstName} {camper.surname} ({camper.fileNumber})
             {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""}
           </p>
@@ -119,14 +119,14 @@ export function ConsentPage() {
       </div>
 
       {consents.length === 0 && (
-        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           No child is accepted to camp without a signed indemnity. Capture the caregiver&rsquo;s
           consent to clear the acceptance gate.
         </div>
       )}
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -140,20 +140,20 @@ export function ConsentPage() {
                   <span className="flex h-7 w-7 items-center justify-center rounded-none bg-accent-tint text-accent">
                     <FileCheck size={14} />
                   </span>
-                  <span className="text-[13.5px] font-medium text-primary">
+                  <span className="text-base font-medium text-primary">
                     {consentTypeLabel(consent.consentType)}
                   </span>
                   {consent.popiaAcknowledged && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-accent-tint px-2 py-0.5 text-[11px] font-medium text-accent">
+                    <span className="inline-flex items-center gap-1 rounded-none bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent">
                       <ShieldCheck size={11} /> POPIA acknowledged
                     </span>
                   )}
                 </div>
-                <div className="mt-1.5 text-[12.5px] text-secondary">
+                <div className="mt-1.5 text-sm text-secondary">
                   Signed by {consent.signedBy}
                   {consent.witnessName ? `, witnessed by ${consent.witnessName}` : ""}
                 </div>
-                <div className="mt-0.5 text-[11.5px] text-muted">
+                <div className="mt-0.5 text-xs text-muted">
                   {formatDate(consent.signedAt)}
                   {consent.signedLocation ? ` · ${consent.signedLocation}` : ""}
                 </div>
@@ -162,7 +162,7 @@ export function ConsentPage() {
                     href={consent.documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-accent hover:underline"
+                    className="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline"
                   >
                     <FileText size={13} /> Scanned document
                   </a>
@@ -205,7 +205,7 @@ export function ConsentPage() {
         ))}
 
       {!canCapture && (
-        <p className="text-[11.5px] text-muted">
+        <p className="text-xs text-muted">
           Consent is captured by the medical team. You have view access.
         </p>
       )}
@@ -319,7 +319,7 @@ function ConsentForm({
               onChange={(e) => setDocumentUrl(e.target.value)}
               placeholder="https://… or upload a PDF"
             />
-            <label className="inline-flex h-[38px] cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary transition hover:text-primary">
+            <label className="inline-flex h-[38px] cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-sm font-medium text-secondary transition hover:text-primary">
               <Upload size={14} />
               {uploading ? "Uploading…" : "Upload PDF"}
               <input
@@ -336,14 +336,14 @@ function ConsentForm({
             </label>
           </div>
           {uploadError && (
-            <p className="mt-1 text-[11.5px] text-danger">{uploadError}</p>
+            <p className="mt-1 text-xs text-danger">{uploadError}</p>
           )}
           {documentUrl && !uploadError && (
             <a
               href={documentUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-1 inline-block text-[11.5px] text-accent hover:underline"
+              className="mt-1 inline-block text-xs text-accent hover:underline"
             >
               View attached document
             </a>
@@ -351,7 +351,7 @@ function ConsentForm({
         </FormField>
       </div>
 
-      <label className="mt-3 flex items-start gap-2 text-[12.5px] text-primary">
+      <label className="mt-3 flex items-start gap-2 text-sm text-primary">
         <input
           type="checkbox"
           className="mt-0.5 accent-accent"
@@ -365,7 +365,7 @@ function ConsentForm({
       </label>
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="text-[11px] text-muted">
+        <p className="text-xs text-muted">
           Consent is filed once and never edited. Corrections are a withdrawal and a fresh
           record.
         </p>

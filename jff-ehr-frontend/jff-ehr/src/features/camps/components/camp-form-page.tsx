@@ -132,7 +132,7 @@ export function CampFormPage() {
       </h1>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -199,7 +199,7 @@ export function CampFormPage() {
 
             {isEdit && (
               <div className="col-span-2 rounded-control border border-card bg-field/40 px-3 py-2.5">
-                <label className="flex items-center gap-2 text-[12.5px] font-medium text-primary">
+                <label className="flex items-center gap-2 text-sm font-medium text-primary">
                   <input
                     type="checkbox"
                     className="accent-danger"
@@ -208,7 +208,7 @@ export function CampFormPage() {
                   />
                   Cancel this camp
                 </label>
-                <p className="mt-1 text-[11px] text-muted">
+                <p className="mt-1 text-xs text-muted">
                   Planned, active and completed are worked out from the dates. The only status set
                   by hand is whether the camp is cancelled.
                 </p>
@@ -226,7 +226,7 @@ export function CampFormPage() {
           </Button>
         </div>
         {!canMaintain && (
-          <p className="mt-2 text-right text-[11.5px] text-muted">
+          <p className="mt-2 text-right text-xs text-muted">
             Camps are maintained by medical or admin staff.
           </p>
         )}

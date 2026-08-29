@@ -7,6 +7,7 @@ import type {
   MedicationDoseDto,
   MedshackVisitDto,
   PrescriptionDto,
+  ConsentRecordDto,
 } from "@/api/types";
 import {
   isPrescriptionActiveOn,
@@ -48,6 +49,25 @@ export interface RecentVisit {
   visitAt: string;
 }
 
+/** One camp day on the adherence chart. */
+export interface DayTotals {
+  /** Local ISO day. */
+  day: string;
+  /** 1-based camp day. */
+  dayNumber: number;
+  given: number;
+  missed: number;
+}
+
+/** A single thing that needs a person to act, shown in the exceptions table. */
+export interface Exception {
+  kind: "no consent" | "missed" | "draft check" | "not checked in";
+  camperName: string;
+  camperId: string;
+  registrationId: string;
+  detail: string;
+}
+
 export interface Dashboard {
   camp: CampDto | null;
   /** 1-based day within the camp, clamped; null before it starts. */
@@ -59,6 +79,12 @@ export interface Dashboard {
   roundDay: string;
   isToday: boolean;
   recentVisits: RecentVisit[];
+  /** Doses given and missed for each camp day reached so far. */
+  byDay: DayTotals[];
+  /** Scheduled and given for the round day, for the headline adherence figure. */
+  scheduledToday: number;
+  givenToday: number;
+  exceptions: Exception[];
 }
 
 export async function fetchDashboard(
@@ -76,16 +102,21 @@ export async function fetchDashboard(
       round: [],
       roundDay: toLocalDay(now),
       isToday: true,
+      byDay: [],
+      scheduledToday: 0,
+      givenToday: 0,
+      exceptions: [],
       recentVisits: [],
     };
   }
 
-  const [registrations, campers, arrivalChecks, visits, prescriptions] = await Promise.all([
+  const [registrations, campers, arrivalChecks, visits, prescriptions, consents] = await Promise.all([
     get<CampRegistrationDto[]>("/campregistrations", { campId: camp.campId }),
     get<CamperDto[]>("/campers"),
     get<ArrivalCheckDto[]>("/arrivalchecks"),
     get<MedshackVisitDto[]>("/medshackvisits"),
     get<PrescriptionDto[]>("/prescriptions"),
+    get<ConsentRecordDto[]>("/consentrecords"),
   ]);
 
   const camperById = new Map(campers.map((c) => [c.camperId, c]));
@@ -159,6 +190,71 @@ export async function fetchDashboard(
       visitAt: v.visitAt,
     }));
 
+  // ---- Report figures -------------------------------------------------
+  // Doses given and missed for every camp day reached so far, so the chart can
+  // show the run of the camp rather than only today. Reuses the dose lists
+  // already fetched above, so this costs no extra requests.
+  const allDoses = doseLists.flat();
+  const daysSoFar = Math.max(0, Math.min(dayNumber ?? 0, totalDays));
+  const byDay: DayTotals[] = [];
+  for (let i = 0; i < daysSoFar; i++) {
+    const iso = toLocalDay(new Date(start.getTime() + i * dayMs));
+    let given = 0;
+    let missed = 0;
+    for (const p of prescriptions) {
+      if (!rosterRegIds.has(p.registrationId)) continue;
+      if (!isPrescriptionActiveOn(p, iso, camp)) continue;
+      for (const time of parseScheduledTimes(p.scheduledTimes)) {
+        const slot = resolveSlot(p.prescriptionId, iso, time, allDoses, now);
+        if (slot.state === "given") given += 1;
+        else if (slot.state === "missed") missed += 1;
+      }
+    }
+    byDay.push({ day: iso, dayNumber: i + 1, given, missed });
+  }
+
+  const scheduledToday = round.length;
+  const givenToday = round.filter((r) => r.slot.state === "given").length;
+
+  // Exceptions: only what a person has to act on, most serious first.
+  const consentRegIds = new Set(consents.map((c) => c.registrationId));
+  const checkByReg = new Map(arrivalChecks.map((a) => [a.registrationId, a]));
+  const exceptions: Exception[] = [];
+  for (const reg of roster) {
+    const camper = camperById.get(reg.camperId);
+    if (!camper) continue;
+    const base = {
+      camperName: `${camper.surname}, ${camper.firstName}`,
+      camperId: camper.camperId,
+      registrationId: reg.registrationId,
+    };
+    if (!consentRegIds.has(reg.registrationId)) {
+      exceptions.push({ ...base, kind: "no consent", detail: "Indemnity not signed, blocks participation" });
+    }
+    const check = checkByReg.get(reg.registrationId);
+    if (!check) {
+      exceptions.push({ ...base, kind: "not checked in", detail: "Registered, no arrival check yet" });
+    } else if (check.status !== "signed") {
+      exceptions.push({ ...base, kind: "draft check", detail: "Arrival check saved as draft, not signed" });
+    }
+  }
+  for (const entry of round) {
+    if (entry.slot.state !== "missed") continue;
+    exceptions.push({
+      kind: "missed",
+      camperName: entry.camperName,
+      camperId: entry.camperId,
+      registrationId: entry.registrationId,
+      detail: `${entry.medicationName}, ${entry.slot.time} round`,
+    });
+  }
+  const order: Record<Exception["kind"], number> = {
+    "no consent": 0,
+    missed: 1,
+    "draft check": 2,
+    "not checked in": 3,
+  };
+  exceptions.sort((a, b) => order[a.kind] - order[b.kind]);
   return {
     camp,
     dayNumber,
@@ -169,5 +265,9 @@ export async function fetchDashboard(
     roundDay,
     isToday: roundDay === today,
     recentVisits,
+    byDay,
+    scheduledToday,
+    givenToday,
+    exceptions,
   };
 }

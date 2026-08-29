@@ -49,7 +49,7 @@ function SidebarNav({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: ()
         .filter((group) => !group.adminOnly || isAdmin)
         .map((group) => (
           <div key={group.heading}>
-            <p className="px-3 pb-1 pt-3 text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">
+            <p className="px-3 pb-1 pt-3 text-xs font-bold uppercase tracking-[0.1em] text-muted">
               {group.heading}
             </p>
             {group.items.map(({ to, label }) => (
@@ -60,7 +60,7 @@ function SidebarNav({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: ()
                 onClick={onNavigate}
                 className={({ isActive }) =>
                   cn(
-                    "block border-l-[3px] px-3 py-2 text-[13px] transition",
+                    "block border-l-[3px] px-3 py-2 text-base transition",
                     isActive
                       ? "border-accent bg-surface font-bold text-accent-strong"
                       : "border-transparent font-medium text-secondary hover:bg-page hover:text-primary",
@@ -126,7 +126,7 @@ export function AppLayout() {
               />
               <div className="absolute left-0 top-0 h-full w-[240px] border-r border-card bg-page px-0 py-1">
                 <div className="mb-1 flex items-center justify-between px-3 pt-2">
-                  <span className="text-[13px] font-semibold text-primary">Menu</span>
+                  <span className="text-base font-semibold text-primary">Menu</span>
                   <button
                     type="button"
                     aria-label="Close navigation"

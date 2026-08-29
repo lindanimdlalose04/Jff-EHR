@@ -60,15 +60,15 @@ export function CrewDetailPage() {
             <FileText size={20} />
           </a>
         ) : (
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[17px] font-semibold text-accent">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-lg font-semibold text-accent">
             {initialsOf(crew.name, crew.surname)}
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="text-[17px] font-semibold text-primary">
+          <h1 className="text-lg font-semibold text-primary">
             {crew.name} {crew.surname}
           </h1>
-          <p className="mt-0.5 text-[12.5px] text-secondary">
+          <p className="mt-0.5 text-sm text-secondary">
             {crew.role} · ID {crew.idNumber}
             {crew.dob ? ` · born ${formatDate(crew.dob)}` : ""}
           </p>
@@ -85,8 +85,8 @@ export function CrewDetailPage() {
       <div className="mt-4 rounded-card border border-card bg-surface p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="text-[13px] font-semibold text-primary">Medical check-in</h2>
-            <p className="mt-0.5 text-[12px] text-muted">
+            <h2 className="text-base font-semibold text-primary">Medical check-in</h2>
+            <p className="mt-0.5 text-sm text-muted">
               {activeCamp
                 ? `Camp ${activeCamp.campNumber}, ${activeCamp.venue}`
                 : "No active camp"}
@@ -102,16 +102,16 @@ export function CrewDetailPage() {
         </div>
 
         {!activeCamp ? (
-          <p className="text-[12.5px] text-muted">
+          <p className="text-sm text-muted">
             There is no active camp, so there is no check-in to show.
           </p>
         ) : !checkin ? (
-          <p className="text-[12.5px] text-muted">Not checked in for this camp yet.</p>
+          <p className="text-sm text-muted">Not checked in for this camp yet.</p>
         ) : (
           <>
             <div className="mb-3 flex flex-wrap gap-2">
               {checkin.medicalReleaseSigned ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-accent-tint px-2.5 py-0.5 text-[11.5px] font-medium text-accent">
+                <span className="inline-flex items-center gap-1 rounded-none bg-accent-tint px-2.5 py-0.5 text-xs font-medium text-accent">
                   <ShieldCheck size={12} /> indemnity signed
                 </span>
               ) : (
@@ -125,7 +125,7 @@ export function CrewDetailPage() {
               <Row label="Current medications" value={checkin.currentMedications} />
               <Row label="Comments" value={checkin.comments} />
             </dl>
-            <p className="mt-2 text-[11.5px] text-muted">
+            <p className="mt-2 text-xs text-muted">
               Checked in by {checkin.checkedInByName ?? "-"} on {formatDateTime(checkin.checkedInAt)}.
             </p>
           </>
@@ -133,11 +133,11 @@ export function CrewDetailPage() {
       </div>
 
       <div className="mt-4 rounded-card border border-card bg-surface p-5">
-        <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold text-primary">
+        <h2 className="mb-3 flex items-center gap-1.5 text-base font-semibold text-primary">
           <Tent size={14} className="text-muted" /> Camps attended
         </h2>
         {camps.length === 0 ? (
-          <p className="text-[12.5px] text-muted">
+          <p className="text-sm text-muted">
             Not registered to any camp yet. Add this crew member from a camp&rsquo;s Crew tab.
           </p>
         ) : (
@@ -148,11 +148,11 @@ export function CrewDetailPage() {
                   to={camp ? `/camps/${camp.campId}` : "#"}
                   className="min-w-0 flex-1"
                 >
-                  <span className="text-[12.5px] font-medium text-primary hover:underline">
+                  <span className="text-sm font-medium text-primary hover:underline">
                     {camp ? `Camp ${camp.campNumber}, ${camp.venue}` : "Camp"}
                   </span>
                   {camp && (
-                    <span className="block text-[11px] text-muted">
+                    <span className="block text-xs text-muted">
                       {formatDate(camp.startDate)} · {deriveCampState(camp, now)}
                       {registration.role ? ` · ${registration.role}` : ""}
                     </span>
@@ -172,7 +172,7 @@ export function CrewDetailPage() {
 
 function Row({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="flex justify-between gap-3 border-b border-divider py-2 text-[12.5px] last:border-b-0">
+    <div className="flex justify-between gap-3 border-b border-divider py-2 text-sm last:border-b-0">
       <dt className="text-muted">{label}</dt>
       <dd className="text-right text-primary">{value || "-"}</dd>
     </div>

@@ -7,6 +7,8 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { exportMedicationAdministrationRecord } from "@/lib/mar-pdf";
 import { useMe } from "@/features/auth/use-me";
+import { RecordBanner, SectionHead, Toolbar, type BannerFlag } from "@/components/ui/record-chrome";
+import { formatSex } from "@/lib/display";
 import {
   fetchCamperGrid,
   isPrescriptionActiveOn,
@@ -100,40 +102,49 @@ export function MedicationGridPage() {
         ]}
       />
 
-      <div className="rounded-card border border-card bg-surface p-4">
-        <h1 className="text-[16px] font-semibold text-primary">
-          {camper.firstName} {camper.surname}
-        </h1>
-        <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] text-secondary">
-          <span>{camp ? `Camp ${camp.campNumber}, ${camp.venue}` : "Camp"}</span>
-          <span>Cabin: {registration.cabin ?? "not set"}</span>
-          <span
-            className={
-              arrivalCheck?.hasAllergies ? "font-medium text-danger" : "text-secondary"
-            }
-          >
-            Allergies:{" "}
-            {arrivalCheck?.hasAllergies
-              ? (arrivalCheck.allergiesDetail ?? "yes")
-              : arrivalCheck
-                ? "none declared"
-                : "not yet checked"}
-          </span>
-          <span>Diagnosis: {precamp?.diagnosis ?? camper.diagnosis ?? "not recorded"}</span>
-        </div>
+      <div className="border border-card bg-surface">
+        {(() => {
+          const flags: BannerFlag[] = [];
+          if (arrivalCheck?.hasAllergies) {
+            flags.push({
+              label: arrivalCheck.allergiesDetail
+                ? `Allergy: ${arrivalCheck.allergiesDetail}`
+                : "Allergies on file",
+              tone: "danger",
+            });
+          } else if (!arrivalCheck) {
+            flags.push({ label: "Not yet arrival checked", tone: "warning" });
+          }
+          return (
+            <RecordBanner
+              title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+              flags={flags}
+              meta={
+                <>
+                  <span className="mono">{camper.fileNumber}</span> &middot; {formatSex(camper.sex)} &middot;{" "}
+                  {camp ? `Camp ${camp.campNumber}, ${camp.venue}` : "Camp"} &middot; cabin{" "}
+                  {registration.cabin ?? "not set"} &middot;{" "}
+                  {precamp?.diagnosis ?? camper.diagnosis ?? "no diagnosis recorded"}
+                </>
+              }
+            />
+          );
+        })()}
       </div>
 
       {error && (
-        <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
 
-      <div className="mt-4 mb-2 flex items-center justify-between">
-        <h2 className="text-[13px] font-semibold text-primary">
-          Week of {format(weekStart, "d MMMM yyyy")}
-        </h2>
-        <div className="flex gap-1.5">
+      <div className="mt-4 border border-card bg-surface">
+      <SectionHead
+        title="Medication and treatment record"
+        hint={`Week of ${format(weekStart, "d MMMM yyyy")}`}
+      />
+      <Toolbar>
+        <div className="flex flex-wrap gap-1.5">
           <Button
             variant="secondary"
             className="h-8 px-3"
@@ -163,24 +174,24 @@ export function MedicationGridPage() {
             <ChevronRight size={15} />
           </Button>
         </div>
-      </div>
+      </Toolbar>
 
       {rows.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface p-6 text-center text-[13px] text-muted">
+        <div className="p-6 text-center text-base text-muted">
           No prescriptions for this camp yet.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-card border border-card bg-surface">
-          <table className="w-full border-collapse text-[12.5px]">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-header-tint">
-                <th className="sticky left-0 z-10 min-w-[190px] border-b border-r border-divider bg-header-tint px-3 py-2 text-left text-[11.5px] font-semibold uppercase tracking-wide text-muted">
+                <th className="sticky left-0 z-10 min-w-[190px] border-b border-r border-divider bg-header-tint px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                   Medication
                 </th>
                 {days.map((d) => (
                   <th
                     key={d.toISOString()}
-                    className="border-b border-divider px-2 py-2 text-center text-[11.5px] font-semibold text-muted"
+                    className="border-b border-divider px-2 py-2 text-center text-xs font-semibold text-muted"
                   >
                     <div>{format(d, "EEE")}</div>
                     <div className="font-normal">{format(d, "d MMM")}</div>
@@ -193,7 +204,7 @@ export function MedicationGridPage() {
                 <tr key={`${prescription.prescriptionId}-${time}`}>
                   <td className="sticky left-0 z-10 border-b border-r border-divider bg-surface px-3 py-2 align-top">
                     <div className="font-medium text-primary">{prescription.medicationName}</div>
-                    <div className="text-[11.5px] text-muted">
+                    <div className="text-xs text-muted">
                       {prescription.dose}
                       {prescription.route ? `, ${prescription.route}` : ""} · {time}
                     </div>
@@ -207,7 +218,7 @@ export function MedicationGridPage() {
                           key={day}
                           className="border-b border-divider px-2 py-2 text-center text-muted"
                         >
-                          <span className="text-[11px]">-</span>
+                          <span className="text-xs">-</span>
                         </td>
                       );
                     }
@@ -236,20 +247,21 @@ export function MedicationGridPage() {
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-4 text-[11.5px] text-muted">
+      <div className="flex flex-wrap items-center gap-4 border-t border-divider px-4 py-2.5 text-sm text-muted">
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-accent-tint ring-1 ring-accent-border" />
+          <span className="inline-block h-3 w-3 bg-success-tint ring-1 ring-success" />
           given
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-warning-tint ring-1 ring-warning/40" />
+          <span className="inline-block h-3 w-3 bg-danger-tint ring-1 ring-danger" />
           missed (time passed, not recorded)
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded bg-field ring-1 ring-field-border" />
+          <span className="inline-block h-3 w-3 bg-field ring-1 ring-field-border" />
           pending
         </span>
         {!canRecord && <span>Recording is limited to the medical team.</span>}
+      </div>
       </div>
     </div>
   );
@@ -270,7 +282,7 @@ function DoseCell({
     const dose = slot.givenDose;
     return (
       <span
-        className="inline-flex min-w-[58px] flex-col items-center rounded-control bg-accent-tint px-1.5 py-1 text-accent ring-1 ring-accent-border"
+        className="inline-flex min-w-[58px] flex-col items-center bg-success-tint px-1.5 py-1 text-success-text ring-1 ring-success"
         title={
           dose?.administeredByName
             ? `Given by ${dose.administeredByName}${dose.administeredAt ? ` at ${format(new Date(dose.administeredAt), "HH:mm")}` : ""}`
@@ -278,7 +290,7 @@ function DoseCell({
         }
       >
         <Check size={13} />
-        <span className="text-[10.5px] font-medium">
+        <span className="text-xs font-medium">
           {dose?.administeredAt ? format(new Date(dose.administeredAt), "HH:mm") : "given"}
         </span>
       </span>
@@ -292,15 +304,15 @@ function DoseCell({
         disabled={busy}
         onClick={onRecord}
         title="Scheduled time has passed with no dose recorded. Click to record it now."
-        className="inline-flex min-w-[58px] flex-col items-center rounded-control bg-warning-tint px-1.5 py-1 text-warning ring-1 ring-warning/40 transition hover:brightness-95 disabled:opacity-50"
+        className="inline-flex min-w-[58px] flex-col items-center bg-danger-tint px-1.5 py-1 text-danger-text ring-1 ring-danger transition hover:brightness-95 disabled:opacity-50"
       >
         <TriangleAlert size={13} />
-        <span className="text-[10.5px] font-medium">missed</span>
+        <span className="text-xs font-medium">missed</span>
       </button>
     ) : (
       <span className="inline-flex min-w-[58px] flex-col items-center rounded-control bg-warning-tint px-1.5 py-1 text-warning ring-1 ring-warning/40">
         <TriangleAlert size={13} />
-        <span className="text-[10.5px] font-medium">missed</span>
+        <span className="text-xs font-medium">missed</span>
       </span>
     );
   }
@@ -311,12 +323,12 @@ function DoseCell({
       disabled={busy}
       onClick={onRecord}
       title="Record this dose as given"
-      className="inline-flex min-w-[58px] items-center justify-center rounded-control bg-field px-1.5 py-1.5 text-[10.5px] text-secondary ring-1 ring-field-border transition hover:bg-accent-tint hover:text-accent disabled:opacity-50"
+      className="inline-flex min-w-[58px] items-center justify-center rounded-control bg-field px-1.5 py-1.5 text-xs text-secondary ring-1 ring-field-border transition hover:bg-accent-tint hover:text-accent disabled:opacity-50"
     >
       record
     </button>
   ) : (
-    <span className="inline-flex min-w-[58px] items-center justify-center rounded-control bg-field px-1.5 py-1.5 text-[10.5px] text-muted ring-1 ring-field-border">
+    <span className="inline-flex min-w-[58px] items-center justify-center rounded-control bg-field px-1.5 py-1.5 text-xs text-muted ring-1 ring-field-border">
       pending
     </span>
   );

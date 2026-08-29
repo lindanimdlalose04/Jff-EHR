@@ -135,7 +135,7 @@ export function SearchSelect({
           className="absolute z-20 mt-1 max-h-[280px] w-full overflow-y-auto rounded-control border border-card bg-surface py-1"
         >
           {matches.length === 0 ? (
-            <li className="px-3 py-2 text-[12.5px] text-muted">{emptyText}</li>
+            <li className="px-3 py-2 text-sm text-muted">{emptyText}</li>
           ) : (
             matches.map((option, i) => (
               <li
@@ -150,9 +150,9 @@ export function SearchSelect({
                   i === active ? "bg-accent-tint" : "hover:bg-field",
                 )}
               >
-                <div className="text-[13px] font-medium text-primary">{option.label}</div>
+                <div className="text-base font-medium text-primary">{option.label}</div>
                 {option.hint && (
-                  <div className="truncate text-[11.5px] text-muted">{option.hint}</div>
+                  <div className="truncate text-xs text-muted">{option.hint}</div>
                 )}
               </li>
             ))

@@ -54,7 +54,7 @@ export function MedicationRoundsPage() {
 
   if (!data.camp) {
     return (
-      <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
+      <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
         No camp is currently active, so there are no rounds to run.
       </div>
     );
@@ -79,13 +79,13 @@ export function MedicationRoundsPage() {
   return (
     <div>
       <div className="mb-1 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">Medication rounds</h1>
+        <h1 className="text-lg font-semibold text-primary">Medication rounds</h1>
         <StatusPill tone="success">{givenCount} given</StatusPill>
         {missedCount > 0 && <StatusPill tone="warning">{missedCount} missed</StatusPill>}
         <CampScopePicker className="ml-auto" />
       </div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[12.5px] text-muted">
+        <p className="text-sm text-muted">
           Camp {data.camp.campNumber}, {data.camp.venue} ·{" "}
           {format(new Date(`${data.day}T00:00:00`), "EEEE d MMMM yyyy")}
           {data.isToday ? " (today)" : ""}
@@ -93,7 +93,7 @@ export function MedicationRoundsPage() {
         <div className="flex items-center gap-1.5">
           <Select
             aria-label="Filter by dose status"
-            className="h-8 w-auto text-[12.5px]"
+            className="h-8 w-auto text-sm"
             value={stateFilter}
             onChange={(e) => setStateFilter(e.target.value)}
           >
@@ -122,13 +122,13 @@ export function MedicationRoundsPage() {
       </div>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
 
       {filteredEntries.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-[13px] text-muted">
+        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
           {data.entries.length === 0
             ? "No doses scheduled on this day."
             : "No doses match the current filter."}
@@ -137,8 +137,8 @@ export function MedicationRoundsPage() {
         [...bySlot.entries()].map(([time, entries]) => (
           <div key={time} className="mb-3 overflow-hidden rounded-card border border-card bg-surface">
             <div className="flex items-center justify-between border-b border-divider bg-header-tint px-4 py-1.5">
-              <span className="text-[11.5px] font-semibold tracking-wide text-secondary">{time}</span>
-              <span className="text-[11.5px] text-muted">
+              <span className="text-xs font-semibold tracking-wide text-secondary">{time}</span>
+              <span className="text-xs text-muted">
                 {entries.filter((e) => e.slot.state === "given").length} of {entries.length} given
               </span>
             </div>
@@ -174,18 +174,18 @@ function RoundRow({
     <div className="flex items-center gap-3 border-b border-divider px-4 py-2.5 last:border-b-0">
       <Link
         to={`/campers/${camper.camperId}`}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent"
       >
         {initialsOf(camper.firstName, camper.surname)}
       </Link>
       <div className="min-w-0 flex-1">
         <Link
           to={`/registrations/${registration.registrationId}/medications`}
-          className="text-[13px] font-medium text-primary hover:underline"
+          className="text-base font-medium text-primary hover:underline"
         >
           {camper.firstName} {camper.surname}
         </Link>
-        <div className="truncate text-[12px] text-muted">
+        <div className="truncate text-sm text-muted">
           <Link
             to={`/registrations/${registration.registrationId}/prescriptions`}
             className="text-secondary hover:text-primary hover:underline"
@@ -200,7 +200,7 @@ function RoundRow({
       </div>
 
       {slot.state === "given" ? (
-        <span className="inline-flex items-center gap-1.5 text-[11.5px] text-muted">
+        <span className="inline-flex items-center gap-1.5 text-xs text-muted">
           {slot.givenDose?.administeredAt
             ? format(new Date(slot.givenDose.administeredAt), "HH:mm")
             : ""}

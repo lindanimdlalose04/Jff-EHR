@@ -59,11 +59,11 @@ export function RegistrationIntakePage() {
   if (!isAdmin) {
     return (
       <div className="rounded-card border border-card bg-surface px-6 py-12 text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-admin-tint text-admin">
+        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-none bg-admin-tint text-admin">
           <ShieldCheck size={20} />
         </span>
-        <h1 className="mt-3 text-[14px] font-medium text-primary">Admin access required</h1>
-        <p className="mx-auto mt-1 max-w-[380px] text-[12.5px] text-muted">
+        <h1 className="mt-3 text-base font-medium text-primary">Admin access required</h1>
+        <p className="mx-auto mt-1 max-w-[380px] text-sm text-muted">
           Your account has the medical role. Registration intake is limited to administrators.
         </p>
       </div>
@@ -75,14 +75,14 @@ export function RegistrationIntakePage() {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-[17px] font-semibold text-primary">Registration intake</h1>
+        <h1 className="text-lg font-semibold text-primary">Registration intake</h1>
         <StatusPill tone="neutral">{rows.length} to review</StatusPill>
       </div>
 
       {/* Import control */}
       <div className="rounded-card border border-card bg-surface p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-[12.5px] font-medium text-secondary hover:text-primary">
+          <label className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-sm font-medium text-secondary hover:text-primary">
             <FileUp size={15} />
             Choose CSV file
             <input
@@ -96,20 +96,20 @@ export function RegistrationIntakePage() {
               }}
             />
           </label>
-          {doImport.isPending && <span className="text-[12.5px] text-muted">Importing…</span>}
-          <span className="ml-auto inline-flex items-center gap-1.5 text-[11.5px] text-muted">
+          {doImport.isPending && <span className="text-sm text-muted">Importing…</span>}
+          <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted">
             <Upload size={13} /> Export the intake form responses as CSV, then import here
           </span>
         </div>
 
         {importError && (
-          <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+          <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
             {importError}
           </div>
         )}
 
         {lastImport && !importError && (
-          <div className="mt-3 rounded-control border border-card bg-header-tint px-3 py-2 text-[12.5px] text-secondary">
+          <div className="mt-3 rounded-control border border-card bg-header-tint px-3 py-2 text-sm text-secondary">
             Imported <strong className="text-primary">{lastImport.rowsImported}</strong> row
             {lastImport.rowsImported === 1 ? "" : "s"}
             {lastImport.possibleDuplicates > 0 &&
@@ -121,7 +121,7 @@ export function RegistrationIntakePage() {
         )}
       </div>
 
-      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-[12.5px] text-secondary">
+      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-sm text-secondary">
         <Info size={16} className="mt-0.5 shrink-0 text-muted" />
         <div>
           <p className="font-medium text-primary">What this does</p>
@@ -141,7 +141,7 @@ export function RegistrationIntakePage() {
           <div className="p-6 text-sm text-danger">Couldn&rsquo;t load drafts. Refresh to try again.</div>
         )}
         {!pending.isLoading && !pending.isError && rows.length === 0 && (
-          <div className="rounded-card border border-card bg-surface px-6 py-10 text-center text-[12.5px] text-muted">
+          <div className="rounded-card border border-card bg-surface px-6 py-10 text-center text-sm text-muted">
             No drafts to review. Import a CSV to get started.
           </div>
         )}
@@ -235,14 +235,14 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-[11px] font-medium text-accent">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
           {row.sourceRow}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-medium text-primary">
+          <span className="block truncate text-base font-medium text-primary">
             {row.firstName || "(no name)"} {row.surname}
           </span>
-          <span className="block truncate text-[11.5px] text-muted">
+          <span className="block truncate text-xs text-muted">
             {row.dob ?? "date needs fixing"}
             {row.tShirtSize ? ` · shirt ${row.tShirtSize}` : ""}
           </span>
@@ -254,13 +254,13 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
           </StatusPill>
         )}
         {row.importNote && !row.possibleDuplicate && <StatusPill tone="warning">check date</StatusPill>}
-        <span className="text-[11.5px] text-muted">{open ? "Close" : "Review"}</span>
+        <span className="text-xs text-muted">{open ? "Close" : "Review"}</span>
       </button>
 
       {open && (
         <div className="border-t border-divider px-4 py-4">
           {row.importNote && (
-            <div className="mb-3 rounded-control border border-card bg-header-tint px-3 py-2 text-[12px] text-secondary">
+            <div className="mb-3 rounded-control border border-card bg-header-tint px-3 py-2 text-sm text-secondary">
               {row.importNote}
               {row.rawDob && <span className="text-muted"> Original value: “{row.rawDob}”.</span>}
             </div>
@@ -307,7 +307,7 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
             </F>
           </FieldGrid>
 
-          <p className="mb-2 mt-4 text-[11.5px] font-medium uppercase tracking-wide text-muted">
+          <p className="mb-2 mt-4 text-xs font-medium uppercase tracking-wide text-muted">
             Primary caregiver
           </p>
           <FieldGrid>
@@ -331,7 +331,7 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
             </F>
           </FieldGrid>
 
-          <p className="mb-2 mt-4 text-[11.5px] font-medium uppercase tracking-wide text-muted">
+          <p className="mb-2 mt-4 text-xs font-medium uppercase tracking-wide text-muted">
             Emergency contact
           </p>
           <FieldGrid>
@@ -356,7 +356,7 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
           </FieldGrid>
 
           {row.possibleDuplicate && (
-            <label className="mt-4 flex items-center gap-2 text-[12.5px] text-secondary">
+            <label className="mt-4 flex items-center gap-2 text-sm text-secondary">
               <input
                 type="checkbox"
                 checked={form.confirmDespiteDuplicate}
@@ -368,7 +368,7 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
           )}
 
           {error && (
-            <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12px] text-danger">
+            <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
               {error}
             </div>
           )}
@@ -416,7 +416,7 @@ function F({
 }) {
   return (
     <label className={`flex flex-col gap-1 ${full ? "sm:col-span-2 lg:col-span-3" : ""}`}>
-      <span className="text-[11.5px] font-medium text-secondary">
+      <span className="text-xs font-medium text-secondary">
         {label}
         {required && <span className="ml-0.5 text-danger">*</span>}
       </span>

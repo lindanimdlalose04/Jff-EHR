@@ -25,13 +25,13 @@ export function FormSection({
     >
       <div
         className={cn(
-          "mb-3 flex items-center gap-2 text-[13px] font-medium",
+          "mb-3 flex items-center gap-2 text-base font-medium",
           danger ? "text-danger" : "text-accent",
         )}
       >
         {icon}
         <span>{title}</span>
-        {hint && <span className="text-[11.5px] font-normal text-muted">{hint}</span>}
+        {hint && <span className="text-xs font-normal text-muted">{hint}</span>}
       </div>
       {children}
     </section>

@@ -33,11 +33,13 @@ export function RecordBanner({
   meta,
   flags = [],
   media,
+  actions,
 }: {
   title: string;
   meta: ReactNode;
   flags?: BannerFlag[];
   media?: ReactNode;
+  actions?: ReactNode;
 }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 border-b border-card bg-page px-4 py-3">
@@ -48,19 +50,22 @@ export function RecordBanner({
           <p className="mt-0.5 text-sm text-secondary">{meta}</p>
         </div>
       </div>
-      {flags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+      {(flags.length > 0 || actions) && (
+        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-wrap justify-end gap-1.5">
           {flags.map((f) => (
             <span
               key={f.label}
               className={cn(
-                "border px-2 py-[3px] text-xs font-bold uppercase",
+                "border px-2 py-[3px] text-xs font-bold uppercase tracking-[0.04em]",
                 flagTone[f.tone],
               )}
             >
               {f.label}
             </span>
           ))}
+        </div>
+        {actions}
         </div>
       )}
     </div>
@@ -152,3 +157,66 @@ export function Field({
     </>
   );
 }
+
+/**
+ * Flush row of headline figures under a banner. Deliberately not separate
+ * cards: one ruled strip reads as a single summary rather than four objects.
+ */
+export function StatStrip({ children }: { children: ReactNode }) {
+  return <div className="flex flex-wrap border-b border-card">{children}</div>;
+}
+
+export function Stat({
+  label,
+  value,
+  tone = "plain",
+}: {
+  label: string;
+  value: ReactNode;
+  tone?: "plain" | "warning" | "danger";
+}) {
+  return (
+    <div className="min-w-[120px] flex-1 border-r border-divider px-4 py-2.5 last:border-r-0">
+      <span
+        className={cn(
+          "block text-xl font-bold tabular-nums",
+          tone === "warning" && "text-warning-text",
+          tone === "danger" && "text-danger-text",
+          tone === "plain" && "text-primary",
+        )}
+      >
+        {value}
+      </span>
+      <span className="mt-0.5 block text-xs font-normal normal-case tracking-normal text-muted">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+/** Search, filters and the primary action, on a rule above a table. */
+export function Toolbar({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-b border-divider px-4 py-2.5">
+      {children}
+    </div>
+  );
+}
+
+/** Dense ruled table. Never a card per row. */
+export function DataTable({ head, children }: { head: ReactNode; children: ReactNode }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-base">
+        <thead>
+          <tr>{head}</tr>
+        </thead>
+        <tbody>{children}</tbody>
+      </table>
+    </div>
+  );
+}
+
+export const thClass =
+  "border-b border-card bg-header-tint px-4 py-2 text-left text-xs font-bold uppercase tracking-[0.06em] text-secondary";
+export const tdClass = "border-b border-divider px-4 py-2 text-primary align-middle";

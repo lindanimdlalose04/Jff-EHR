@@ -43,14 +43,14 @@ export function LoginPage() {
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-none bg-accent text-white">
               <HeartPulse size={22} />
             </div>
-            <h1 className="text-[17px] font-semibold text-primary">JFF EHR</h1>
-            <p className="mt-0.5 text-[12.5px] text-muted">
+            <h1 className="text-lg font-semibold text-primary">JFF EHR</h1>
+            <p className="mt-0.5 text-sm text-muted">
               Camp Health Records: staff sign in
             </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
-            <label className="mb-1 block text-[12.5px] font-medium text-secondary" htmlFor="email">
+            <label className="mb-1 block text-sm font-medium text-secondary" htmlFor="email">
               Email
             </label>
             <Input
@@ -65,7 +65,7 @@ export function LoginPage() {
             />
 
             <label
-              className="mb-1 mt-4 block text-[12.5px] font-medium text-secondary"
+              className="mb-1 mt-4 block text-sm font-medium text-secondary"
               htmlFor="password"
             >
               Password
@@ -84,7 +84,7 @@ export function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="mt-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger"
+                className="mt-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger"
               >
                 {error}
               </div>
@@ -101,7 +101,7 @@ export function LoginPage() {
           </form>
         </div>
 
-        <p className="mt-4 text-center text-[11.5px] text-muted">
+        <p className="mt-4 text-center text-xs text-muted">
           Access is limited to registered JFF camp staff.
         </p>
       </div>

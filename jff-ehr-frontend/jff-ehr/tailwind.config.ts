@@ -59,7 +59,9 @@ export default {
        * between 10.5px and 14px is how the old look went flat.
        */
       fontSize: {
-        xs: ["11px", { lineHeight: "1.45", letterSpacing: "0.06em" }],
+        // No tracking here: xs carries both uppercase labels and small hints.
+        // Uppercase call sites add tracking-[0.06em] themselves.
+        xs: ["11px", { lineHeight: "1.45" }],
         sm: ["12px", { lineHeight: "1.45" }],
         base: ["13px", { lineHeight: "1.5" }],
         md: ["15px", { lineHeight: "1.4" }],

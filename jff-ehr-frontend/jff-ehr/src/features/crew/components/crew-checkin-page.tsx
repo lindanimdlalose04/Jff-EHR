@@ -117,7 +117,7 @@ export function CrewCheckinPage() {
             { label: "Medical check-in" },
           ]}
         />
-        <div className="rounded-card border border-card bg-surface p-6 text-center text-[13px] text-muted">
+        <div className="rounded-card border border-card bg-surface p-6 text-center text-base text-muted">
           There is no active camp to check this crew member into.
         </div>
       </div>
@@ -137,12 +137,12 @@ export function CrewCheckinPage() {
       />
 
       <h1 className="text-lg font-medium text-primary">Crew medical check-in</h1>
-      <p className="mb-4 mt-0.5 text-[12.5px] text-muted">
+      <p className="mb-4 mt-0.5 text-sm text-muted">
         {crew.name} {crew.surname} · Camp {activeCamp.campNumber}, {activeCamp.venue}
       </p>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -190,7 +190,7 @@ export function CrewCheckinPage() {
         </FormSection>
 
         <FormSection icon={<ShieldCheck size={15} />} title="Indemnity and medical release">
-          <label className="flex items-start gap-2 text-[12.5px] text-primary">
+          <label className="flex items-start gap-2 text-sm text-primary">
             <input
               type="checkbox"
               className="mt-0.5 accent-accent"
@@ -214,7 +214,7 @@ export function CrewCheckinPage() {
           </Button>
         </div>
         {!canRecord && (
-          <p className="mt-2 text-right text-[11.5px] text-muted">
+          <p className="mt-2 text-right text-xs text-muted">
             Crew check-ins are recorded by medical or admin staff.
           </p>
         )}

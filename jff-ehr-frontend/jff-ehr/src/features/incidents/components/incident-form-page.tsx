@@ -117,12 +117,12 @@ export function IncidentFormPage() {
       <h1 className="text-lg font-medium text-primary">
         Medication / treatment event / near miss
       </h1>
-      <p className="mb-4 mt-0.5 text-[12.5px] text-muted">
+      <p className="mb-4 mt-0.5 text-sm text-muted">
         Append-only, reviewed by a doctor, never editable once filed
       </p>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -152,7 +152,7 @@ export function IncidentFormPage() {
             </FormField>
 
             {selected && (
-              <div className="col-span-2 rounded-control bg-header-tint px-3 py-2 text-[12px] text-secondary">
+              <div className="col-span-2 rounded-control bg-header-tint px-3 py-2 text-sm text-secondary">
                 Born {formatDate(selected.camper.dob)} ({ageYears(selected.camper.dob)} years)
                 {selected.cabin ? ` · cabin ${selected.cabin}` : ""} · primary diagnosis:{" "}
                 {selected.diagnosis ?? "not recorded"}
@@ -203,7 +203,7 @@ export function IncidentFormPage() {
         >
           <div className="grid gap-2 sm:grid-cols-3">
             {EVENT_TYPES.map((t) => (
-              <label key={t} className="flex items-center gap-2 text-[12.5px] text-primary">
+              <label key={t} className="flex items-center gap-2 text-sm text-primary">
                 <input
                   type="checkbox"
                   className="accent-accent"
@@ -213,7 +213,7 @@ export function IncidentFormPage() {
                 {t}
               </label>
             ))}
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+            <label className="flex items-center gap-2 text-sm text-primary">
               <input
                 type="checkbox"
                 className="accent-accent"
@@ -234,7 +234,7 @@ export function IncidentFormPage() {
             </div>
           )}
           {!hasImpression && (
-            <p className="mt-2 text-[11.5px] text-muted">
+            <p className="mt-2 text-xs text-muted">
               Select at least one, or tick Other and describe it.
             </p>
           )}
@@ -247,7 +247,7 @@ export function IncidentFormPage() {
         >
           <div className="grid gap-2 sm:grid-cols-3">
             {CONTRIBUTING_FACTORS.map((f) => (
-              <label key={f} className="flex items-center gap-2 text-[12.5px] text-primary">
+              <label key={f} className="flex items-center gap-2 text-sm text-primary">
                 <input
                   type="checkbox"
                   className="accent-accent"
@@ -257,7 +257,7 @@ export function IncidentFormPage() {
                 {f}
               </label>
             ))}
-            <label className="flex items-center gap-2 text-[12.5px] text-primary">
+            <label className="flex items-center gap-2 text-sm text-primary">
               <input
                 type="checkbox"
                 className="accent-accent"
@@ -305,7 +305,7 @@ export function IncidentFormPage() {
               />
             </FormField>
             <div>
-              <label className="flex items-center gap-2 text-[12.5px] text-primary">
+              <label className="flex items-center gap-2 text-sm text-primary">
                 <input
                   type="checkbox"
                   className="accent-accent"
@@ -329,7 +329,7 @@ export function IncidentFormPage() {
         </FormSection>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="max-w-[400px] text-[11.5px] text-muted">
+          <p className="max-w-[400px] text-xs text-muted">
             Reported by {me.data ? `${me.data.name} ${me.data.surname}` : "the reporter"}. Not yet
             reviewed: a medical person adds the investigation and corrective action plan after
             filing.
@@ -344,7 +344,7 @@ export function IncidentFormPage() {
           </div>
         </div>
         {!canFile && (
-          <p className="mt-2 text-right text-[11.5px] text-muted">
+          <p className="mt-2 text-right text-xs text-muted">
             Filing reports is limited to the medical team.
           </p>
         )}

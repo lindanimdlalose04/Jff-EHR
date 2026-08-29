@@ -204,7 +204,7 @@ function ContactRowForm({
       </div>
       <div className="mt-2 flex items-center justify-between">
         {withPrimary ? (
-          <label className="flex items-center gap-1.5 text-[12.5px] text-primary">
+          <label className="flex items-center gap-1.5 text-sm text-primary">
             <input
               type="checkbox"
               className="accent-accent"
@@ -293,14 +293,14 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
   return (
     <div className="space-y-4">
       {error && (
-        <div className="rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-[12.5px] text-danger">
+        <div className="rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
           {error}
         </div>
       )}
 
       <div className="rounded-card border border-card bg-surface p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[13px] font-semibold text-primary">Caregivers</h2>
+          <h2 className="text-base font-semibold text-primary">Caregivers</h2>
           <Button
             variant="secondary"
             className="h-8 px-3"
@@ -327,7 +327,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
               </li>
             ) : (
               <li key={cg.caregiverId} className="flex items-center gap-2 rounded-control border border-divider px-3 py-2">
-                <span className="min-w-0 flex-1 text-[12.5px]">
+                <span className="min-w-0 flex-1 text-sm">
                   <span className="flex items-center gap-1.5 font-medium text-primary">
                     {cg.name}
                     {cg.isPrimary && <StatusPill tone="success">primary</StatusPill>}
@@ -369,14 +369,14 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
             </li>
           )}
           {detail.caregivers.length === 0 && editing !== "new-caregiver" && (
-            <li className="text-[12.5px] text-muted">No caregivers on file.</li>
+            <li className="text-sm text-muted">No caregivers on file.</li>
           )}
         </ul>
       </div>
 
       <div className="rounded-card border border-card bg-surface p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[13px] font-semibold text-primary">Emergency contacts</h2>
+          <h2 className="text-base font-semibold text-primary">Emergency contacts</h2>
           <Button
             variant="secondary"
             className="h-8 px-3"
@@ -403,7 +403,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
               </li>
             ) : (
               <li key={ec.contactId} className="flex items-center gap-2 rounded-control border border-divider px-3 py-2">
-                <span className="min-w-0 flex-1 text-[12.5px]">
+                <span className="min-w-0 flex-1 text-sm">
                   <span className="block font-medium text-primary">{ec.name}</span>
                   <span className="text-muted">
                     {ec.relationship} · {ec.cellNo}
@@ -442,7 +442,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
             </li>
           )}
           {detail.emergencyContacts.length === 0 && editing !== "new-contact" && (
-            <li className="text-[12.5px] text-muted">No emergency contacts on file.</li>
+            <li className="text-sm text-muted">No emergency contacts on file.</li>
           )}
         </ul>
       </div>
@@ -555,7 +555,7 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-card border border-card bg-surface p-6 text-center text-[13px] text-muted">
+      <div className="rounded-card border border-card bg-surface p-6 text-center text-base text-muted">
         Not registered on any camp yet.
       </div>
     );
@@ -589,10 +589,10 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
                 <Tent size={16} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[13.5px] font-medium text-primary">
+                <span className="block text-base font-medium text-primary">
                   {camp ? `Camp ${camp.campNumber}: ${camp.venue}` : "Camp"}
                 </span>
-                <span className="text-[12px] text-muted">
+                <span className="text-sm text-muted">
                   {camp ? format(parseISO(camp.startDate), "MMMM yyyy") : ""}
                   {reg.cabin ? ` · Cabin ${reg.cabin}` : ""}
                 </span>
@@ -601,13 +601,13 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
             <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
             <Link
               to={`/registrations/${reg.registrationId}/arrival-check`}
-              className="shrink-0 text-[12px] font-medium text-accent hover:underline"
+              className="shrink-0 text-sm font-medium text-accent hover:underline"
             >
               {checkLabel}
             </Link>
             <Link
               to={`/registrations/${reg.registrationId}/medications`}
-              className="shrink-0 text-[12px] font-medium text-accent hover:underline"
+              className="shrink-0 text-sm font-medium text-accent hover:underline"
             >
               Medications
             </Link>
@@ -615,8 +615,8 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
               to={`/registrations/${reg.registrationId}/consent`}
               className={
                 hasConsent
-                  ? "shrink-0 text-[12px] font-medium text-accent hover:underline"
-                  : "shrink-0 text-[12px] font-medium text-danger hover:underline"
+                  ? "shrink-0 text-sm font-medium text-accent hover:underline"
+                  : "shrink-0 text-sm font-medium text-danger hover:underline"
               }
             >
               {hasConsent ? "Consent" : "No consent"}

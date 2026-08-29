@@ -13,7 +13,7 @@ export function FormField({ label, htmlFor, error, className, children }: FormFi
         {label}
       </label>
       {children}
-      {error && <p className="mt-1 text-[11.5px] text-danger">{error}</p>}
+      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   );
 }
