@@ -1,10 +1,16 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Entered data is read back more often than it is typed, so controls use the
+ * body step rather than the small step. The focus state is a solid two-pixel
+ * accent outline drawn inside the control: crisper than a soft ring, and it
+ * does not shift layout.
+ */
 const fieldBase =
-  "w-full rounded-control border border-field-border bg-field px-2.5 text-sm text-primary " +
-  "outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 " +
-  "placeholder:text-muted disabled:opacity-60";
+  "w-full rounded-control border border-field-border bg-field px-2.5 text-base text-primary " +
+  "transition placeholder:text-muted disabled:opacity-60 " +
+  "focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-accent";
 
 export const Input = forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, ...props }, ref) => (

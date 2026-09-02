@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ChevronRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
+import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDate, statusLabel, statusTone } from "@/lib/display";
 import { deriveCampState } from "@/lib/camp-state";
@@ -59,10 +60,10 @@ export function CampsListPage() {
     });
 
   return (
-    <div>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Camps</h1>
-        <StatusPill tone="neutral">{visible.length}</StatusPill>
+    <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">Camps</h1>
+        <span className="text-sm text-muted">{visible.length} shown</span>
         <Link to="/camps/new" className="ml-auto">
           <Button variant="primary" className="h-9 px-3">
             <Plus size={14} /> New camp
@@ -70,7 +71,7 @@ export function CampsListPage() {
         </Link>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <Toolbar>
         <div className="relative w-full max-w-[260px]">
           <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
           <Input
@@ -101,45 +102,49 @@ export function CampsListPage() {
           onChange={(v) => setSortKey(v as SortKey)}
           onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
         />
-      </div>
+      </Toolbar>
 
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
-        <div className="grid grid-cols-[1fr_auto] items-center gap-2 border-b border-divider bg-header-tint px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted sm:grid-cols-[1.4fr_1fr_0.8fr_auto_auto]">
-          <span>Camp</span>
-          <span className="hidden sm:block">Dates</span>
-          <span className="hidden sm:block">Province</span>
-          <span className="hidden sm:block">Type</span>
-          <span className="text-right">Status</span>
+      {visible.length === 0 ? (
+        <div className="px-4 py-8 text-center text-base text-muted">
+          No camps match the current filters.
         </div>
-        {visible.map((camp) => (
-          <Link
-            key={camp.campId}
-            to={`/camps/${camp.campId}`}
-            className="grid grid-cols-[1fr_auto] items-center gap-2 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field sm:grid-cols-[1.4fr_1fr_0.8fr_auto_auto]"
-          >
-            <span className="flex items-center gap-1.5 text-base font-medium text-primary">
-              Camp {camp.campNumber}: {camp.venue}
-              <ChevronRight size={14} className="text-muted" />
-            </span>
-            <span className="hidden text-sm text-secondary sm:block">
-              {formatDate(camp.startDate)} to {formatDate(camp.endDate)}
-            </span>
-            <span className="hidden text-sm text-secondary sm:block">{camp.province}</span>
-            <span className="hidden text-sm text-secondary sm:block">{camp.campType}</span>
-            <span className="text-right">
-              {(() => {
-                const state = deriveCampState(camp, now);
-                return <StatusPill tone={statusTone(state)}>{statusLabel(state)}</StatusPill>;
-              })()}
-            </span>
-          </Link>
-        ))}
-        {visible.length === 0 && (
-          <div className="px-4 py-6 text-center text-base text-muted">
-            No camps match the current filters.
-          </div>
-        )}
-      </div>
+      ) : (
+        <DataTable
+          head={
+            <>
+              <th className={thClass}>Camp</th>
+              <th className={thClass}>Dates</th>
+              <th className={thClass}>Province</th>
+              <th className={thClass}>Type</th>
+              <th className={thClass}>Status</th>
+            </>
+          }
+        >
+          {visible.map((camp) => {
+            const state = deriveCampState(camp, now);
+            return (
+              <tr key={camp.campId} className="even:bg-page/60">
+                <td className={tdClass}>
+                  <Link
+                    to={`/camps/${camp.campId}`}
+                    className="font-semibold text-accent-strong underline"
+                  >
+                    Camp {camp.campNumber}, {camp.venue}
+                  </Link>
+                </td>
+                <td className={`${tdClass} mono whitespace-nowrap text-secondary`}>
+                  {formatDate(camp.startDate)} to {formatDate(camp.endDate)}
+                </td>
+                <td className={`${tdClass} text-secondary`}>{camp.province}</td>
+                <td className={`${tdClass} capitalize text-secondary`}>{camp.campType}</td>
+                <td className={tdClass}>
+                  <StatusPill tone={statusTone(state)}>{statusLabel(state)}</StatusPill>
+                </td>
+              </tr>
+            );
+          })}
+        </DataTable>
+      )}
     </div>
   );
 }

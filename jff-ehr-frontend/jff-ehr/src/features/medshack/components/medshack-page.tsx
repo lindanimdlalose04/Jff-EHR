@@ -4,7 +4,7 @@ import { Plus, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
-import { StatusPill } from "@/components/ui/status-pill";
+import { Toolbar } from "@/components/ui/record-chrome";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDateTime, initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
@@ -68,12 +68,15 @@ export function MedShackPage() {
 
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">MedShack</h1>
-        <StatusPill tone="neutral">{rows.length} visits</StatusPill>
+      <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">MedShack</h1>
+        <span className="text-sm text-muted">
+          {rows.length} visit{rows.length === 1 ? "" : "s"}
+        </span>
         {canRecord && (
           <Link to="/medshack/new" className="ml-auto">
-            <Button variant="primary">
+            <Button variant="primary" className="h-9 px-3">
               <Plus size={15} />
               New visit
             </Button>
@@ -81,7 +84,7 @@ export function MedShackPage() {
         )}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <Toolbar>
         <Select
           aria-label="Filter by camp"
           className="h-9 w-auto text-sm"
@@ -103,14 +106,15 @@ export function MedShackPage() {
           onChange={(v) => setSortKey(v as SortKey)}
           onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
         />
+      </Toolbar>
       </div>
 
-      <div className="space-y-3">
+      <div className="mt-3 space-y-3">
         {rows.map((visit) => (
           <VisitCard key={visit.visitId} visit={visit} canRecord={canRecord} />
         ))}
         {rows.length === 0 && (
-          <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+          <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
             No MedShack visits match the current filter.
           </div>
         )}
@@ -149,10 +153,10 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
   });
 
   return (
-    <div className="rounded-card border border-card bg-surface p-4">
-      <div className="flex flex-wrap items-center gap-2.5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-none bg-danger-tint text-danger">
-          <Stethoscope size={15} />
+    <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-2.5 border-b border-divider bg-page px-4 py-2.5">
+        <span className="flex h-7 w-7 items-center justify-center border border-danger bg-danger-tint text-danger-text">
+          <Stethoscope size={14} />
         </span>
         {visit.camper ? (
           <Link
@@ -172,13 +176,13 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
         <span className="ml-auto text-xs text-muted">{formatDateTime(visit.visitAt)}</span>
       </div>
 
-      <p className="mt-2 text-base font-medium text-primary">{visit.reason}</p>
-      <p className="mt-0.5 text-xs text-muted">
+      <p className="px-4 pt-3 text-base font-semibold text-primary">{visit.reason}</p>
+      <p className="px-4 pt-0.5 text-xs text-muted">
         {visit.campLabel}
         {visit.accompaniedBy ? ` · accompanied by ${visit.accompaniedBy}` : ""}
       </p>
 
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-secondary">
+      <div className="mono mt-2 flex flex-wrap gap-x-4 gap-y-1 px-4 text-sm text-secondary">
         {visit.temperature != null && <span>{visit.temperature}°C</span>}
         {visit.pulse != null && <span>Pulse {visit.pulse}</span>}
         {visit.bloodPressure && <span>BP {visit.bloodPressure}</span>}

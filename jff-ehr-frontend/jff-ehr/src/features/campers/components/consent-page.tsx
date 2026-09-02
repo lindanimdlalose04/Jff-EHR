@@ -133,18 +133,18 @@ export function ConsentPage() {
 
       <div className="mb-3 space-y-2.5">
         {consents.map((consent) => (
-          <div key={consent.consentId} className="rounded-card border border-card bg-surface p-4">
+          <div key={consent.consentId} className="border border-card bg-surface p-4">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-none bg-accent-tint text-accent">
+                  <span className="flex h-7 w-7 items-center justify-center bg-accent-tint text-accent">
                     <FileCheck size={14} />
                   </span>
                   <span className="text-base font-medium text-primary">
                     {consentTypeLabel(consent.consentType)}
                   </span>
                   {consent.popiaAcknowledged && (
-                    <span className="inline-flex items-center gap-1 rounded-none bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent">
+                    <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2 py-0.5 text-xs font-semibold text-success-text">
                       <ShieldCheck size={11} /> POPIA acknowledged
                     </span>
                   )}

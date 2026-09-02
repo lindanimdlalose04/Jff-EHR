@@ -4,6 +4,7 @@ import { Info, ShieldCheck } from "lucide-react";
 import type { UserDto } from "@/api/types";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/ui/status-pill";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { formatDate, initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
 import { fetchAdminUsers, updateUser, type AdminUserRow } from "../api/admin.api";
@@ -32,8 +33,8 @@ export function AdminUsersPage() {
 
   if (!isAdmin) {
     return (
-      <div className="rounded-card border border-card bg-surface px-6 py-12 text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-none bg-admin-tint text-admin">
+      <div className="border border-card bg-surface px-6 py-12 text-center">
+        <span className="mx-auto flex h-11 w-11 items-center justify-center bg-admin-tint text-admin">
           <ShieldCheck size={20} />
         </span>
         <h1 className="mt-3 text-base font-medium text-primary">Admin access required</h1>
@@ -53,13 +54,18 @@ export function AdminUsersPage() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Users</h1>
-        <StatusPill tone="neutral">{data.length}</StatusPill>
-      </div>
-
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
-        <div className="hidden grid-cols-[1.3fr_1.6fr_auto_auto] items-center gap-3 border-b border-divider bg-header-tint px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted sm:grid">
+      <div className="border border-card bg-surface">
+        <RecordBanner
+          title="Users and access"
+          flags={[{ label: `${data.length} accounts`, tone: "neutral" }]}
+          meta={
+            <>
+              Who may edit the clinical record and who may administer. Deactivating revokes
+              access without removing the person from the records they signed.
+            </>
+          }
+        />
+        <div className="hidden grid-cols-[1.3fr_1.6fr_auto_auto] items-center gap-3 border-b border-card bg-header-tint px-4 py-2 text-xs font-bold uppercase tracking-[0.06em] text-secondary sm:grid">
           <span>Name</span>
           <span>Email</span>
           <span>Role</span>
@@ -70,7 +76,7 @@ export function AdminUsersPage() {
         ))}
       </div>
 
-      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-sm text-secondary">
+      <div className="mt-4 flex items-start gap-2.5 border border-card bg-surface p-4 text-sm text-secondary">
         <Info size={16} className="mt-0.5 shrink-0 text-muted" />
         <div>
           <p className="font-medium text-primary">Adding a new staff login</p>
@@ -116,7 +122,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
     <div className="border-b border-divider px-4 py-3 last:border-b-0">
       <div className="grid grid-cols-[1fr_auto] items-center gap-3 sm:grid-cols-[1.3fr_1.6fr_auto_auto]">
         <span className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-accent-tint text-xs font-medium text-accent">
             {crew ? initialsOf(crew.name, crew.surname) : "?"}
           </span>
           <span className="min-w-0">

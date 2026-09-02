@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
+import { RecordBanner, Toolbar } from "@/components/ui/record-chrome";
 import { initialsOf } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
 import { useActiveCamp } from "@/app/active-camp-context";
@@ -54,7 +55,7 @@ export function MedicationRoundsPage() {
 
   if (!data.camp) {
     return (
-      <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+      <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
         No camp is currently active, so there are no rounds to run.
       </div>
     );
@@ -78,19 +79,28 @@ export function MedicationRoundsPage() {
 
   return (
     <div>
-      <div className="mb-1 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Medication rounds</h1>
-        <StatusPill tone="success">{givenCount} given</StatusPill>
-        {missedCount > 0 && <StatusPill tone="warning">{missedCount} missed</StatusPill>}
-        <CampScopePicker className="ml-auto" />
-      </div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-muted">
-          Camp {data.camp.campNumber}, {data.camp.venue} ·{" "}
-          {format(new Date(`${data.day}T00:00:00`), "EEEE d MMMM yyyy")}
-          {data.isToday ? " (today)" : ""}
-        </p>
-        <div className="flex items-center gap-1.5">
+      <div className="border border-card bg-surface">
+      <RecordBanner
+        title="Medication rounds"
+        actions={<CampScopePicker />}
+        flags={[
+          { label: `${givenCount} given`, tone: "success" },
+          ...(missedCount > 0
+            ? [{ label: `${missedCount} missed`, tone: "danger" as const }]
+            : []),
+        ]}
+        meta={
+          <>
+            Camp {data.camp.campNumber}, {data.camp.venue} &middot;{" "}
+            <span className="mono">
+              {format(new Date(`${data.day}T00:00:00`), "EEEE d MMMM yyyy")}
+            </span>
+            {data.isToday ? " (today)" : ""}
+          </>
+        }
+      />
+      <Toolbar>
+        <div className="flex flex-wrap items-center gap-1.5">
           <Select
             aria-label="Filter by dose status"
             className="h-8 w-auto text-sm"
@@ -119,6 +129,7 @@ export function MedicationRoundsPage() {
             <ChevronRight size={15} />
           </Button>
         </div>
+      </Toolbar>
       </div>
 
       {error && (
@@ -128,14 +139,14 @@ export function MedicationRoundsPage() {
       )}
 
       {filteredEntries.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+        <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
           {data.entries.length === 0
             ? "No doses scheduled on this day."
             : "No doses match the current filter."}
         </div>
       ) : (
         [...bySlot.entries()].map(([time, entries]) => (
-          <div key={time} className="mb-3 overflow-hidden rounded-card border border-card bg-surface">
+          <div key={time} className="mb-3 overflow-hidden border border-card bg-surface">
             <div className="flex items-center justify-between border-b border-divider bg-header-tint px-4 py-1.5">
               <span className="text-xs font-semibold tracking-wide text-secondary">{time}</span>
               <span className="text-xs text-muted">
@@ -174,7 +185,7 @@ function RoundRow({
     <div className="flex items-center gap-3 border-b border-divider px-4 py-2.5 last:border-b-0">
       <Link
         to={`/campers/${camper.camperId}`}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent"
+        className="flex h-8 w-8 shrink-0 items-center justify-center bg-accent-tint text-xs font-medium text-accent"
       >
         {initialsOf(camper.firstName, camper.surname)}
       </Link>

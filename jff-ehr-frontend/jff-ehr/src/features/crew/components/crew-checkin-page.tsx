@@ -117,7 +117,7 @@ export function CrewCheckinPage() {
             { label: "Medical check-in" },
           ]}
         />
-        <div className="rounded-card border border-card bg-surface p-6 text-center text-base text-muted">
+        <div className="border border-card bg-surface p-6 text-center text-base text-muted">
           There is no active camp to check this crew member into.
         </div>
       </div>

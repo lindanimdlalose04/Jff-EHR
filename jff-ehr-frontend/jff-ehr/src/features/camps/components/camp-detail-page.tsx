@@ -255,12 +255,12 @@ function MedicationTab({
       </div>
 
       {hub.doses.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+        <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
           No doses scheduled on this day.
         </div>
       ) : (
         [...bySlot.entries()].map(([time, rows]) => (
-          <div key={time} className="mb-3 overflow-hidden rounded-card border border-card bg-surface">
+          <div key={time} className="mb-3 overflow-hidden border border-card bg-surface">
             <div className="flex items-center justify-between border-b border-divider bg-header-tint px-4 py-1.5">
               <span className="text-xs font-semibold tracking-wide text-secondary">{time}</span>
               <span className="text-xs text-muted">
@@ -302,7 +302,7 @@ function MedicationTab({
 function MedShackTab({ hub }: { hub: CampHub }) {
   if (hub.visits.length === 0) {
     return (
-      <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+      <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
         No MedShack visits recorded for this camp.
       </div>
     );
@@ -317,13 +317,13 @@ function MedShackTab({ hub }: { hub: CampHub }) {
           </Button>
         </Link>
       </div>
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
+      <div className="overflow-hidden border border-card bg-surface">
         {hub.visits.map((visit) => (
           <div
             key={visit.visitId}
             className="flex items-start gap-3 border-b border-divider px-4 py-3 last:border-b-0"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-danger-tint text-danger">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-danger-tint text-danger">
               <Stethoscope size={15} />
             </span>
             <span className="min-w-0 flex-1">
@@ -343,7 +343,7 @@ function MedShackTab({ hub }: { hub: CampHub }) {
 function IncidentsTab({ hub }: { hub: CampHub }) {
   if (hub.incidents.length === 0) {
     return (
-      <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+      <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
         No medication or treatment events reported for this camp.
       </div>
     );
@@ -358,13 +358,13 @@ function IncidentsTab({ hub }: { hub: CampHub }) {
           </Button>
         </Link>
       </div>
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
+      <div className="overflow-hidden border border-card bg-surface">
         {hub.incidents.map((event) => (
           <div
             key={event.eventId}
             className="flex items-start gap-3 border-b border-divider px-4 py-3 last:border-b-0"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-danger-tint text-danger">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-danger-tint text-danger">
               <TriangleAlert size={15} />
             </span>
             <span className="min-w-0 flex-1">

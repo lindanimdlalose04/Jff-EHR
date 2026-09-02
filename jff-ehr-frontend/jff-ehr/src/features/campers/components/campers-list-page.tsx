@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, Search, UserRoundPlus } from "lucide-react";
+import { Search, UserRoundPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/client";
@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
-import { initialsOf, statusLabel, statusTone } from "@/lib/display";
+import { statusLabel, statusTone, formatSex, ageYears } from "@/lib/display";
+import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
 import { campFilterLabel } from "@/lib/camp-state";
 import { useCampers, useCamps } from "@/features/camps/hooks/use-camps";
 
@@ -94,10 +95,12 @@ export function CampersListPage() {
   const campOptions = [...(camps.data ?? [])].sort((a, b) => b.campNumber - a.campNumber);
 
   return (
-    <div>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Campers</h1>
-        <StatusPill tone="neutral">{visible.length}</StatusPill>
+    <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">Campers</h1>
+        <span className="text-sm text-muted">
+          {visible.length} of {campers.data.length} shown
+        </span>
         <Link to="/campers/new" className="ml-auto">
           <Button variant="primary" className="h-9 px-3">
             <UserRoundPlus size={14} /> New camper
@@ -105,7 +108,7 @@ export function CampersListPage() {
         </Link>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <Toolbar>
         <div className="relative w-full max-w-[280px]">
           <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
           <Input
@@ -136,44 +139,55 @@ export function CampersListPage() {
           onChange={(v) => setSortKey(v as SortKey)}
           onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
         />
-      </div>
+      </Toolbar>
 
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
-        {visible.map((camper) => {
-          const status = latestRegStatus.get(camper.camperId);
-          return (
-            <Link
-              key={camper.camperId}
-              to={`/campers/${camper.camperId}`}
-              className="flex items-center gap-3 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-accent-tint text-sm font-medium text-accent">
-                {initialsOf(camper.firstName, camper.surname)}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5 text-base font-medium text-primary">
-                  {camper.firstName} {camper.surname}
-                  <ChevronRight size={14} className="shrink-0 text-muted" />
-                </span>
-                <span className="mt-0.5 block truncate text-sm text-muted">
-                  {camper.fileNumber}
-                  {camper.diagnosis ? ` · ${camper.diagnosis}` : " · No diagnosis on file"}
-                </span>
-              </span>
-              {status ? (
-                <StatusPill tone={statusTone(status)}>{statusLabel(status)}</StatusPill>
-              ) : (
-                <StatusPill tone="neutral">no registration</StatusPill>
-              )}
-            </Link>
-          );
-        })}
-        {visible.length === 0 && (
-          <div className="px-4 py-6 text-center text-base text-muted">
-            No campers match the current filters.
-          </div>
-        )}
-      </div>
+      {visible.length === 0 ? (
+        <div className="px-4 py-8 text-center text-base text-muted">
+          No campers match the current filters.
+        </div>
+      ) : (
+        <DataTable
+          head={
+            <>
+              <th className={thClass}>Camper</th>
+              <th className={thClass}>File</th>
+              <th className={thClass}>Age / sex</th>
+              <th className={thClass}>Diagnosis</th>
+              <th className={thClass}>Latest registration</th>
+            </>
+          }
+        >
+          {visible.map((camper) => {
+            const status = latestRegStatus.get(camper.camperId);
+            return (
+              <tr key={camper.camperId} className="even:bg-page/60">
+                <td className={tdClass}>
+                  <Link
+                    to={`/campers/${camper.camperId}`}
+                    className="font-semibold text-accent-strong underline"
+                  >
+                    {camper.surname}, {camper.firstName}
+                  </Link>
+                </td>
+                <td className={`${tdClass} mono`}>{camper.fileNumber}</td>
+                <td className={`${tdClass} whitespace-nowrap`}>
+                  <span className="mono">{ageYears(camper.dob)}y</span> · {formatSex(camper.sex)}
+                </td>
+                <td className={`${tdClass} text-secondary`}>
+                  {camper.diagnosis || <span className="text-muted">No diagnosis on file</span>}
+                </td>
+                <td className={tdClass}>
+                  {status ? (
+                    <StatusPill tone={statusTone(status)}>{statusLabel(status)}</StatusPill>
+                  ) : (
+                    <StatusPill tone="neutral">no registration</StatusPill>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </DataTable>
+      )}
     </div>
   );
 }

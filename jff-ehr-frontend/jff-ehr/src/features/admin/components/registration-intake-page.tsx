@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { useMe } from "@/features/auth/use-me";
+import { RecordBanner, SectionHead, Toolbar } from "@/components/ui/record-chrome";
 import {
   confirmRegistration,
   discardRegistration,
@@ -58,8 +59,8 @@ export function RegistrationIntakePage() {
 
   if (!isAdmin) {
     return (
-      <div className="rounded-card border border-card bg-surface px-6 py-12 text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-none bg-admin-tint text-admin">
+      <div className="border border-card bg-surface px-6 py-12 text-center">
+        <span className="mx-auto flex h-11 w-11 items-center justify-center bg-admin-tint text-admin">
           <ShieldCheck size={20} />
         </span>
         <h1 className="mt-3 text-base font-medium text-primary">Admin access required</h1>
@@ -74,14 +75,22 @@ export function RegistrationIntakePage() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Registration intake</h1>
-        <StatusPill tone="neutral">{rows.length} to review</StatusPill>
-      </div>
-
-      {/* Import control */}
-      <div className="rounded-card border border-card bg-surface p-4">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="border border-card bg-surface">
+        <RecordBanner
+          title="Registration intake"
+          flags={
+            rows.length > 0
+              ? [{ label: `${rows.length} to review`, tone: "warning" }]
+              : [{ label: "Nothing pending", tone: "neutral" }]
+          }
+          meta={
+            <>
+              Import the public intake form&rsquo;s CSV export, review each row, then confirm it
+              into a camper record
+            </>
+          }
+        />
+        <Toolbar>
           <label className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-control border border-field-border bg-field px-3 text-sm font-medium text-secondary hover:text-primary">
             <FileUp size={15} />
             Choose CSV file
@@ -100,7 +109,8 @@ export function RegistrationIntakePage() {
           <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted">
             <Upload size={13} /> Export the intake form responses as CSV, then import here
           </span>
-        </div>
+        </Toolbar>
+        <div className="px-4 pb-3">
 
         {importError && (
           <div className="mt-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
@@ -119,9 +129,10 @@ export function RegistrationIntakePage() {
             . Review them below.
           </div>
         )}
+        </div>
       </div>
 
-      <div className="mt-4 flex items-start gap-2.5 rounded-card border border-card bg-surface p-4 text-sm text-secondary">
+      <div className="mt-3 flex items-start gap-2.5 border border-card bg-surface p-4 text-sm text-secondary">
         <Info size={16} className="mt-0.5 shrink-0 text-muted" />
         <div>
           <p className="font-medium text-primary">What this does</p>
@@ -135,13 +146,14 @@ export function RegistrationIntakePage() {
       </div>
 
       {/* Review queue */}
-      <div className="mt-4">
+      <div className="mt-3">
+        <SectionHead title="Drafts awaiting review" hint="Confirm creates the camper record" />
         {pending.isLoading && <div className="p-6 text-sm text-muted">Loading drafts…</div>}
         {pending.isError && (
           <div className="p-6 text-sm text-danger">Couldn&rsquo;t load drafts. Refresh to try again.</div>
         )}
         {!pending.isLoading && !pending.isError && rows.length === 0 && (
-          <div className="rounded-card border border-card bg-surface px-6 py-10 text-center text-sm text-muted">
+          <div className="border border-card bg-surface px-6 py-10 text-center text-base text-muted">
             No drafts to review. Import a CSV to get started.
           </div>
         )}
@@ -229,13 +241,13 @@ function PendingRow({ row }: { row: PendingRegistrationDto }) {
   const canConfirm = required.every((v) => v.trim() !== "");
 
   return (
-    <div className="overflow-hidden rounded-card border border-card bg-surface">
+    <div className="overflow-hidden border border-card bg-surface">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-accent-tint text-xs font-medium text-accent">
           {row.sourceRow}
         </span>
         <span className="min-w-0 flex-1">

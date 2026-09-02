@@ -298,7 +298,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
         </div>
       )}
 
-      <div className="rounded-card border border-card bg-surface p-5">
+      <div className="border border-card bg-surface p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-primary">Caregivers</h2>
           <Button
@@ -374,7 +374,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
         </ul>
       </div>
 
-      <div className="rounded-card border border-card bg-surface p-5">
+      <div className="border border-card bg-surface p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-primary">Emergency contacts</h2>
           <Button
@@ -555,14 +555,14 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-card border border-card bg-surface p-6 text-center text-base text-muted">
+      <div className="border border-card bg-surface p-6 text-center text-base text-muted">
         Not registered on any camp yet.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-card border border-card bg-surface">
+    <div className="overflow-hidden border border-card bg-surface">
       {rows.map(({ reg, camp, check, hasConsent }) => {
         const pill = check
           ? check.status === "signed"
@@ -585,7 +585,7 @@ function CampHistoryTab({ detail }: { detail: CamperDetail }) {
               to={camp ? `/camps/${camp.campId}` : "#"}
               className="flex min-w-0 flex-1 items-center gap-3 transition hover:opacity-80"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-none bg-accent-tint text-accent">
+              <span className="flex h-9 w-9 items-center justify-center bg-accent-tint text-accent">
                 <Tent size={16} />
               </span>
               <span className="min-w-0 flex-1">

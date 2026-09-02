@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FileText, HeartPulse, Pencil, ShieldCheck, Tent } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner, SectionHead, Toolbar } from "@/components/ui/record-chrome";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate, formatDateTime, initialsOf, statusLabel, statusTone } from "@/lib/display";
 import { deriveCampState } from "@/lib/camp-state";
@@ -42,64 +43,82 @@ export function CrewDetailPage() {
         ]}
       />
 
-      <div className="flex items-start gap-4 rounded-card border border-card bg-surface p-5">
-        {crew.photoUrl && !isPdfUrl(crew.photoUrl) ? (
-          <img
-            src={crew.photoUrl}
-            alt={`${crew.name} ${crew.surname}`}
-            className="h-14 w-14 rounded-none object-cover"
-          />
-        ) : crew.photoUrl ? (
-          <a
-            href={crew.photoUrl}
-            target="_blank"
-            rel="noreferrer"
-            title="View scanned document"
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-accent"
-          >
-            <FileText size={20} />
-          </a>
-        ) : (
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none bg-accent-tint text-lg font-semibold text-accent">
-            {initialsOf(crew.name, crew.surname)}
-          </span>
-        )}
-        <div className="min-w-0 flex-1">
-          <h1 className="text-lg font-semibold text-primary">
-            {crew.name} {crew.surname}
-          </h1>
-          <p className="mt-0.5 text-sm text-secondary">
-            {crew.role} · ID {crew.idNumber}
-            {crew.dob ? ` · born ${formatDate(crew.dob)}` : ""}
-          </p>
-        </div>
-        {canMaintain && (
-          <Link to={`/crew/${crew.crewId}/edit`}>
-            <Button variant="secondary" className="h-8 px-3">
-              <Pencil size={13} /> Edit
-            </Button>
-          </Link>
-        )}
+      <div className="border border-card bg-surface">
+        <RecordBanner
+          title={`${crew.surname.toUpperCase()}, ${crew.name}`}
+          media={
+            crew.photoUrl && !isPdfUrl(crew.photoUrl) ? (
+              <img
+                src={crew.photoUrl}
+                alt={`${crew.name} ${crew.surname}`}
+                className="h-12 w-12 shrink-0 object-cover"
+              />
+            ) : crew.photoUrl ? (
+              <a
+                href={crew.photoUrl}
+                target="_blank"
+                rel="noreferrer"
+                title="View scanned document"
+                className="flex h-12 w-12 shrink-0 items-center justify-center border border-card bg-accent-tint text-accent"
+              >
+                <FileText size={18} />
+              </a>
+            ) : (
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center border border-card bg-accent-tint text-md font-bold text-accent">
+                {initialsOf(crew.name, crew.surname)}
+              </span>
+            )
+          }
+          flags={
+            !activeCamp
+              ? []
+              : !checkin
+                ? [{ label: "Not checked in", tone: "warning" }]
+                : checkin.medicalReleaseSigned
+                  ? [{ label: "Checked in", tone: "success" }]
+                  : [{ label: "Indemnity outstanding", tone: "danger" }]
+          }
+          actions={
+            canMaintain ? (
+              <Link to={`/crew/${crew.crewId}/edit`}>
+                <Button variant="secondary" className="h-8 px-3">
+                  <Pencil size={13} /> Edit
+                </Button>
+              </Link>
+            ) : undefined
+          }
+          meta={
+            <>
+              {crew.role} &middot; ID <span className="mono">{crew.idNumber}</span>
+              {crew.dob ? (
+                <>
+                  {" · born "}
+                  <span className="mono">{formatDate(crew.dob)}</span>
+                </>
+              ) : null}
+            </>
+          }
+        />
       </div>
 
-      <div className="mt-4 rounded-card border border-card bg-surface p-5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="text-base font-semibold text-primary">Medical check-in</h2>
-            <p className="mt-0.5 text-sm text-muted">
-              {activeCamp
-                ? `Camp ${activeCamp.campNumber}, ${activeCamp.venue}`
-                : "No active camp"}
-            </p>
-          </div>
-          {activeCamp && canMaintain && (
+      <div className="mt-3 border border-card bg-surface">
+        <SectionHead
+          title="Medical check-in"
+          hint={
+            activeCamp ? `Camp ${activeCamp.campNumber}, ${activeCamp.venue}` : "No active camp"
+          }
+        />
+        {activeCamp && canMaintain && (
+          <Toolbar>
+            <span className="flex-1" />
             <Link to={`/crew/${crew.crewId}/checkin`}>
               <Button variant={checkin ? "secondary" : "primary"} className="h-8 px-3">
                 <HeartPulse size={13} /> {checkin ? "Edit check-in" : "Check in"}
               </Button>
             </Link>
-          )}
-        </div>
+          </Toolbar>
+        )}
+        <div className="p-4">
 
         {!activeCamp ? (
           <p className="text-sm text-muted">
@@ -111,7 +130,7 @@ export function CrewDetailPage() {
           <>
             <div className="mb-3 flex flex-wrap gap-2">
               {checkin.medicalReleaseSigned ? (
-                <span className="inline-flex items-center gap-1 rounded-none bg-accent-tint px-2.5 py-0.5 text-xs font-medium text-accent">
+                <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2.5 py-0.5 text-xs font-semibold text-success-text">
                   <ShieldCheck size={12} /> indemnity signed
                 </span>
               ) : (
@@ -130,9 +149,10 @@ export function CrewDetailPage() {
             </p>
           </>
         )}
+        </div>
       </div>
 
-      <div className="mt-4 rounded-card border border-card bg-surface p-5">
+      <div className="mt-4 border border-card bg-surface p-5">
         <h2 className="mb-3 flex items-center gap-1.5 text-base font-semibold text-primary">
           <Tent size={14} className="text-muted" /> Camps attended
         </h2>

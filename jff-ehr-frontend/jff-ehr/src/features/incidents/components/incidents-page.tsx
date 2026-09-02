@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Select, Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
+import { Toolbar } from "@/components/ui/record-chrome";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDateTime } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
@@ -70,13 +71,14 @@ export function IncidentsPage() {
 
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Incidents and near misses</h1>
-        <StatusPill tone="neutral">{rows.length}</StatusPill>
+      <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">Incidents and near misses</h1>
+        <span className="text-sm text-muted">{rows.length} shown</span>
         {awaiting > 0 && <StatusPill tone="warning">{awaiting} awaiting review</StatusPill>}
         {canReview && (
           <Link to="/incidents/new" className="ml-auto">
-            <Button variant="primary">
+            <Button variant="primary" className="h-9 px-3">
               <Plus size={15} />
               Report an event
             </Button>
@@ -84,7 +86,7 @@ export function IncidentsPage() {
         )}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <Toolbar>
         <Select
           aria-label="Filter by camp"
           className="h-9 w-auto text-sm"
@@ -116,18 +118,19 @@ export function IncidentsPage() {
           onChange={(v) => setSortKey(v as SortKey)}
           onToggleDirection={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
         />
+      </Toolbar>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-10 text-center">
+        <div className="mt-3 border border-card bg-surface px-4 py-10 text-center">
           <TriangleAlert size={22} className="mx-auto text-muted" />
-          <p className="mt-2 text-base font-medium text-primary">No events to show</p>
+          <p className="mt-2 text-base font-semibold text-primary">No events to show</p>
           <p className="mt-1 text-sm text-muted">
             Nothing matches the current filters.
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="mt-3 space-y-3">
           {rows.map((event) => (
             <IncidentCard key={event.eventId} event={event} canReview={canReview} />
           ))}
@@ -162,9 +165,9 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
   });
 
   return (
-    <div className="rounded-card border border-card bg-surface p-4">
+    <div className="border border-card bg-surface p-4">
       <div className="flex flex-wrap items-center gap-2.5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-none bg-danger-tint text-danger">
+        <span className="flex h-8 w-8 items-center justify-center bg-danger-tint text-danger">
           <TriangleAlert size={15} />
         </span>
         {event.camper ? (
@@ -192,26 +195,26 @@ function IncidentCard({ event, canReview }: { event: IncidentRow; canReview: boo
         {event.types.map((t) => (
           <span
             key={t}
-            className="rounded-none bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger"
+            className="bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger"
           >
             {t}
           </span>
         ))}
         {event.otherEventType && (
-          <span className="rounded-none bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger">
+          <span className="bg-danger-tint px-2 py-0.5 text-xs font-medium text-danger">
             Other: {event.otherEventType}
           </span>
         )}
         {event.factors.map((f) => (
           <span
             key={f}
-            className="rounded-none bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral"
+            className="bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral"
           >
             {f}
           </span>
         ))}
         {event.otherContributingFactor && (
-          <span className="rounded-none bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral">
+          <span className="bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral">
             Other: {event.otherContributingFactor}
           </span>
         )}

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRight, Search, UserPlus } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
-import { initialsOf } from "@/lib/display";
+import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
 import { useMe } from "@/features/auth/use-me";
 import { fetchCrewList } from "../api/crew.api";
 
@@ -41,68 +41,79 @@ export function CrewListPage() {
   );
 
   return (
-    <div>
-      <div className="mb-1 flex flex-wrap items-center gap-3">
-        <h1 className="text-lg font-semibold text-primary">Crew</h1>
-        <StatusPill tone="neutral">{visible.length}</StatusPill>
-        <div className="relative ml-auto w-full max-w-[260px]">
-          <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-          <Input
-            className="pl-8"
-            placeholder="Search name, role, ID number…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+    <div className="border border-card bg-surface">
+      <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">Crew</h1>
+        <span className="text-sm text-muted">{visible.length} shown</span>
         {canMaintain && (
-          <Link to="/crew/new">
+          <Link to="/crew/new" className="ml-auto">
             <Button variant="primary" className="h-9 px-3">
               <UserPlus size={14} /> New crew member
             </Button>
           </Link>
         )}
       </div>
-      <p className="mb-4 text-sm text-muted">
-        {data.activeCamp
-          ? `Check-in status is for Camp ${data.activeCamp.campNumber}, ${data.activeCamp.venue}.`
-          : "No camp is currently active, so there is no check-in status to show."}
-      </p>
 
-      <div className="overflow-hidden rounded-card border border-card bg-surface">
-        {visible.map(({ crew, checkin }) => {
-          const pill = !checkin
-            ? { tone: "warning" as const, label: "not checked in" }
-            : checkin.medicalReleaseSigned
-              ? { tone: "success" as const, label: "checked in" }
-              : { tone: "danger" as const, label: "indemnity outstanding" };
-          return (
-            <Link
-              key={crew.crewId}
-              to={`/crew/${crew.crewId}`}
-              className="flex items-center gap-3 border-b border-divider px-4 py-3 transition last:border-b-0 hover:bg-field"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-accent-tint text-sm font-medium text-accent">
-                {initialsOf(crew.name, crew.surname)}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5 text-base font-medium text-primary">
-                  {crew.name} {crew.surname}
-                  <ChevronRight size={14} className="shrink-0 text-muted" />
-                </span>
-                <span className="mt-0.5 block truncate text-sm text-muted">
-                  {crew.role} · ID {crew.idNumber}
-                </span>
-              </span>
-              {data.activeCamp && <StatusPill tone={pill.tone}>{pill.label}</StatusPill>}
-            </Link>
-          );
-        })}
-        {visible.length === 0 && (
-          <div className="px-4 py-6 text-center text-base text-muted">
-            No crew match &ldquo;{search}&rdquo;.
-          </div>
-        )}
-      </div>
+      <Toolbar>
+        <div className="relative w-full max-w-[280px]">
+          <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+          <Input
+            className="h-9 pl-8"
+            placeholder="Search name, role, ID number…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <span className="ml-auto text-sm text-muted">
+          {data.activeCamp
+            ? `Check-in status is for camp ${data.activeCamp.campNumber}, ${data.activeCamp.venue}.`
+            : "No camp is currently active, so there is no check-in status to show."}
+        </span>
+      </Toolbar>
+
+      {visible.length === 0 ? (
+        <div className="px-4 py-8 text-center text-base text-muted">
+          No crew match &ldquo;{search}&rdquo;.
+        </div>
+      ) : (
+        <DataTable
+          head={
+            <>
+              <th className={thClass}>Crew member</th>
+              <th className={thClass}>Role</th>
+              <th className={thClass}>ID number</th>
+              {data.activeCamp && <th className={thClass}>Check-in</th>}
+            </>
+          }
+        >
+          {visible.map(({ crew, checkin }) => {
+            const pill = !checkin
+              ? { tone: "warning" as const, label: "not checked in" }
+              : checkin.medicalReleaseSigned
+                ? { tone: "success" as const, label: "checked in" }
+                : { tone: "danger" as const, label: "indemnity outstanding" };
+            return (
+              <tr key={crew.crewId} className="even:bg-page/60">
+                <td className={tdClass}>
+                  <Link
+                    to={`/crew/${crew.crewId}`}
+                    className="font-semibold text-accent-strong underline"
+                  >
+                    {crew.surname}, {crew.name}
+                  </Link>
+                </td>
+                <td className={`${tdClass} text-secondary`}>{crew.role}</td>
+                <td className={`${tdClass} mono`}>{crew.idNumber}</td>
+                {data.activeCamp && (
+                  <td className={tdClass}>
+                    <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </DataTable>
+      )}
     </div>
   );
 }

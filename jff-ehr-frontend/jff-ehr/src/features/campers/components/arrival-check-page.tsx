@@ -1,25 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Accessibility,
-  ClipboardPlus,
-  FilePenLine,
-  Lock,
-  Pencil,
-  Pill,
-  ShieldQuestion,
-} from "lucide-react";
+import { Accessibility, ClipboardPlus, FilePenLine, Lock, Pill, ShieldQuestion } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { ArrivalCheckDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { Input, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
-import { formatDate, formatDateTime } from "@/lib/display";
+import { formatDate, formatDateTime, formatSex } from "@/lib/display";
 import {
   createArrivalCheck,
   fetchArrivalCheckContext,
@@ -242,29 +235,26 @@ export function ArrivalCheckPage() {
         ]}
       />
 
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-medium text-primary">
-            Arrival check and medication check-in
-          </h1>
-          <p className="mt-0.5 text-sm text-muted">
-            {camper.firstName} {camper.surname} ({camper.fileNumber})
-            {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""} · nurse-signed on day one
-          </p>
-        </div>
-        {signed ? (
-          <span className="inline-flex items-center gap-1 border border-success bg-success-tint px-2.5 py-1 text-xs font-semibold text-success-text">
-            <Lock size={12} /> signed
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 border border-warning bg-warning-tint px-2.5 py-1 text-xs font-semibold text-warning-text">
-            <Pencil size={12} /> draft, editable
-          </span>
-        )}
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+          flags={[
+            signed
+              ? { label: "Arrival check signed", tone: "success" }
+              : { label: "Arrival check: draft", tone: "warning" },
+          ]}
+          meta={
+            <>
+              <span className="mono">{camper.fileNumber}</span> &middot; {formatSex(camper.sex)} &middot;{" "}
+              {camp ? `Camp ${camp.campNumber}, ${camp.venue}` : "no camp"} &middot; arrival check
+              and medication check-in, nurse-signed on day one
+            </>
+          }
+        />
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {serverError}
         </div>
       )}
@@ -295,7 +285,7 @@ export function ArrivalCheckPage() {
 
 function ReadOnlyOverlapFields({ dietary, religion }: { dietary: string | null; religion: string | null }) {
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-control bg-header-tint px-3 py-2.5">
+    <div className="grid grid-cols-2 gap-3 border-l-[3px] border-accent bg-header-tint px-3 py-2.5">
       <div>
         <div className="text-xs font-medium uppercase tracking-wide text-muted">
           Special dietary requirements
@@ -559,7 +549,7 @@ function SignedView({
 
   return (
     <div>
-      <div className="rounded-card border border-card bg-surface p-5">
+      <div className="border border-card bg-surface p-5">
         <dl>
           <SignedRow
             label="Allergies"

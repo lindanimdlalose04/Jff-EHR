@@ -106,17 +106,17 @@ export function CampCrewTab({ campId }: { campId: string }) {
       )}
 
       {crew.data.length === 0 ? (
-        <div className="rounded-card border border-card bg-surface px-4 py-8 text-center text-base text-muted">
+        <div className="border border-card bg-surface px-4 py-8 text-center text-base text-muted">
           No crew registered to this camp yet.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-card border border-card bg-surface">
+        <div className="overflow-hidden border border-card bg-surface">
           {crew.data.map((entry) => (
             <div
               key={entry.registration.crewRegistrationId}
               className="flex flex-wrap items-center gap-3 border-b border-divider px-4 py-3 last:border-b-0"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none bg-accent-tint text-xs font-medium text-accent">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-accent-tint text-xs font-medium text-accent">
                 {entry.crew ? initialsOf(entry.crew.name, entry.crew.surname) : "?"}
               </span>
               <Link

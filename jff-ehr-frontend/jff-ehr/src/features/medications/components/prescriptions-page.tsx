@@ -182,7 +182,7 @@ export function PrescriptionsPage() {
       )}
 
       {prescriptions.length === 0 && editing !== "new" ? (
-        <div className="rounded-card border border-card bg-surface p-6 text-center text-base text-muted">
+        <div className="border border-card bg-surface p-6 text-center text-base text-muted">
           No prescriptions for this camp yet.
         </div>
       ) : (
@@ -200,19 +200,19 @@ export function PrescriptionsPage() {
             ) : (
               <li
                 key={p.prescriptionId}
-                className="rounded-card border border-card bg-surface p-4"
+                className="border border-card bg-surface p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-none bg-accent-tint text-accent">
+                      <span className="flex h-7 w-7 items-center justify-center bg-accent-tint text-accent">
                         <Pill size={14} />
                       </span>
                       <span className="text-base font-medium text-primary">
                         {p.medicationName}
                       </span>
                       {p.isLocked ? (
-                        <span className="inline-flex items-center gap-1 rounded-none bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral">
+                        <span className="inline-flex items-center gap-1 bg-neutral-tint px-2 py-0.5 text-xs font-medium text-neutral">
                           <Lock size={11} /> locked, {p.administeredDoseCount} dose
                           {p.administeredDoseCount === 1 ? "" : "s"} given
                         </span>
@@ -304,7 +304,7 @@ function PrescriptionForm({
     draft.startDate;
 
   return (
-    <div className="rounded-card border border-accent-border bg-accent-tint/30 p-4">
+    <div className="border border-accent-border bg-accent-tint/30 p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="sm:col-span-2">
           <span className="mb-1 block text-sm font-medium text-secondary">
