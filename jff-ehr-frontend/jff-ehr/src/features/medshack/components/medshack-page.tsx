@@ -222,7 +222,7 @@ function VisitCard({ visit, canRecord }: { visit: VisitRow; canRecord: boolean }
       )}
 
       {error && (
-        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mt-2 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
           {error}
         </div>
       )}

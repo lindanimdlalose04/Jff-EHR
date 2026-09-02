@@ -41,7 +41,7 @@ export function LoginPage() {
         <div className="border border-card bg-surface p-7">
           <div className="mb-6 flex flex-col items-center text-center">
             <div className="mb-3 flex h-11 w-11 items-center justify-center bg-accent text-white">
-              <HeartPulse size={22} /
+              <HeartPulse size={22} />
             </div>
             <h1 className="text-lg font-semibold text-primary">JFF EHR</h1>
             <p className="mt-0.5 text-sm text-muted">
@@ -84,7 +84,7 @@ export function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="mt-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger"
+                className="mt-4 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text"
               >
                 {error}
               </div>

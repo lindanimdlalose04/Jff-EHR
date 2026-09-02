@@ -220,3 +220,19 @@ export function DataTable({ head, children }: { head: ReactNode; children: React
 export const thClass =
   "border-b border-card bg-header-tint px-4 py-2 text-left text-xs font-bold uppercase tracking-[0.06em] text-secondary";
 export const tdClass = "border-b border-divider px-4 py-2 text-primary align-middle";
+
+/**
+ * Header for a create-or-edit form, where there is not yet a record to pin a
+ * banner to. Same ruled, square treatment as the banner so the two read as one
+ * system, but without identifiers or flags.
+ */
+export function PageHead({ title, meta }: { title: string; meta?: ReactNode }) {
+  return (
+    <div className="mb-3 border border-card bg-surface">
+      <div className="border-b border-card bg-page px-4 py-3">
+        <h1 className="text-lg font-bold text-primary">{title}</h1>
+        {meta && <p className="mt-0.5 text-sm text-secondary">{meta}</p>}
+      </div>
+    </div>
+  );
+}

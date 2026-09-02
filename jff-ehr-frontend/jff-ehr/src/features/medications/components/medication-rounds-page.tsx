@@ -133,7 +133,7 @@ export function MedicationRoundsPage() {
       </div>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
           {error}
         </div>
       )}

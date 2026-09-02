@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, UserRoundCog } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/record-chrome";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -131,12 +132,13 @@ export function CrewFormPage() {
         }
       />
 
-      <h1 className="mb-4 text-lg font-medium text-primary">
-        {isEdit ? `Edit ${existing.data?.name} ${existing.data?.surname}` : "New crew member"}
-      </h1>
+      <PageHead
+        title={isEdit ? `Edit ${existing.data?.name} ${existing.data?.surname}` : "New crew member"}
+        meta="A volunteer is a persistent person, registered to each camp they attend"
+      />
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

@@ -6,6 +6,7 @@ import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { Input, Textarea } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useMe } from "@/features/auth/use-me";
@@ -114,15 +115,16 @@ export function IncidentFormPage() {
         items={[{ label: "Incidents", to: "/incidents" }, { label: "Report an event" }]}
       />
 
-      <h1 className="text-lg font-medium text-primary">
-        Medication / treatment event / near miss
-      </h1>
-      <p className="mb-4 mt-0.5 text-sm text-muted">
-        Append-only, reviewed by a doctor, never editable once filed
-      </p>
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title="Medication, treatment or near-miss event"
+          flags={[{ label: "Append only", tone: "warning" }]}
+          meta={<>Reviewed by a doctor once, then never editable. File it as it happened.</>}
+        />
+      </div>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

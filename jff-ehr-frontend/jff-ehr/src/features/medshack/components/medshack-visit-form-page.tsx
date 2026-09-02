@@ -14,6 +14,7 @@ import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/record-chrome";
 import { Input, Textarea } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useMe } from "@/features/auth/use-me";
@@ -147,14 +148,18 @@ export function MedShackVisitFormPage() {
         items={[{ label: "MedShack", to: "/medshack" }, { label: "New visit" }]}
       />
 
-      <h1 className="text-lg font-medium text-primary">MedShack visit</h1>
-      <p className="mb-4 mt-0.5 text-sm text-muted">
-        {ORGANISATION}
-        {context.camp ? ` · Camp ${context.camp.campNumber}, ${context.camp.venue}` : ""}
-      </p>
+      <PageHead
+        title="MedShack visit"
+        meta={
+          <>
+            {ORGANISATION}
+            {context.camp ? ` · Camp ${context.camp.campNumber}, ${context.camp.venue}` : ""}
+          </>
+        }
+      />
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

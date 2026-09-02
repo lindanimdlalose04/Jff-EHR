@@ -6,6 +6,7 @@ import { apiClient } from "@/api/client";
 import type { CamperDto, CampDto, CampRegistrationDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/record-chrome";
 import { Input, Select } from "@/components/ui/field";
 import { SearchSelect } from "@/components/ui/search-select";
 import { FormField } from "@/components/forms/form-field";
@@ -100,10 +101,13 @@ export function CampRegisterPage() {
         ]}
       />
 
-      <h1 className="text-lg font-medium text-primary">Register a camper</h1>
+      <PageHead
+        title="Register a camper to this camp"
+        meta="The child already exists as a record; this attaches them to one camp"
+      />
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

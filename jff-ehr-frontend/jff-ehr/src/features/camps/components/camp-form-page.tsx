@@ -6,6 +6,7 @@ import { apiClient } from "@/api/client";
 import type { CampDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/record-chrome";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -127,12 +128,13 @@ export function CampFormPage() {
         }
       />
 
-      <h1 className="mb-4 text-lg font-medium text-primary">
-        {isEdit ? `Edit camp ${existing.data?.campNumber ?? ""}` : "New camp"}
-      </h1>
+      <PageHead
+        title={isEdit ? `Edit camp ${existing.data?.campNumber ?? ""}` : "New camp"}
+        meta="Active state is derived from the dates; status records a cancellation only"
+      />
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

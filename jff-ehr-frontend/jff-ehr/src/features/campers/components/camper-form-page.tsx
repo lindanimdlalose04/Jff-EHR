@@ -10,6 +10,7 @@ import { apiClient } from "@/api/client";
 import type { CamperDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/record-chrome";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -165,9 +166,10 @@ export function CamperFormPage() {
         }
       />
 
-      <h1 className="mb-4 text-lg font-medium text-primary">
-        {isEdit ? `Edit ${existing.data?.firstName} ${existing.data?.surname}` : "New camper"}
-      </h1>
+      <PageHead
+        title={isEdit ? `Edit ${existing.data?.firstName} ${existing.data?.surname}` : "New camper"}
+        meta="Part 1 of the registration form: identity, contact and logistics"
+      />
 
       <form
         onSubmit={handleSubmit((values) => {
@@ -250,7 +252,7 @@ export function CamperFormPage() {
         </FormSection>
 
         {serverError && (
-          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+          <div className="mb-4 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
             {serverError}
           </div>
         )}

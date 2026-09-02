@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
-import { StatusPill } from "@/components/ui/status-pill";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { formatDate } from "@/lib/display";
 import { supabase } from "@/lib/supabase";
 import { useMe } from "@/features/auth/use-me";
@@ -103,30 +103,33 @@ export function ConsentPage() {
         ]}
       />
 
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-medium text-primary">Consent and indemnity</h1>
-          <p className="mt-0.5 text-sm text-muted">
-            {camper.firstName} {camper.surname} ({camper.fileNumber})
-            {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""}
-          </p>
-        </div>
-        {consents.length > 0 ? (
-          <StatusPill tone="success">consent on file</StatusPill>
-        ) : (
-          <StatusPill tone="danger">no consent</StatusPill>
-        )}
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+          flags={[
+            consents.length > 0
+              ? { label: "Consent on file", tone: "success" }
+              : { label: "No consent, blocks participation", tone: "danger" },
+          ]}
+          meta={
+            <>
+              <span className="mono">{camper.fileNumber}</span>
+              {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""} &middot; no child may take
+              part without a signed indemnity
+            </>
+          }
+        />
       </div>
 
       {consents.length === 0 && (
-        <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-4 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
           No child is accepted to camp without a signed indemnity. Capture the caregiver&rsquo;s
           consent to clear the acceptance gate.
         </div>
       )}
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
           {error}
         </div>
       )}

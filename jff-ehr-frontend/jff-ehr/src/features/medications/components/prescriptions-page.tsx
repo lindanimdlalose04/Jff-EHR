@@ -5,6 +5,7 @@ import { Ban, Lock, Pencil, Pill, Plus } from "lucide-react";
 import type { PrescriptionDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { Input, Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate } from "@/lib/display";
@@ -140,32 +141,37 @@ export function PrescriptionsPage() {
         ]}
       />
 
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-medium text-primary">Prescriptions</h1>
-          <p className="mt-0.5 text-sm text-muted">
-            {camper.firstName} {camper.surname} ({camper.fileNumber})
-            {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""}
-            {registration.cabin ? ` · cabin ${registration.cabin}` : ""}
-          </p>
-        </div>
-        {canPrescribe && editing !== "new" && (
-          <Button
-            variant="primary"
-            className="h-9 px-3"
-            disabled={busy}
-            onClick={() => {
-              setEditing("new");
-              setError(null);
-            }}
-          >
-            <Plus size={14} /> New prescription
-          </Button>
-        )}
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+          meta={
+            <>
+              <span className="mono">{camper.fileNumber}</span>
+              {camp ? ` · Camp ${camp.campNumber}, ${camp.venue}` : ""}
+              {registration.cabin ? ` · cabin ${registration.cabin}` : ""} &middot; prescriptions
+              for this camp
+            </>
+          }
+          actions={
+            canPrescribe && editing !== "new" ? (
+              <Button
+                variant="primary"
+                className="h-9 px-3"
+                disabled={busy}
+                onClick={() => {
+                  setEditing("new");
+                  setError(null);
+                }}
+              >
+                <Plus size={14} /> New prescription
+              </Button>
+            ) : undefined
+          }
+        />
       </div>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

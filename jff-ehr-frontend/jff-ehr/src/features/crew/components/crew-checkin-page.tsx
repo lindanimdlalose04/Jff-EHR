@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HeartPulse, NotebookPen, Pill, ShieldCheck } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { Input, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -136,13 +137,20 @@ export function CrewCheckinPage() {
         ]}
       />
 
-      <h1 className="text-lg font-medium text-primary">Crew medical check-in</h1>
-      <p className="mb-4 mt-0.5 text-sm text-muted">
-        {crew.name} {crew.surname} · Camp {activeCamp.campNumber}, {activeCamp.venue}
-      </p>
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title={`${crew.surname.toUpperCase()}, ${crew.name}`}
+          meta={
+            <>
+              {crew.role} &middot; medical check-in for camp {activeCamp.campNumber},{" "}
+              {activeCamp.venue}
+            </>
+          }
+        />
+      </div>
 
       {error && (
-        <div className="mb-3 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
         </div>
       )}

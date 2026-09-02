@@ -293,7 +293,7 @@ function CaregiversTab({ detail }: { detail: CamperDetail }) {
   return (
     <div className="space-y-4">
       {error && (
-        <div className="rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+        <div className="border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
           {error}
         </div>
       )}

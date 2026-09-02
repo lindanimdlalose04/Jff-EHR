@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { RecordBanner } from "@/components/ui/record-chrome";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/forms/form-field";
 import { FormSection } from "@/components/forms/form-section";
@@ -178,13 +179,19 @@ export function PrecampFormPage() {
         ]}
       />
 
-      <h1 className="text-lg font-medium text-primary">
-        {existing ? "Edit pre-camp medical" : "Pre-camp medical"}
-      </h1>
-      <p className="mb-4 mt-0.5 text-sm text-muted">
-        {camper.firstName} {camper.surname} ({camper.fileNumber}) · from the caregiver&rsquo;s
-        registration pack, strictly confidential
-      </p>
+      <div className="mb-3 border border-card bg-surface">
+        <RecordBanner
+          title={`${camper.surname.toUpperCase()}, ${camper.firstName}`}
+          flags={[{ label: "Strictly confidential", tone: "danger" }]}
+          meta={
+            <>
+              <span className="mono">{camper.fileNumber}</span> &middot;{" "}
+              {existing ? "editing the" : "capturing the"} pre-camp medical, from the
+              caregiver&rsquo;s registration pack
+            </>
+          }
+        />
+      </div>
 
       <form
         onSubmit={handleSubmit((values) => {
@@ -333,7 +340,7 @@ export function PrecampFormPage() {
         </FormSection>
 
         {serverError && (
-          <div className="mb-4 rounded-control border border-danger-border bg-danger-tint px-3 py-2 text-sm text-danger">
+          <div className="mb-4 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text">
             {serverError}
           </div>
         )}

@@ -170,7 +170,7 @@ function UserRow({ row, currentUserId }: { row: AdminUserRow; currentUserId: str
         </span>
       </div>
       {error && (
-        <div className="mt-2 rounded-control border border-danger-border bg-danger-tint px-3 py-1.5 text-xs text-danger">
+        <div className="mt-2 rounded-control border border-danger bg-danger-tint px-3 py-1.5 text-xs text-danger">
           {error}
         </div>
       )}
