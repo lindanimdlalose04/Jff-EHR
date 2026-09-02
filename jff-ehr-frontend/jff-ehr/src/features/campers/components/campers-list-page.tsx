@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, UserRoundPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { statusLabel, statusTone, formatSex, ageYears } from "@/lib/display";
-import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
+import { Toolbar, DataTable, thClass, tdClass, Pagination } from "@/components/ui/record-chrome";
 import { campFilterLabel } from "@/lib/camp-state";
 import { useCampers, useCamps } from "@/features/camps/hooks/use-camps";
 
@@ -35,6 +35,7 @@ export function CampersListPage() {
   const camps = useCamps();
   const registrations = useAllRegistrations();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const [campFilter, setCampFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDirection>("asc");
@@ -43,7 +44,11 @@ export function CampersListPage() {
     return <div className="p-6 text-sm text-muted">Loading campers…</div>;
   }
   if (campers.isError || !campers.data || !registrations.data) {
-    return (
+  
+  // A filter change can leave you on a page that no longer exists.
+  useEffect(() => { setPage(0); }, [search, campFilter, sortKey, sortDir]);
+
+  return (
       <div className="p-6 text-sm text-danger">
         Couldn&rsquo;t load campers. Refresh to try again.
       </div>
@@ -94,12 +99,17 @@ export function CampersListPage() {
 
   const campOptions = [...(camps.data ?? [])].sort((a, b) => b.campNumber - a.campNumber);
 
+  const PAGE_SIZE = 30;
+  const pageRows = visible.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div className="border border-card bg-surface">
       <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
         <h1 className="text-lg font-bold text-primary">Campers</h1>
         <span className="text-sm text-muted">
-          {visible.length} of {campers.data.length} shown
+          {visible.length === campers.data.length
+            ? `${campers.data.length} campers`
+            : `${visible.length} of ${campers.data.length} campers match`}
         </span>
         <Link to="/campers/new" className="ml-auto">
           <Button variant="primary" className="h-9 px-3">
@@ -157,7 +167,7 @@ export function CampersListPage() {
             </>
           }
         >
-          {visible.map((camper) => {
+          {pageRows.map((camper) => {
             const status = latestRegStatus.get(camper.camperId);
             return (
               <tr key={camper.camperId} className="even:bg-page/60">
@@ -188,6 +198,13 @@ export function CampersListPage() {
           })}
         </DataTable>
       )}
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={visible.length}
+        onPage={setPage}
+        noun="campers"
+      />
     </div>
   );
 }

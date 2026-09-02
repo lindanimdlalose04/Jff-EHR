@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
-import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
+import { Toolbar, DataTable, thClass, tdClass, Pagination } from "@/components/ui/record-chrome";
 import { SortControl, type SortDirection } from "@/components/ui/sort-control";
 import { formatDate, statusLabel, statusTone } from "@/lib/display";
 import { deriveCampState } from "@/lib/camp-state";
@@ -25,13 +25,18 @@ const STATE_FILTERS = ["planned", "active", "completed", "cancelled"];
 export function CampsListPage() {
   const { data: camps, isLoading, isError } = useCamps();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const [stateFilter, setStateFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("number");
   const [sortDir, setSortDir] = useState<SortDirection>("desc");
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading camps…</div>;
   if (isError || !camps) {
-    return (
+  
+  // A filter change can leave you on a page that no longer exists.
+  useEffect(() => { setPage(0); }, [search, stateFilter, sortKey, sortDir]);
+
+  return (
       <div className="p-6 text-sm text-danger">
         Couldn&rsquo;t load camps. Check that the API is running, then refresh.
       </div>
@@ -59,11 +64,14 @@ export function CampsListPage() {
       return dir * (a.campNumber - b.campNumber);
     });
 
+  const PAGE_SIZE = 30;
+  const pageRows = visible.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div className="border border-card bg-surface">
       <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
         <h1 className="text-lg font-bold text-primary">Camps</h1>
-        <span className="text-sm text-muted">{visible.length} shown</span>
+        <span className="text-sm text-muted">{visible.length} camps</span>
         <Link to="/camps/new" className="ml-auto">
           <Button variant="primary" className="h-9 px-3">
             <Plus size={14} /> New camp
@@ -120,7 +128,7 @@ export function CampsListPage() {
             </>
           }
         >
-          {visible.map((camp) => {
+          {pageRows.map((camp) => {
             const state = deriveCampState(camp, now);
             return (
               <tr key={camp.campId} className="even:bg-page/60">
@@ -145,6 +153,13 @@ export function CampsListPage() {
           })}
         </DataTable>
       )}
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={visible.length}
+        onPage={setPage}
+        noun="camps"
+      />
     </div>
   );
 }

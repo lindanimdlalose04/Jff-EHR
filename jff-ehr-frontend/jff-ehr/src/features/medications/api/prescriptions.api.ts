@@ -1,8 +1,9 @@
 import { apiClient } from "@/api/client";
 import type {
-  CamperDto,
   CampDto,
   CampRegistrationDto,
+  CamperDto,
+  PrecampMedicalDto,
   PrescriptionDto,
 } from "@/api/types";
 
@@ -35,18 +36,29 @@ export interface PrescriptionsContext {
   camper: CamperDto;
   camp: CampDto | null;
   prescriptions: PrescriptionDto[];
+  /** Newest pre-camp medical for this registration, or null if not captured yet. */
+  precamp: PrecampMedicalDto | null;
 }
 
 export async function fetchPrescriptionsContext(
   registrationId: string,
 ): Promise<PrescriptionsContext> {
   const registration = await get<CampRegistrationDto>(`/campregistrations/${registrationId}`);
-  const [camper, camp, prescriptions] = await Promise.all([
+  const [camper, camp, prescriptions, precamps] = await Promise.all([
     get<CamperDto>(`/campers/${registration.camperId}`),
     get<CampDto>(`/camps/${registration.campId}`),
     get<PrescriptionDto[]>("/prescriptions", { registrationId }),
+    // The caregiver's declared medication list, so the nurse can set the grid
+    // up from it instead of retyping each name.
+    get<PrecampMedicalDto[]>("/precampmedicals", { registrationId }),
   ]);
-  return { registration, camper, camp: camp ?? null, prescriptions };
+  return {
+    registration,
+    camper,
+    camp: camp ?? null,
+    prescriptions,
+    precamp: precamps[0] ?? null,
+  };
 }
 
 export async function createPrescription(

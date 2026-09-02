@@ -236,3 +236,63 @@ export function PageHead({ title, meta }: { title: string; meta?: ReactNode }) {
     </div>
   );
 }
+
+/**
+ * Page footer for a long table. A camp roster is forty children and the camper
+ * register runs to hundreds, which is past the point where one scrolling list
+ * is readable. Shows the window and the total, so "31 to 60 of 124" tells you
+ * both where you are and how much there is.
+ */
+export function Pagination({
+  page,
+  pageSize,
+  total,
+  onPage,
+  noun = "records",
+}: {
+  page: number;
+  pageSize: number;
+  total: number;
+  onPage: (page: number) => void;
+  noun?: string;
+}) {
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  if (total <= pageSize) {
+    return (
+      <div className="border-t border-divider px-4 py-2.5 text-sm text-muted">
+        {total} {noun}
+      </div>
+    );
+  }
+  const from = page * pageSize + 1;
+  const to = Math.min(total, (page + 1) * pageSize);
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-t border-divider px-4 py-2.5">
+      <span className="text-sm text-muted">
+        Showing <span className="mono font-semibold text-primary">{from}</span> to{" "}
+        <span className="mono font-semibold text-primary">{to}</span> of{" "}
+        <span className="mono font-semibold text-primary">{total}</span> {noun}
+      </span>
+      <span className="flex-1" />
+      <span className="text-sm text-muted">
+        Page <span className="mono">{page + 1}</span> of <span className="mono">{pages}</span>
+      </span>
+      <button
+        type="button"
+        disabled={page === 0}
+        onClick={() => onPage(page - 1)}
+        className="rounded-control border border-field-border bg-field px-3 py-1 text-sm font-semibold text-secondary transition hover:text-primary disabled:opacity-40"
+      >
+        Previous
+      </button>
+      <button
+        type="button"
+        disabled={page >= pages - 1}
+        onClick={() => onPage(page + 1)}
+        className="rounded-control border border-field-border bg-field px-3 py-1 text-sm font-semibold text-secondary transition hover:text-primary disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+  );
+}

@@ -5,8 +5,8 @@ import { Ban, Lock, Pencil, Pill, Plus } from "lucide-react";
 import type { PrescriptionDto } from "@/api/types";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { RecordBanner } from "@/components/ui/record-chrome";
-import { Input, Textarea } from "@/components/ui/field";
+import { RecordBanner, SectionHead, thClass, tdClass } from "@/components/ui/record-chrome";
+import { Input, Select, Textarea } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate } from "@/lib/display";
 import { useMe } from "@/features/auth/use-me";
@@ -78,6 +78,7 @@ export function PrescriptionsPage() {
   const me = useMe();
   const canPrescribe = me.data?.role === "medical";
   const [editing, setEditing] = useState<string | null>(null);
+  const [bulk, setBulk] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
@@ -112,6 +113,26 @@ export function PrescriptionsPage() {
     onError: fail,
   });
 
+  // Created one at a time rather than in a single request: there is no bulk
+  // endpoint, and doing them in sequence means a failure half way through
+  // still leaves the successful ones in place and reports what happened.
+  const saveBulk = useMutation({
+    mutationFn: async (drafts: Draft[]) => {
+      let created = 0;
+      for (const draft of drafts) {
+        await createPrescription(regId, toPayload(draft));
+        created += 1;
+      }
+      return created;
+    },
+    onSuccess: () => {
+      setBulk(false);
+      setError(null);
+      refresh();
+    },
+    onError: fail,
+  });
+
   const withdraw = useMutation({
     mutationFn: withdrawPrescription,
     onSuccess: () => {
@@ -128,7 +149,25 @@ export function PrescriptionsPage() {
 
   const { camper, camp, registration, prescriptions } = data;
   const defaultStart = camp?.startDate ?? new Date().toISOString().slice(0, 10);
-  const busy = save.isPending || withdraw.isPending;
+  const busy = save.isPending || withdraw.isPending || saveBulk.isPending;
+
+  // Medications the caregiver declared that are not prescribed yet.
+  const declaredMeds: string[] = (() => {
+    if (!data.precamp?.medicationList) return [];
+    let names: string[] = [];
+    try {
+      const parsed: unknown = JSON.parse(data.precamp.medicationList);
+      if (Array.isArray(parsed)) names = parsed.map(String);
+    } catch {
+      return [];
+    }
+    const already = new Set(
+      prescriptions.map((p) => (p.medicationName ?? "").trim().toLowerCase()),
+    );
+    return names
+      .map((n) => n.trim())
+      .filter((n) => n && !already.has(n.toLowerCase()));
+  })();
 
   return (
     <div className="mx-auto max-w-[820px]">
@@ -173,6 +212,36 @@ export function PrescriptionsPage() {
       {error && (
         <div className="mb-3 border border-danger bg-danger-tint px-3 py-2 text-sm font-semibold text-danger-text" role="alert">
           {error}
+        </div>
+      )}
+
+      {bulk && declaredMeds.length > 0 && (
+        <BulkSetup
+          declared={declaredMeds}
+          defaultStart={defaultStart}
+          saving={saveBulk.isPending}
+          onSave={(drafts) => saveBulk.mutate(drafts)}
+          onCancel={() => setBulk(false)}
+        />
+      )}
+
+      {/* The caregiver declared medications that are not on the grid yet. */}
+      {!bulk && declaredMeds.length > 0 && canPrescribe && editing === null && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 border border-warning bg-warning-tint px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-base font-semibold text-warning-text">
+              {declaredMeds.length} declared medication
+              {declaredMeds.length === 1 ? "" : "s"} not prescribed yet
+            </p>
+            <p className="mt-0.5 text-sm text-secondary">
+              The caregiver&rsquo;s pre-camp form lists {declaredMeds.join(", ")}. Set{" "}
+              {declaredMeds.length === 1 ? "it" : "them"} up in one pass instead of adding each
+              one separately.
+            </p>
+          </div>
+          <Button variant="primary" className="h-9 px-3" onClick={() => setBulk(true)}>
+            <Plus size={14} /> Set up from pre-camp list
+          </Button>
         </div>
       )}
 
@@ -397,6 +466,195 @@ function PrescriptionForm({
             {saving ? "Saving…" : "Save"}
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Frequency presets and the times they imply. The caregiver's form gives the
+ * medication names only (form 01 part 2, "current medication list, numbered,
+ * up to 4"); dose and schedule are the nurse's to set. Choosing a frequency
+ * fills the times so the common cases need no typing at all.
+ */
+const FREQUENCY_PRESETS: { label: string; frequency: string; times: string }[] = [
+  { label: "Once daily", frequency: "Once daily", times: "08:00" },
+  { label: "Twice daily", frequency: "Twice daily", times: "08:00, 20:00" },
+  { label: "Three times daily", frequency: "Three times daily", times: "08:00, 14:00, 20:00" },
+  { label: "Four times daily", frequency: "Four times daily", times: "06:00, 12:00, 18:00, 22:00" },
+  { label: "At night", frequency: "At night", times: "20:00" },
+];
+
+interface BulkRow extends Draft {
+  include: boolean;
+  /** True when the name came from the caregiver's declared list. */
+  fromPrecamp: boolean;
+}
+
+/**
+ * Sets up the whole medication grid from the pre-camp list in one pass.
+ *
+ * Without this the declared medications are captured and then thrown away: the
+ * nurse reads the names off the pre-camp record and retypes each one as a
+ * separate prescription. Here every declared medication arrives pre-named, and
+ * only dose and frequency are left to enter. Names already prescribed are
+ * dropped so nothing is created twice, and a blank row covers anything the
+ * caregiver did not declare.
+ */
+function BulkSetup({
+  declared,
+  defaultStart,
+  saving,
+  onSave,
+  onCancel,
+}: {
+  declared: string[];
+  defaultStart: string;
+  saving: boolean;
+  onSave: (drafts: Draft[]) => void;
+  onCancel: () => void;
+}) {
+  const [rows, setRows] = useState<BulkRow[]>(() =>
+    declared.map((name) => ({
+      ...emptyDraft(defaultStart),
+      medicationName: name,
+      include: true,
+      fromPrecamp: true,
+    })),
+  );
+
+  const setRow = (i: number, patch: Partial<BulkRow>) =>
+    setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+
+  const applyPreset = (i: number, label: string) => {
+    const preset = FREQUENCY_PRESETS.find((p) => p.label === label);
+    if (preset) setRow(i, { frequency: preset.frequency, times: preset.times });
+  };
+
+  const chosen = rows.filter((r) => r.include && r.medicationName.trim());
+  const incomplete = chosen.filter((r) => !r.dose.trim() || !r.times.trim());
+  const canSave = chosen.length > 0 && incomplete.length === 0;
+
+  return (
+    <div className="mb-3 border border-card bg-surface">
+      <SectionHead
+        title="Set up from the pre-camp list"
+        hint={`${declared.length} medication${declared.length === 1 ? "" : "s"} declared by the caregiver`}
+      />
+
+      <div className="border-b border-divider bg-header-tint px-4 py-2 text-sm text-secondary">
+        Each medication the caregiver declared is listed below with its name already filled in.
+        Add the dose and pick a frequency, and the times fill themselves. Everything you tick is
+        created at once.
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-base">
+          <thead>
+            <tr>
+              <th className={`${thClass} w-[42px]`} />
+              <th className={thClass}>Medication</th>
+              <th className={thClass}>Dose</th>
+              <th className={thClass}>Frequency</th>
+              <th className={thClass}>Times</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i} className={row.include ? "" : "opacity-45"}>
+                <td className={`${tdClass} text-center`}>
+                  <input
+                    type="checkbox"
+                    aria-label={`Include ${row.medicationName || "this row"}`}
+                    checked={row.include}
+                    onChange={(e) => setRow(i, { include: e.target.checked })}
+                    className="h-4 w-4 accent-[hsl(var(--accent))]"
+                  />
+                </td>
+                <td className={tdClass}>
+                  <Input
+                    aria-label="Medication name"
+                    className="h-9"
+                    value={row.medicationName}
+                    onChange={(e) => setRow(i, { medicationName: e.target.value })}
+                    placeholder="Medication"
+                  />
+                  {row.fromPrecamp && (
+                    <span className="mt-0.5 block text-xs text-muted">from the pre-camp list</span>
+                  )}
+                </td>
+                <td className={tdClass}>
+                  <Input
+                    aria-label="Dose"
+                    className="h-9 min-w-[110px]"
+                    value={row.dose}
+                    onChange={(e) => setRow(i, { dose: e.target.value })}
+                    placeholder="e.g. 50 mg"
+                  />
+                </td>
+                <td className={tdClass}>
+                  <Select
+                    aria-label="Frequency"
+                    className="h-9 min-w-[150px]"
+                    value={FREQUENCY_PRESETS.find((p) => p.frequency === row.frequency)?.label ?? ""}
+                    onChange={(e) => applyPreset(i, e.target.value)}
+                  >
+                    <option value="">Choose…</option>
+                    {FREQUENCY_PRESETS.map((p) => (
+                      <option key={p.label} value={p.label}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </Select>
+                </td>
+                <td className={tdClass}>
+                  <Input
+                    aria-label="Times"
+                    className="mono h-9 min-w-[140px]"
+                    value={row.times}
+                    onChange={(e) => setRow(i, { times: e.target.value })}
+                    placeholder="08:00, 20:00"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 border-t border-divider px-4 py-2.5">
+        <Button
+          variant="secondary"
+          className="h-8 px-3"
+          disabled={saving}
+          onClick={() =>
+            setRows((rs) => [
+              ...rs,
+              { ...emptyDraft(defaultStart), include: true, fromPrecamp: false },
+            ])
+          }
+        >
+          <Plus size={13} /> Add another medication
+        </Button>
+        <span className="flex-1" />
+        {incomplete.length > 0 && (
+          <span className="text-sm text-warning-text">
+            {incomplete.length} row{incomplete.length === 1 ? "" : "s"} still need a dose and times
+          </span>
+        )}
+        <Button variant="secondary" className="h-8 px-3" disabled={saving} onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          className="h-8 px-3"
+          disabled={!canSave || saving}
+          onClick={() => onSave(chosen.map(({ include, fromPrecamp, ...d }) => d))}
+        >
+          {saving
+            ? "Creating…"
+            : `Create ${chosen.length} prescription${chosen.length === 1 ? "" : "s"}`}
+        </Button>
       </div>
     </div>
   );

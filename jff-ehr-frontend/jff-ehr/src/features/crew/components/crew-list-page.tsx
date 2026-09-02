@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { StatusPill } from "@/components/ui/status-pill";
-import { Toolbar, DataTable, thClass, tdClass } from "@/components/ui/record-chrome";
+import { Toolbar, DataTable, thClass, tdClass, Pagination } from "@/components/ui/record-chrome";
 import { useMe } from "@/features/auth/use-me";
 import { fetchCrewList } from "../api/crew.api";
 
@@ -19,6 +19,7 @@ export function CrewListPage() {
   const me = useMe();
   const canMaintain = me.data?.role === "medical" || me.data?.role === "admin";
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["crew-list"],
     queryFn: fetchCrewList,
@@ -26,7 +27,11 @@ export function CrewListPage() {
 
   if (isLoading) return <div className="p-6 text-sm text-muted">Loading crew…</div>;
   if (isError || !data) {
-    return (
+  
+  // A filter change can leave you on a page that no longer exists.
+  useEffect(() => { setPage(0); }, [search]);
+
+  return (
       <div className="p-6 text-sm text-danger">Couldn&rsquo;t load the crew. Refresh to try again.</div>
     );
   }
@@ -40,11 +45,14 @@ export function CrewListPage() {
       crew.idNumber.toLowerCase().includes(needle),
   );
 
+  const PAGE_SIZE = 30;
+  const pageRows = visible.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div className="border border-card bg-surface">
       <div className="flex flex-wrap items-center gap-3 border-b border-card bg-page px-4 py-3">
         <h1 className="text-lg font-bold text-primary">Crew</h1>
-        <span className="text-sm text-muted">{visible.length} shown</span>
+        <span className="text-sm text-muted">{visible.length} crew</span>
         {canMaintain && (
           <Link to="/crew/new" className="ml-auto">
             <Button variant="primary" className="h-9 px-3">
@@ -86,7 +94,7 @@ export function CrewListPage() {
             </>
           }
         >
-          {visible.map(({ crew, checkin }) => {
+          {pageRows.map(({ crew, checkin }) => {
             const pill = !checkin
               ? { tone: "warning" as const, label: "not checked in" }
               : checkin.medicalReleaseSigned
@@ -114,6 +122,13 @@ export function CrewListPage() {
           })}
         </DataTable>
       )}
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={visible.length}
+        onPage={setPage}
+        noun="crew"
+      />
     </div>
   );
 }

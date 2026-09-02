@@ -140,12 +140,25 @@ export function PrecampFormPage() {
       const existing = context.data?.existing;
       return existing ? updatePrecamp(existing.precampId, payload) : createPrecamp(regId, payload);
     },
-    onSuccess: () => {
+    onSuccess: (_result, values) => {
       const camperId = context.data?.camper.camperId;
       if (camperId) {
         void queryClient.invalidateQueries({ queryKey: ["camper-detail", camperId] });
       }
       void queryClient.invalidateQueries({ queryKey: ["precamp-context", regId] });
+      void queryClient.invalidateQueries({ queryKey: ["prescriptions-context", regId] });
+
+      // If the caregiver declared any medication, the next thing that has to
+      // happen is putting it on the grid. Go straight there, where the declared
+      // names are waiting to be set up in one pass, rather than leaving the
+      // list captured and unused on the record.
+      const declared = [values.med1, values.med2, values.med3, values.med4].filter(
+        (m) => (m ?? "").trim() !== "",
+      );
+      if (declared.length > 0) {
+        navigate(`/registrations/${regId}/prescriptions`);
+        return;
+      }
       navigate(camperId ? `/campers/${camperId}?tab=medical` : "/campers");
     },
     onError: (e: Error & { response?: { status?: number } }) => {
